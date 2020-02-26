@@ -1,0 +1,20 @@
+input.c:1:4: error: « \303 » égaré dans le programme
+ Si ça c'est du C, moi je suis prof de manga.
+    ^
+input.c:1:5: error: « \247 » égaré dans le programme
+ Si ça c'est du C, moi je suis prof de manga.
+     ^
+input.c:1:1: error: nom de type « Si » inconnu
+ Si ça c'est du C, moi je suis prof de manga.
+ ^~
+input.c:1:8: error: expected « = », « , », « ; », « asm » or « __attribute__ » before « c »
+ Si ça c'est du C, moi je suis prof de manga.
+        ^
+input.c:1:9: warning: caractère ' de terminaison manquant
+ Si ça c'est du C, moi je suis prof de manga.
+         ^
+input.c:1:9: error: caractère de terminaison ' manquant
+ Si ça c'est du C, moi je suis prof de manga.
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+return code: 1

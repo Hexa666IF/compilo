@@ -222,4 +222,4 @@ for jobname in jobs:
         continue
 
     ## last but not least
-    print("TEST OK (its a all good man")
+    print("TEST OK (its a all good man)")
