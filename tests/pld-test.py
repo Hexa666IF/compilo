@@ -187,7 +187,7 @@ for jobname in jobs:
     
     if gccstatus != 0 and pldstatus != 0:
         ## padawan correctly rejects invalid program -> test-case ok
-        print("TEST OK")
+        print("TEST OK (both compilers fail to compile the program)")
         continue
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
@@ -222,4 +222,4 @@ for jobname in jobs:
         continue
 
     ## last but not least
-    print("TEST OK")
+    print("TEST OK (its a all good man")
