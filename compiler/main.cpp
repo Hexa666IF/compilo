@@ -13,6 +13,7 @@ using namespace antlr4;
 using namespace std;
 
 int main(int argn, const char **argv) {
+  int ret = 0;
   stringstream in;
   if (argn==2) {
      ifstream lecture(argv[1]);
@@ -27,11 +28,19 @@ int main(int argn, const char **argv) {
 //    std::cout << token->toString() << std::endl;
 //  }
 
+  if(lexer.getNumberOfSyntaxErrors() != 0)
+	return lexer.getNumberOfSyntaxErrors();
+
   ifccParser parser(&tokens);
   tree::ParseTree* tree = parser.axiom();
-
+  
+  if(parser.getNumberOfSyntaxErrors() != 0) 
+  {
+	cout << "Error during parsing operation... ! " << endl;
+	return parser.getNumberOfSyntaxErrors();
+  }
   Visitor visitor;
   visitor.visit(tree);
-
+  
   return 0;
 }
