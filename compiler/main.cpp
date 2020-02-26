@@ -29,7 +29,10 @@ int main(int argn, const char **argv) {
 //  }
 
   if(lexer.getNumberOfSyntaxErrors() != 0)
+  {
+	cout << "Error during lexer operation... ! " << endl;
 	return lexer.getNumberOfSyntaxErrors();
+  }
 
   ifccParser parser(&tokens);
   tree::ParseTree* tree = parser.axiom();
