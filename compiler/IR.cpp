@@ -74,5 +74,24 @@ void IRInstrSpecial::gen_asm(ostream &o) const
 
 // ============================= BasicBlock =================================
 
+// === Constructor / Destructor  ===
+
+BasicBlock::BasicBlock(CFG * c, string entry_label)
+: exit_true(nullptr), exit_false(nullptr), label(entry_label), cfg(c)
+{
+
+}
+
+void BasicBlock::gen_asm(ostream &o)
+{
+	// TODO: implement code generation for BasicBlock.
+	// for( IRInstr * instr : instrs )
+	// {
+	// 		instr->gen_asm(o);
+	// }
+	//
+	// Don't forget to handle exit_true and exit_false modification !
+}
+
 // ================================ CFG =====================================
 
