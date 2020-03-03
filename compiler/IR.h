@@ -209,8 +209,8 @@ class CFG {
 	void gen_asm_epilogue(std::ostream& o);
 
 	// symbol table methods
-	//void add_to_symbol_table(std::string name, Type t);
-	//std::string create_new_tempvar(Type t);
+	void add_to_symbol_table(std::string name); // , Type t);
+	std::string create_new_tempvar();  // Type t);
 	int get_var_index(std::string name);
 	//Type get_var_type(std::string name);
 

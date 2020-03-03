@@ -105,4 +105,28 @@ CFG::CFG(Ast * tree)
 
 // === public methods ===
 
+// = symbol table methods =
 
+void CFG::add_to_symbol_table(string name)
+{
+	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
+	SymbolIndex.insert(p);
+	++nextFreeSymbolIndex;
+}
+
+string CFG::create_new_tempvar()
+{
+	// TODO: is it what create_new_tempvar is supposed to do ?
+	string varName = "tmp" + to_string(nextFreeSymbolIndex);
+	pair<string, int> p = make_pair(varName, nextFreeSymbolIndex);
+	SymbolIndex.insert(p);
+	++nextFreeSymbolIndex;
+
+	return varName;
+}
+
+int CFG::get_var_index(string name)
+{
+	map<string, int>::iterator it = SymbolIndex.find(name);
+	return it->second;
+}
