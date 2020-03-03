@@ -95,3 +95,14 @@ void BasicBlock::gen_asm(ostream &o)
 
 // ================================ CFG =====================================
 
+// === Constructor / Destructor ===
+
+CFG::CFG(Ast * tree)
+: ast(tree), current_bb(nullptr)
+{
+	// TODO : complete the initialisation of other attributes !
+}
+
+// === public methods ===
+
+

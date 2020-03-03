@@ -10,7 +10,7 @@
 
 class BasicBlock;
 class CFG;
-class DefFonction;
+class Ast;
 
 
 // TODO : there was a Type.h and Type used in the code. What's this ?
@@ -190,15 +190,21 @@ class BasicBlock {
  */
 class CFG {
  public:
-	CFG(DefFonction* ast);
+	CFG(Ast* ast);
 
-	DefFonction* ast; /**< The AST this CFG comes from */
 	
 	void add_bb(BasicBlock* bb); 
 
 	// x86 code generation: could be encapsulated in a processor class in a retargetable compiler
+	// This method has not been declared const yet, because we aren't sure
+	// that this method won't modify some attributes of the CFG, for example
+	// the basicblocks pointers...
 	void gen_asm(std::ostream& o);
-	std::string IR_reg_to_asm(std::string reg); /**< helper method: inputs a IR reg or input variable, returns e.g. "-24(%rbp)" for the proper value of 24 */
+	
+	// Helper method : inputs a IR reg or input variable, and return
+	// e.g. "-24(%rbp)" for the proper value of 24 
+	std::string IR_reg_to_asm(std::string reg);
+	
 	void gen_asm_prologue(std::ostream& o);
 	void gen_asm_epilogue(std::ostream& o);
 
@@ -210,9 +216,12 @@ class CFG {
 
 	// basic block management
 	std::string new_BB_name();
-	BasicBlock* current_bb;
 
  protected:
+	
+	Ast* ast; /**< The AST this CFG comes from */
+	BasicBlock* current_bb;
+	
 	//std::map <std::string, Type> SymbolType; /**< part of the symbol table  */
 	std::map <std::string, int> SymbolIndex; /**< part of the symbol table  */
 	int nextFreeSymbolIndex; /**< to allocate new symbols in the symbol table */
