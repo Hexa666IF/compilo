@@ -18,7 +18,7 @@ IRInstr::IRInstr(BasicBlock * bb) : bb(bb)
 IRInstr2op::IRInstr2op(	BasicBlock * bb,
 						Operation2op op,
 						string a1,
-						string a2,
+						string a2
 					)
 : IRInstr(bb), operation(op), arg1(a1), arg2(a2)
 {
