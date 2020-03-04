@@ -82,6 +82,8 @@ BasicBlock::BasicBlock(CFG * c, string entry_label)
 
 }
 
+// === public methods ===
+
 void BasicBlock::gen_asm(ostream &o)
 {
 	// TODO: implement code generation for BasicBlock.
@@ -99,6 +101,11 @@ void BasicBlock::add_instr(IRInstr * instr)
 	// TODO : updates if the instruction is a conditionnal jump ?
 }
 
+string BasicBlock::getLabel() const
+{
+	return label;
+}
+
 // ================================ CFG =====================================
 
 // === Constructor / Destructor ===
@@ -110,6 +117,16 @@ CFG::CFG(Ast * tree)
 }
 
 // === public methods ===
+
+void CFG::add_bb(BasicBlock * bb)
+{
+	bbs.push_back(bb);
+	current_bb = bb;
+
+	// not sure about this increment, but seems like the right thing to do with
+	// it...
+	++nextBBnumber;	
+}
 
 void CFG::add_instr(IRInstr * instr)
 {
@@ -141,3 +158,9 @@ int CFG::get_var_index(string name)
 	map<string, int>::iterator it = SymbolIndex.find(name);
 	return it->second;
 }
+
+string CFG::new_BB_name() const
+{
+	return current_bb->getLabel();
+}
+

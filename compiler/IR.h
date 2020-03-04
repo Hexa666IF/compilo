@@ -168,6 +168,10 @@ class BasicBlock {
 
 		void add_instr(IRInstr * instr);
 		//void add_IRInstr(IRInstr::Operation op, Type t, vector<string> params);
+		
+		// Return the label of the basic block.
+		// TODO : check if the return of this method can be a const reference.
+		std::string getLabel() const;
 
 	protected:
 		BasicBlock* exit_true;  /**< pointer to the next basic block, true branch. If nullptr, return from procedure */ 
@@ -219,7 +223,8 @@ class CFG {
 	//Type get_var_type(std::string name);
 
 	// basic block management
-	std::string new_BB_name();
+	// TODO : check if the return of this method can be a const reference.
+	std::string new_BB_name() const;
 
  protected:
 	
