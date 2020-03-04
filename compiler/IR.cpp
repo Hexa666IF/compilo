@@ -93,6 +93,12 @@ void BasicBlock::gen_asm(ostream &o)
 	// Don't forget to handle exit_true and exit_false modification !
 }
 
+void BasicBlock::add_instr(IRInstr * instr)
+{
+	instrs.push_back(instr);
+	// TODO : updates if the instruction is a conditionnal jump ?
+}
+
 // ================================ CFG =====================================
 
 // === Constructor / Destructor ===
@@ -104,6 +110,11 @@ CFG::CFG(Ast * tree)
 }
 
 // === public methods ===
+
+void CFG::add_instr(IRInstr * instr)
+{
+	current_bb->add_instr(instr);
+}
 
 // = symbol table methods =
 

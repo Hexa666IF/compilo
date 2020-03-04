@@ -166,6 +166,7 @@ class BasicBlock {
 		BasicBlock(CFG* c, std::string entry_label);
 		void gen_asm(std::ostream &o); /**< x86 assembly code generation for this basic block (very simple) */
 
+		void add_instr(IRInstr * instr);
 		//void add_IRInstr(IRInstr::Operation op, Type t, vector<string> params);
 
 	protected:
@@ -194,6 +195,9 @@ class CFG {
 
 	
 	void add_bb(BasicBlock* bb); 
+
+	// Add the IRInstr to the current BasicBlock.
+	void add_instr(IRInstr * instr);
 
 	// x86 code generation: could be encapsulated in a processor class in a retargetable compiler
 	// This method has not been declared const yet, because we aren't sure
