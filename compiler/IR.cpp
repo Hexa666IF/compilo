@@ -13,6 +13,23 @@ IRInstr::IRInstr(BasicBlock * bb) : bb(bb)
 
 }
 
+// ====== IRInstr1op class related stuff ======
+
+IRInstr1op::IRInstr1op(	BasicBlock * bb,
+						Operation1op op,
+						string a
+					)
+: IRInstr(bb), operation(op), arg(a)
+{
+
+}
+
+void IRInstr1op::gen_asm(ostream &o) const
+{
+	// TODO: implement code generation for IRInstr1op
+	// o << "Ope" << " " << arg1 << endl;
+}
+
 // ====== IRInstr2op class related stuff ======
 
 IRInstr2op::IRInstr2op(	BasicBlock * bb,
@@ -28,7 +45,7 @@ IRInstr2op::IRInstr2op(	BasicBlock * bb,
 void IRInstr2op::gen_asm(ostream &o) const
 {
 	// TODO: implement code generation for IRInstr2op
-	// o << "Ope" << " " << arg1 << ", " << arg2 << ", " << endl;
+	// o << "Ope" << " " << arg1 << ", " << arg2 << endl;
 }
 
 // ====== IRInstr3op class related stuff ======
@@ -47,7 +64,7 @@ IRInstr3op::IRInstr3op(	BasicBlock * bb,
 void IRInstr3op::gen_asm(ostream &o) const
 {
 	// TODO: implement code generation for IRInstr3op
-	// o << "Ope" << " "  << arg1 << ", " << arg2 << ", " << arg3 << ", " << endl;
+	// o << "Ope" << " "  << arg1 << ", " << arg2 << ", " << arg3 << endl;
 }
 
 // ====== IRInstrSpecial class related stuff ======
@@ -133,6 +150,21 @@ void CFG::add_instr(IRInstr * instr)
 	current_bb->add_instr(instr);
 }
 
+void CFG::gen_asm_prologue(ostream& o)
+{
+	// TODO : use IRInstr1op instead of printing hardcoded assembly code ?
+	o << "pushq %rbp" << endl
+	  << "movq %rsp, rbp" << endl;
+
+	// TODO : allocate memory on the stack
+}
+
+void CFG::gen_asm_epilogue(ostream& o)
+{
+	// TODO : use IRInstr1op instead of printing hardcoded assembly code ?
+	o << "popq %rbp" << endl
+	  << "ret" << endl;
+}
 // = symbol table methods =
 
 void CFG::add_to_symbol_table(string name)

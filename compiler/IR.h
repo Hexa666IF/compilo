@@ -25,8 +25,7 @@ class Ast;
 // === IRInstr ===
 // 		Base class for IRInstr3op, IRInstr2op
 // 		and IRInstrSpecial.
-// 		Cannot be instanciated, because it would
-// 		be nonsense !
+// 		It is an instruction with 1 operand !
 
 class IRInstr {
  
@@ -41,6 +40,33 @@ class IRInstr {
  protected:
 	BasicBlock* bb; /**< The BB this instruction belongs to, which provides a pointer to the CFG this instruction belong to */
 	// Type t ?
+};
+
+class IRInstr1op : public IRInstr
+{
+	public:
+
+		typedef enum
+		{
+			push,
+			pop
+		} Operation1op;
+
+	// === Constructor / Destructor ===
+	
+		IRInstr1op(	BasicBlock * bb,
+					Operation1op op,
+					std::string a
+			  	);
+
+	// === Overriden method from IRInstr ===
+		
+		// Code generation.
+		void gen_asm(std::ostream &o) const = 0;
+
+	protected:
+		Operation1op operation;
+		std::string arg;
 };
 
 // === IRInstr2op ===
