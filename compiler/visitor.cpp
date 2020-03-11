@@ -5,7 +5,7 @@
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
-	int retval = stoi(ctx->CONST()->getText());
+	int retval = stoi(ctx->EXPR()->getText());
 	std::cout<<".globl	main\n"
 	"main: \n"
 	   "pushq %rbp\n"
