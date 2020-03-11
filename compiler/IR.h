@@ -33,6 +33,7 @@ class IRInstr {
 	
 	/**  constructor */
 	IRInstr(BasicBlock * bb);
+	virtual ~IRInstr();
 	
 	/** Actual code generation */
 	virtual void gen_asm(std::ostream &o) const = 0; /**< x86 assembly code generation for this IR instruction */
@@ -58,11 +59,12 @@ class IRInstr1op : public IRInstr
 					Operation1op op,
 					std::string a
 			  	);
+		virtual ~IRInstr1op();
 
 	// === Overriden method from IRInstr ===
 		
 		// Code generation.
-		void gen_asm(std::ostream &o) const = 0;
+		void gen_asm(std::ostream &o) const;
 
 	protected:
 		Operation1op operation;

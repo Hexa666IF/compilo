@@ -13,6 +13,12 @@ IRInstr::IRInstr(BasicBlock * bb) : bb(bb)
 
 }
 
+IRInstr::~IRInstr()
+{
+
+}
+
+
 // ====== IRInstr1op class related stuff ======
 
 IRInstr1op::IRInstr1op(	BasicBlock * bb,
@@ -24,10 +30,15 @@ IRInstr1op::IRInstr1op(	BasicBlock * bb,
 
 }
 
+IRInstr1op::~IRInstr1op()
+{
+
+}
+
 void IRInstr1op::gen_asm(ostream &o) const
 {
-	// TODO: implement code generation for IRInstr1op
-	// o << "Ope" << " " << arg1 << endl;
+	static const string instructions [] = {"pushq", "popq"};
+	o <<  instructions[operation] << " " << arg << endl;
 }
 
 // ====== IRInstr2op class related stuff ======
@@ -44,8 +55,8 @@ IRInstr2op::IRInstr2op(	BasicBlock * bb,
 
 void IRInstr2op::gen_asm(ostream &o) const
 {
-	// TODO: implement code generation for IRInstr2op
-	// o << "Ope" << " " << arg1 << ", " << arg2 << endl;
+	static const string instructions [] = { "copy", "ldconst", "rmem", "wmem"};
+	o << instructions[operation] << " " << arg1 << ", " << arg2 << endl;
 }
 
 // ====== IRInstr3op class related stuff ======
@@ -63,8 +74,9 @@ IRInstr3op::IRInstr3op(	BasicBlock * bb,
 
 void IRInstr3op::gen_asm(ostream &o) const
 {
-	// TODO: implement code generation for IRInstr3op
-	// o << "Ope" << " "  << arg1 << ", " << arg2 << ", " << arg3 << endl;
+	static const string instructions [] = { "add", "sub", "mul", "cmp_eq", "cmp_lt", "cmp_le"};
+	o << instructions[operation] << " "  << arg1 << ", " << arg2 << ", " << arg3 << endl;
+	// TODO : handle conditionnal jump ?
 }
 
 // ====== IRInstrSpecial class related stuff ======
@@ -80,13 +92,12 @@ IRInstrSpecial::IRInstrSpecial(	BasicBlock * bb,
 
 void IRInstrSpecial::gen_asm(ostream &o) const
 {
-	// TODO: implement code generation for IRInstrSpecial.
-	// o << "Ope";
-	// for ( string arg : args )
-	// {
-	// 		o << " " << arg;
-	// }
-	// o << endl;
+	o << "call";
+	for ( string arg : args )
+	{
+		o << ", " << arg;
+	}
+	o << endl;
 }
 
 // ============================= BasicBlock =================================
