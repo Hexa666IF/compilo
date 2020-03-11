@@ -114,7 +114,7 @@ BasicBlock::BasicBlock(CFG * c, string entry_label)
 
 void BasicBlock::gen_asm(ostream &o)
 {
-	o << ".global main" << endl
+	o << ".globl main" << endl
 		<< "main:" << endl;
 	for( IRInstr * instr : instrs )
 	{
