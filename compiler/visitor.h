@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 
+#include "IR.h"
 
 /**
  * This class provides an empty implementation of ifccVisitor, which can be
@@ -15,12 +16,15 @@
 class  Visitor : public ifccVisitor {
 public:
 
+  Visitor(BasicBlock * bb);
+
   virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
-
+protected:
+  BasicBlock * block;
 };
 
