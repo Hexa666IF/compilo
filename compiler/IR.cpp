@@ -55,7 +55,7 @@ IRInstr2op::IRInstr2op(	BasicBlock * bb,
 
 void IRInstr2op::gen_asm(ostream &o) const
 {
-	static const string instructions [] = { "copy", "ldconst", "rmem", "wmem"};
+	static const string instructions [] = { "copy", "ldconst", "rmem", "wmem", "movq", "movl"};
 	o << instructions[operation] << " " << arg1 << ", " << arg2 << endl;
 }
 
@@ -114,10 +114,14 @@ BasicBlock::BasicBlock(CFG * c, string entry_label)
 
 void BasicBlock::gen_asm(ostream &o)
 {
+	o << ".globl main" << endl
+		<< "main:" << endl;
 	for( IRInstr * instr : instrs )
 	{
 		instr->gen_asm(o);
 	}
+
+	o << "ret" << endl;
 	// Don't forget to handle exit_true and exit_false modification !
 }
 

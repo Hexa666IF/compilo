@@ -9,6 +9,8 @@
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
 
+#include "IR.h"
+
 using namespace antlr4;
 using namespace std;
 
@@ -42,8 +44,11 @@ int main(int argn, const char **argv) {
 	cout << "Error during parsing operation... ! " << endl;
 	return parser.getNumberOfSyntaxErrors();
   }
-  Visitor visitor;
+
+  BasicBlock * bb = new BasicBlock(nullptr, "main");
+  Visitor visitor(bb);
   visitor.visit(tree);
   
+  bb->gen_asm(cout);
   return 0;
 }

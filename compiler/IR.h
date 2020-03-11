@@ -83,7 +83,9 @@ class IRInstr2op : public IRInstr
 			copy,
 			ldconst,
 			rmem,
-			wmem
+			wmem,
+			movq,
+			movl
 		} Operation2op;
 
 	// === Constructors / Destructor ===
