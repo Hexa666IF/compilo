@@ -4,9 +4,9 @@ axiom : prog;
 
 prog : 'int' 'main' '(' ')' '{' L RETURN VAL ';' '}' ;
 
-L : VAR = VAL ; L | */epsilon*/ ;
+L : VAR '=' VAL ';' L | /*epsilon*/ ;
 
-VAR : int TEXT | TEXT ;
+VAR : 'int' TEXT | TEXT ;
 
 VAL : CONST | TEXT ;
 
