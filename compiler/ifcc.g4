@@ -8,12 +8,12 @@ l : var '=' val ';' l
   | /*epsilon*/ 
   ; 
 
-var : 'int' TEXT 
-    | TEXT 
+var : 'int' TEXT # decl
+    | TEXT # textVar
     ;
 
 val : CONST # const
-    | TEXT # text
+    | TEXT # textVal
     ;
 
 

@@ -14,7 +14,9 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
 	block->add_instr(IRInstr1op::push, "%rbp");
 	block->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
-
+	
+	visit(ctx->l());
+	
 	string retcode = visit(ctx->val());
 	
 	block->add_instr(IRInstr2op::movl, retcode, "%eax");
@@ -32,14 +34,42 @@ antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx){
 	return retval;
 }
 
-antlrcpp::Any Visitor::visitText(ifccParser::TextContext *ctx){
+antlrcpp::Any Visitor::visitTextVar(ifccParser::TextVarContext *ctx){
+	
+	
+	
+	
+	
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitTextVal(ifccParser::TextValContext *ctx){
+	
+	
+	
+	
+	
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitL(ifccParser::LContext *ctx){
+	
+	
+	visit(ctx->val());
+	
+	
+	visit(ctx->var());
+	
+	
+	visit(ctx->l());
+	
 	return 0;
 }
 
-antlrcpp::Any Visitor::visitVar(ifccParser::VarContext *ctx){
+antlrcpp::Any Visitor::visitDecl(ifccParser::DeclContext *ctx){
+	
+	
+	
+	
 	return 0;
 }

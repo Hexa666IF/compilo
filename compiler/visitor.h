@@ -25,12 +25,14 @@ public:
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
   
   virtual antlrcpp::Any visitL(ifccParser::LContext *ctx) override;
-  
-  virtual antlrcpp::Any visitVar(ifccParser::VarContext *ctx) override;
+
+  virtual antlrcpp::Any visitDecl(ifccParser::DeclContext *ctx) override;
   
   virtual antlrcpp::Any visitConst(ifccParser::ConstContext *ctx) override;
 
-  virtual antlrcpp::Any visitText(ifccParser::TextContext *ctx) override;
+  virtual antlrcpp::Any visitTextVal(ifccParser::TextValContext *ctx) override;
+
+  virtual antlrcpp::Any visitTextVar(ifccParser::TextVarContext *ctx) override;
 
 protected:
   BasicBlock * block;
