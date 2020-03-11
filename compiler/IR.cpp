@@ -167,8 +167,10 @@ string BasicBlock::getLabel() const
 // === Constructor / Destructor ===
 
 CFG::CFG(Ast * tree)
-: ast(tree), current_bb(nullptr)
+: ast(tree)
 {
+	current_bb = new BasicBlock(this, "main");
+	bbs.push_back(current_bb);
 	// TODO : complete the initialisation of other attributes !
 }
 
@@ -184,10 +186,33 @@ void CFG::add_bb(BasicBlock * bb)
 	++nextBBnumber;	
 }
 
-void CFG::add_instr(IRInstr * instr)
+void CFG::add_instr(IRInstr1op::Operation1op op, string arg)
 {
-	//current_bb->add_instr(instr);
-	//TODO : handle the differents add_instr...
+	current_bb->add_instr(op, arg);	
+}
+
+void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
+{
+	current_bb->add_instr(op, arg1, arg2);
+}
+
+void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
+{
+	current_bb->add_instr(op, arg1, arg2, arg3);
+}
+
+void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
+{
+	current_bb->add_instr(op, args);
+}
+
+
+void CFG::gen_asm(ostream& o)
+{
+	for(BasicBlock * b : bbs)
+	{
+		b->gen_asm(o);
+	}
 }
 
 void CFG::gen_asm_prologue(ostream& o)

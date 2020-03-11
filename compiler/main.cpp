@@ -45,10 +45,10 @@ int main(int argn, const char **argv) {
 	return parser.getNumberOfSyntaxErrors();
   }
 
-  BasicBlock * bb = new BasicBlock(nullptr, "main");
-  Visitor visitor(bb);
+  CFG * cfg = new CFG(nullptr);
+  Visitor visitor(cfg);
   visitor.visit(tree);
   
-  bb->gen_asm(cout);
+  cfg->gen_asm(cout);
   return 0;
 }

@@ -235,7 +235,11 @@ class CFG {
 	void add_bb(BasicBlock* bb); 
 
 	// Add the IRInstr to the current BasicBlock.
-	void add_instr(IRInstr * instr);
+	//void add_instr(IRInstr * instr);
+	void add_instr(IRInstr1op::Operation1op op, std::string arg);
+	void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
+	void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
+	void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
 
 	// x86 code generation: could be encapsulated in a processor class in a retargetable compiler
 	// This method has not been declared const yet, because we aren't sure
