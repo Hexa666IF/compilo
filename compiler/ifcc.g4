@@ -4,16 +4,23 @@ axiom : prog;
 
 prog : 'int' 'main' '(' ')' '{' l RETURN val ';' '}' ;
 
-l : var '=' val ';' l 
-  | /*epsilon*/ 
+l : decl ';' l # lDecl
+  | affect ';' l # lAffect
+  | /*epsilon*/ # lEpsilon
   ; 
 
-var : 'int' TEXT # decl
-    | TEXT # textVar
+decl : TEXT ',' decl # declMultiple
+     | TEXT # declSimple
+     ;
+
+affect : var '=' val ;
+
+var : 'int' TEXT # varDecl
+    | TEXT # varText
     ;
 
-val : CONST # const
-    | TEXT # textVal
+val : CONST # valConst
+    | TEXT # valText
     ;
 
 

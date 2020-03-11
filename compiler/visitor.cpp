@@ -15,7 +15,7 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 	block->add_instr(IRInstr1op::push, "%rbp");
 	block->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
 	
-	visit(ctx->l());
+	//visit(ctx->l());
 	
 	string retcode = visit(ctx->val());
 	
@@ -26,50 +26,55 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 	return 0;
 }
 
-antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx){
+antlrcpp::Any Visitor::visitLDecl(ifccParser::LDeclContext *ctx){
 	
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx){
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx){
+
 	string valeur = ctx->CONST()->getText();
-	string retval = "$"+valeur;
+	string retval = '$'+valeur;
 	
 	return retval;
 }
 
-antlrcpp::Any Visitor::visitTextVar(ifccParser::TextVarContext *ctx){
-	
-	
-	
-	
-	
-	return 0;
-}
+antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx){
 
-antlrcpp::Any Visitor::visitTextVal(ifccParser::TextValContext *ctx){
-	
-	
-	
-	
-	
-	return 0;
-}
-
-antlrcpp::Any Visitor::visitL(ifccParser::LContext *ctx){
-	
-	
-	visit(ctx->val());
-	
-	
-	visit(ctx->var());
-	
-	
-	visit(ctx->l());
-	
-	return 0;
-}
-
-antlrcpp::Any Visitor::visitDecl(ifccParser::DeclContext *ctx){
-	
-	
-	
-	
 	return 0;
 }
