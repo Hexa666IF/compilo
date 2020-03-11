@@ -7,6 +7,7 @@
 #include "antlr4-generated/ifccVisitor.h"
 
 #include "IR.h"
+#include <map>
 
 /**
  * This class provides an empty implementation of ifccVisitor, which can be
@@ -46,4 +47,6 @@ public:
 
 protected:
   BasicBlock *block;
+
+  std::map<std::string, int> symboles;
 };

@@ -4,7 +4,7 @@ axiom : prog;
 
 prog : 'int' 'main' '(' ')' '{' l RETURN val ';' '}' ;
 
-l : decl ';' l # lDecl
+l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
   | /*epsilon*/ # lEpsilon
   ; 
@@ -22,7 +22,6 @@ var : 'int' TEXT # varDecl
 val : CONST # valConst
     | TEXT # valText
     ;
-
 
 RETURN : 'return' ;
 CONST : [0-9]+ ;
