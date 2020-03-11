@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Visitor::Visitor(BasicBlock * bb) : ifccVisitor(), block(bb)
+Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
 {
 
 }
@@ -14,11 +14,11 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
 	int retval = stoi(ctx->CONST()->getText());
 
-	block->add_instr(IRInstr1op::push, "%rbp");
-	block->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
+	cfg->add_instr(IRInstr1op::push, "%rbp");
+	cfg->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
 	string retcode = "$" + to_string(retval);
-	block->add_instr(IRInstr2op::movl, retcode, "%eax");
-	block->add_instr(IRInstr1op::pop, "%rbp");
+	cfg->add_instr(IRInstr2op::movl, retcode, "%eax");
+	cfg->add_instr(IRInstr1op::pop, "%rbp");
 
 	return 0;
 }

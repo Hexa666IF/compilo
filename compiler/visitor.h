@@ -16,7 +16,7 @@
 class  Visitor : public ifccVisitor {
 public:
 
-  Visitor(BasicBlock * bb);
+  Visitor(CFG * c);
 
   virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override {
     return visitChildren(ctx);
@@ -25,6 +25,6 @@ public:
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
 protected:
-  BasicBlock * block;
+  CFG * cfg;
 };
 
