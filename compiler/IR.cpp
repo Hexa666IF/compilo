@@ -234,18 +234,19 @@ void CFG::gen_asm_epilogue(ostream& o)
 
 void CFG::add_to_symbol_table(string name)
 {
+	// TODO : handle multiple declaration errors.
 	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
 	SymbolIndex.insert(p);
-	++nextFreeSymbolIndex;
+	nextFreeSymbolIndex += 4;
 }
 
 string CFG::create_new_tempvar()
 {
-	// TODO: is it what create_new_tempvar is supposed to do ?
+	// TODO : correctly handle declaration of an existant variable name but in a sub-block...
 	string varName = "tmp" + to_string(nextFreeSymbolIndex);
 	pair<string, int> p = make_pair(varName, nextFreeSymbolIndex);
 	SymbolIndex.insert(p);
-	++nextFreeSymbolIndex;
+	nextFreeSymbolIndex += 4;
 
 	return varName;
 }
