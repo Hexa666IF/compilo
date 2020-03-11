@@ -2,13 +2,19 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' '{' L RETURN VAL ';' '}' ;
+prog : 'int' 'main' '(' ')' '{' l RETURN val ';' '}' ;
 
-L : VAR '=' VAL ';' L | /*epsilon*/ ;
+l : var '=' val ';' l 
+  | /*epsilon*/ 
+  ; 
 
-VAR : 'int' TEXT | TEXT ;
+var : 'int' TEXT 
+    | TEXT 
+    ;
 
-VAL : CONST | TEXT ;
+val : CONST # const
+    | TEXT # text
+    ;
 
 
 RETURN : 'return' ;
