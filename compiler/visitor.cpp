@@ -5,32 +5,31 @@
 #include <string>
 using namespace std;
 
+Visitor::Visitor(BasicBlock * bb) : ifccVisitor(), block(bb)
+{
+
+}
+
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
-	
-	std::cout<<".globl	main\n"
-	"main: \n"
-	"pushq %rbp\n"
-	"movq %rsp, %rbp\n";
-	
-	visit(ctx->l());
-	
-	std::cout<<"movl ";
 
-	visit(ctx->val());
+	block->add_instr(IRInstr1op::push, "%rbp");
+	block->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
 
-	std::cout<<", %eax\n"
-	"popq %rbp\n"
-	"ret\n";
+	string retcode = visit(ctx->val());
 	
+	block->add_instr(IRInstr2op::movl, retcode, "%eax");
+
+	block->add_instr(IRInstr1op::pop, "%rbp");
+
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx){
 	
-	int retval = stoi(ctx->CONST()->getText());
-	std::cout<<"$"<<retval;
+	string valeur = ctx->CONST()->getText();
+	string retval = "$"+valeur;
 	
-	return 0;
+	return retval;
 }
 
 antlrcpp::Any Visitor::visitText(ifccParser::TextContext *ctx){
