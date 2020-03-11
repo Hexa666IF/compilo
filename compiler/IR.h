@@ -194,7 +194,11 @@ class BasicBlock {
 		BasicBlock(CFG* c, std::string entry_label);
 		void gen_asm(std::ostream &o); /**< x86 assembly code generation for this basic block (very simple) */
 
-		void add_instr(IRInstr * instr);
+		//void add_instr(IRInstr * instr);
+		void add_instr(IRInstr1op::Operation1op op, std::string arg);
+		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
+		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
+		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
 		//void add_IRInstr(IRInstr::Operation op, Type t, vector<string> params);
 		
 		// Return the label of the basic block.

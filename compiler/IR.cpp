@@ -121,10 +121,36 @@ void BasicBlock::gen_asm(ostream &o)
 	// Don't forget to handle exit_true and exit_false modification !
 }
 
+/*
 void BasicBlock::add_instr(IRInstr * instr)
 {
 	instrs.push_back(instr);
 	// TODO : updates if the instruction is a conditionnal jump ?
+}
+*/
+
+void BasicBlock::add_instr(IRInstr1op::Operation1op op, string arg)
+{
+	IRInstr1op * instr = new IRInstr1op(this, op, arg);
+	instrs.push_back(instr);
+}
+
+void BasicBlock::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
+{
+	IRInstr2op * instr = new IRInstr2op(this, op, arg1, arg2);
+	instrs.push_back(instr);
+}
+
+void BasicBlock::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
+{
+	IRInstr3op * instr = new IRInstr3op(this, op, arg1, arg2, arg3);
+	instrs.push_back(instr);
+}
+
+void BasicBlock::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
+{
+	IRInstrSpecial * instr = new IRInstrSpecial(this, op, args);
+	instrs.push_back(instr); 
 }
 
 string BasicBlock::getLabel() const
@@ -156,7 +182,8 @@ void CFG::add_bb(BasicBlock * bb)
 
 void CFG::add_instr(IRInstr * instr)
 {
-	current_bb->add_instr(instr);
+	//current_bb->add_instr(instr);
+	//TODO : handle the differents add_instr...
 }
 
 void CFG::gen_asm_prologue(ostream& o)
