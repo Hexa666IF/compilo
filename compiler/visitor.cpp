@@ -14,8 +14,6 @@ Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
-	cout << "coucou";
-
 	cfg->add_instr(IRInstr1op::push, "%rbp");
 	cfg->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
 	
@@ -116,5 +114,7 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx){
 
 	cfg->add_instr(IRInstr2op::movl, valText, "%eax");
 
-	return "%eax";
+	string retval = "%eax";
+
+	return retval;
 }
