@@ -20,26 +20,28 @@ IRInstr::~IRInstr()
 
 
 // ====== IRInstr1op class related stuff ======
+// This class is not used anymore !
 
-IRInstr1op::IRInstr1op(	BasicBlock * bb,
-						Operation1op op,
-						string a
-					)
-: IRInstr(bb), operation(op), arg(a)
-{
-
-}
-
-IRInstr1op::~IRInstr1op()
-{
-
-}
-
-void IRInstr1op::gen_asm(ostream &o) const
-{
-	static const string instructions [] = {"pushq", "popq"};
-	o <<  instructions[operation] << " " << arg << endl;
-}
+// IRInstr1op::IRInstr1op(	BasicBlock * bb,
+// 						Operation1op op,
+// 						string a
+// 					)
+// : IRInstr(bb), operation(op), arg(a)
+// {
+//
+// }
+//
+// IRInstr1op::~IRInstr1op()
+// {
+//
+// }
+//
+// void IRInstr1op::gen_asm(ostream &o) const
+// {
+// 	static const string instructions [] = {"pushq", "popq"};
+// 	o <<  instructions[operation] << " " << arg << endl;
+// }
+//
 
 // ====== IRInstr2op class related stuff ======
 

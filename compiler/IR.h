@@ -43,33 +43,38 @@ class IRInstr {
 	// Type t ?
 };
 
-class IRInstr1op : public IRInstr
-{
-	public:
-
-		typedef enum
-		{
-			push,
-			pop
-		} Operation1op;
-
-	// === Constructor / Destructor ===
-	
-		IRInstr1op(	BasicBlock * bb,
-					Operation1op op,
-					std::string a
-			  	);
-		virtual ~IRInstr1op();
-
-	// === Overriden method from IRInstr ===
-		
-		// Code generation.
-		void gen_asm(std::ostream &o) const;
-
-	protected:
-		Operation1op operation;
-		std::string arg;
-};
+/*
+ * This class is useless for now.
+ *
+ * class IRInstr1op : public IRInstr
+ * {
+ * 	public:
+ * 
+ * 		typedef enum
+ * 		{
+ * 			push,
+ * 			pop
+ * 		} Operation1op;
+ * 
+ * 	// === Constructor / Destructor ===
+ * 	
+ * 		IRInstr1op(	BasicBlock * bb,
+ * 					Operation1op op,
+ * 					std::string a
+ * 			  	);
+ * 		virtual ~IRInstr1op();
+ * 
+ * 	// === Overriden method from IRInstr ===
+ * 		
+ * 		// Code generation.
+ * 		void gen_asm(std::ostream &o) const;
+ * 
+ * 	protected:
+ * 		Operation1op operation;
+ * 		std::string arg;
+ * };
+ *
+ */
 
 // === IRInstr2op ===
 // 		2 operands instructions.
@@ -84,8 +89,6 @@ class IRInstr2op : public IRInstr
 			ldconst,
 			rmem,
 			wmem,
-			movq,
-			movl
 		} Operation2op;
 
 	// === Constructors / Destructor ===
