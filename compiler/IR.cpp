@@ -171,7 +171,11 @@ CFG::CFG(Ast * tree)
 {
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
-	// TODO : complete the initialisation of other attributes !
+	
+	nextFreeSymbolIndex = -4;
+	// TODO: check that nextBBnumber is correctly initialised.
+	nextBBnumber = 0;
+
 }
 
 // === public methods ===
@@ -184,6 +188,9 @@ void CFG::add_bb(BasicBlock * bb)
 	// not sure about this increment, but seems like the right thing to do with
 	// it...
 	++nextBBnumber;	
+	nextFreeSymbolIndex = -4;
+
+	// TODO: handle if-blocks. (differents paths, same %rbp).
 }
 
 void CFG::add_instr(IRInstr1op::Operation1op op, string arg)
@@ -237,7 +244,7 @@ void CFG::add_to_symbol_table(string name)
 	// TODO : handle multiple declaration errors.
 	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
 	SymbolIndex.insert(p);
-	nextFreeSymbolIndex += 4;
+	nextFreeSymbolIndex -= 4;
 }
 
 string CFG::create_new_tempvar()
@@ -246,7 +253,7 @@ string CFG::create_new_tempvar()
 	string varName = "tmp" + to_string(nextFreeSymbolIndex);
 	pair<string, int> p = make_pair(varName, nextFreeSymbolIndex);
 	SymbolIndex.insert(p);
-	nextFreeSymbolIndex += 4;
+	nextFreeSymbolIndex -= 4;
 
 	return varName;
 }
