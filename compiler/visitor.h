@@ -16,10 +16,9 @@
 class Visitor : public ifccVisitor
 {
 public:
-  Visitor(BasicBlock *bb);
+    Visitor(CFG * c);
 
-  virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override
-  {
+  virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -46,7 +45,5 @@ public:
   virtual antlrcpp::Any visitValText(ifccParser::ValTextContext *ctx) override;
 
 protected:
-  BasicBlock *block;
-
-  std::map<std::string, int> symboles;
+  CFG * cfg;
 };

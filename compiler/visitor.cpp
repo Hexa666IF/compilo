@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Visitor::Visitor(BasicBlock * bb) : ifccVisitor(), block(bb)
+Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
 {
 
 }
@@ -16,19 +16,18 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
 	cout << "coucou";
 
-	block->add_instr(IRInstr1op::push, "%rbp");
-	block->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
+	cfg->add_instr(IRInstr1op::push, "%rbp");
+	cfg->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
 	
 	visit(ctx->l());
 	
 	string retcode = visit(ctx->val());
 	
 	if(retcode[0] == '$'){
-		block->add_instr(IRInstr2op::movl, retcode, "%eax");
+		cfg->add_instr(IRInstr2op::movl, retcode, "%eax");
 	}
 
-	block->add_instr(IRInstr1op::pop, "%rbp");
-
+	cfg->add_instr(IRInstr1op::pop, "%rbp");
 	return 0;
 }
 
@@ -54,12 +53,10 @@ antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx){
 
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx){
 
-	//Ajout du symbole dans la table
-	string symbole = ctx->TEXT()->getText();
-	int offset = (symboles.size()+1)*(-4);
+	// Add symbol name to symbol table.
+	string symbol = ctx->TEXT()->getText();
 
-	symboles.insert(pair<string, int>(symbole, offset));
-
+	cfg->add_to_symbol_table(symbol);
 	visit(ctx->decl());
 
 	return 0;
@@ -67,12 +64,9 @@ antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx){
 
 antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx){
 
-	//Ajout du symbole dans la table
-	string symbole = ctx->TEXT()->getText();
-	int offset = (symboles.size()+1)*(-4);
-
-	symboles.insert(pair<string, int>(symbole, offset));
-
+	// Add symbol name to symbol table.
+	string symbol = ctx->TEXT()->getText();
+	cfg->add_to_symbol_table(symbol);
 	return 0;
 }
 
@@ -81,27 +75,25 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx){
 	string val = visit(ctx->val());
 	string var = visit(ctx->var());
 
-	block->add_instr(IRInstr2op::movl, val, var);
+	cfg->add_instr(IRInstr2op::movl, val, var);
 
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx){
 
-	//Ajout du symbole dans la table
-	string symbole = ctx->TEXT()->getText();
-	int offset = (symboles.size()+1)*(-4);
-
-	symboles.insert(pair<string, int>(symbole, offset));
-
+	// Add symbol name to symbol table.
+	string symbol = ctx->TEXT()->getText();
+	cfg->add_to_symbol_table(symbol);
+	int offset = cfg->get_var_index(symbol);
 	return to_string(offset) + "(%rbp)";
 }
 
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx){
 
-	//Recherche de l'offset dans la table des symboles
-	string symbole = ctx->TEXT()->getText();
-	int offset = symboles.find(symbole) -> second;
+	// Search for symbol index into symbol table.
+	string symbol = ctx->TEXT()->getText();
+	int offset = cfg->get_var_index(symbol);
 
 	return to_string(offset) + "(%rbp)";
 }
@@ -116,13 +108,13 @@ antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx){
 
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx){
 
-	//Recherche de l'offset dans la table des symboles
-	string symbole = ctx->TEXT()->getText();
-	int offset = symboles.find(symbole) -> second;
+	// Search for symbol index into symbol table.
+	string symbol = ctx->TEXT()->getText();
+	int offset = cfg->get_var_index(symbol);
 
 	string valText = to_string(offset) + "(%rbp)";
 
-	block->add_instr(IRInstr2op::movl, valText, "%eax");
+	cfg->add_instr(IRInstr2op::movl, valText, "%eax");
 
 	return "%eax";
 }
