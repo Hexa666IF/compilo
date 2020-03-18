@@ -2,11 +2,19 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' '{' RETURN EXPR ';' '}' ;
+prog : 'int' 'main' '(' ')' '{' RETURN expr ';' '}' ;
 
-EXPR : TERM '+' EXPR | TERM '-' EXPR | TERM;
-TERM : F '*' TERM | F '/' TERM | F;
-F : CONST | '(' EXPR ')';
+expr : term '+' expr # add
+    | term '-' expr # moins
+    | term # expr_single
+    ;
+term : f '*' term # mult
+    | f '/' term # div
+    | f # f_single
+    ;
+f : CONST # const
+    | '(' expr ')' # par
+    ;
 
 RETURN : 'return' ;
 CONST : [0-9]+ ;

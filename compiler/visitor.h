@@ -21,6 +21,35 @@ public:
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
+  // virtual antlrcpp::Any visitExpr(ifccParser::ExprContext *ctx) override {
+  //   ctx->getCONST()->getText();
+  //   visitChildren(ctx);
+  //   return 0;
+  // }
+
+  // virtual antlrcpp::Any visitTerm(eifccParser::TermContext *ctx) override {
+  //   return 0;
+  // }
+
+  // virtual antlrcpp::Any visitF(ifccParser::FContext *ctx) override {
+  //   return 0;
+  // }
+
+  virtual antlrcpp::Any visitAdd(ifccParser::AddContext *context) override;
+
+  virtual antlrcpp::Any visitMoins(ifccParser::MoinsContext *context) override;
+
+  virtual antlrcpp::Any visitExpr_single(ifccParser::Expr_singleContext *context) override;
+
+  virtual antlrcpp::Any visitMult(ifccParser::MultContext *context) override;
+
+  virtual antlrcpp::Any visitDiv(ifccParser::DivContext *context) override;
+
+  virtual antlrcpp::Any visitF_single(ifccParser::F_singleContext *context) override;
+
+  virtual antlrcpp::Any visitConst(ifccParser::ConstContext *context) override;
+
+  virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
 };
 
