@@ -34,7 +34,7 @@ void Asm::ldconst(string arg1, string arg2)
 	arg1 = cfg->IR_reg_to_asm(arg1);
 	arg2 = cfg->IR_reg_to_asm(arg2);
 
-	output << "movl " << arg1 << ", " << arg2 << endl;	
+	output << "movq " << arg1 << ", " << arg2 << endl;	
 }
 
 void Asm::globl(string name)
