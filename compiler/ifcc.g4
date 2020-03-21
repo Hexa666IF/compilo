@@ -2,10 +2,11 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' '{' l RETURN val ';' '}' ;
+prog : 'int' 'main' '(' ')' '{' l '}' ;
 
 l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
+  | RETURN val ';' # return
   | /*epsilon*/ # lEpsilon
   ; 
 
