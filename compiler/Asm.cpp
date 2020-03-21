@@ -36,6 +36,13 @@ void Asm::ldconst(string arg1, string arg2)
 
 	output << "movl " << arg1 << ", " << arg2 << endl;	
 }
+
+void Asm::globl(string name)
+{
+	output << ".globl " << name << endl
+		   << name << ":" << endl;
+}
+
 //------------- Constructor / Destructors ------------------------------------------------
 
 Asm::Asm(CFG * graph, ostream &out) : cfg(graph), output(out)

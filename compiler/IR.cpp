@@ -239,6 +239,8 @@ void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
 
 void CFG::gen_asm()
 {
+	// TODO : do not use hardcoded string for globl() call.
+	toasm.globl("main");
 	toasm.gen_prologue(SymbolIndex.size()*4);
 	for(BasicBlock * b : bbs)
 	{

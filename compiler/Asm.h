@@ -23,6 +23,10 @@ class Asm
 		void gen_epilogue();
 
 		void ldconst(std::string arg1, std::string arg2);
+	
+		// TODO : check if the globl exist in ARM and MSP430 ABI.
+		void globl(std::string name);
+
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
 		Asm(CFG * graph, std::ostream &out);
