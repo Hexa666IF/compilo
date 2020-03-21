@@ -28,6 +28,8 @@ public:
 
   virtual antlrcpp::Any visitLAffect(ifccParser::LAffectContext *ctx) override;
 
+  virtual antlrcpp::Any visitReturn(ifccParser::ReturnContext *context) override;
+
   virtual antlrcpp::Any visitLEpsilon(ifccParser::LEpsilonContext *ctx) override;
 
   virtual antlrcpp::Any visitDeclMultiple(ifccParser::DeclMultipleContext *ctx) override;

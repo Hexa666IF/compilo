@@ -14,18 +14,7 @@ Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx){
 
-	// cfg->add_instr(IRInstr1op::push, "%rbp");
-	// cfg->add_instr(IRInstr2op::movq, "%rsp", "%rbp");
-	
 	visit(ctx->l());
-	
-	string retcode = visit(ctx->val());
-	
-	// if(retcode[0] == '$'){
-	// 	cfg->add_instr(IRInstr2op::movl, retcode, "%eax");
-	// }
-
-	// cfg->add_instr(IRInstr1op::pop, "%rbp");
 	return 0;
 }
 
@@ -41,6 +30,14 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx){
 
 	visit(ctx->affect());
 	visit(ctx->l());
+
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
+{
+	string retval = visit(ctx->val());
+	cfg->add_instr(IRInstr2op::ldconst, retval, "%retval");
 
 	return 0;
 }
