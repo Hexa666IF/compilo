@@ -49,6 +49,6 @@ int main(int argn, const char **argv) {
   Visitor visitor(cfg);
   visitor.visit(tree);
   
-  cfg->gen_asm(cout);
+  cfg->gen_asm();
   return 0;
 }
