@@ -6,6 +6,8 @@
 #include <iostream>
 #include <initializer_list>
 #include <map>
+
+#include "Asm.h"
 // Declarations from the parser -- replace with your own
 
 class BasicBlock;
@@ -13,7 +15,6 @@ class CFG;
 class Ast;
 
 
-// TODO : there was a Type.h and Type used in the code. What's this ?
 
 /*
  * IRInstr classes :
@@ -25,7 +26,6 @@ class Ast;
 // === IRInstr ===
 // 		Base class for IRInstr3op, IRInstr2op
 // 		and IRInstrSpecial.
-// 		It is an instruction with 1 operand !
 
 class IRInstr {
  
@@ -36,40 +36,45 @@ class IRInstr {
 	virtual ~IRInstr();
 	
 	/** Actual code generation */
-	virtual void gen_asm(std::ostream &o) const = 0; /**< x86 assembly code generation for this IR instruction */
+	virtual void gen_asm(Asm &toasm) const = 0; /**< x86 assembly code generation for this IR instruction */
 	
  protected:
 	BasicBlock* bb; /**< The BB this instruction belongs to, which provides a pointer to the CFG this instruction belong to */
 	// Type t ?
 };
 
-class IRInstr1op : public IRInstr
-{
-	public:
-
-		typedef enum
-		{
-			push,
-			pop
-		} Operation1op;
-
-	// === Constructor / Destructor ===
-	
-		IRInstr1op(	BasicBlock * bb,
-					Operation1op op,
-					std::string a
-			  	);
-		virtual ~IRInstr1op();
-
-	// === Overriden method from IRInstr ===
-		
-		// Code generation.
-		void gen_asm(std::ostream &o) const;
-
-	protected:
-		Operation1op operation;
-		std::string arg;
-};
+/*
+ * This class is useless for now.
+ *
+ * class IRInstr1op : public IRInstr
+ * {
+ * 	public:
+ * 
+ * 		typedef enum
+ * 		{
+ * 			push,
+ * 			pop
+ * 		} Operation1op;
+ * 
+ * 	// === Constructor / Destructor ===
+ * 	
+ * 		IRInstr1op(	BasicBlock * bb,
+ * 					Operation1op op,
+ * 					std::string a
+ * 			  	);
+ * 		virtual ~IRInstr1op();
+ * 
+ * 	// === Overriden method from IRInstr ===
+ * 		
+ * 		// Code generation.
+ * 		void gen_asm(std::ostream &o) const;
+ * 
+ * 	protected:
+ * 		Operation1op operation;
+ * 		std::string arg;
+ * };
+ *
+ */
 
 // === IRInstr2op ===
 // 		2 operands instructions.
@@ -84,8 +89,6 @@ class IRInstr2op : public IRInstr
 			ldconst,
 			rmem,
 			wmem,
-			movq,
-			movl
 		} Operation2op;
 
 	// === Constructors / Destructor ===
@@ -98,7 +101,7 @@ class IRInstr2op : public IRInstr
 	// === Overriden methods ===
 	
 		// code generation inherited from IRInstr.
-		void gen_asm(std::ostream &o) const;
+		void gen_asm(Asm &toasm) const;
 	
 	protected:
 		Operation2op operation;
@@ -136,7 +139,7 @@ class IRInstr3op : public IRInstr
 	// === Overriden methods ===
 
 		// Code generation inherited from IRInstr.
-		void gen_asm(std::ostream &o) const;
+		void gen_asm(Asm &toasm) const;
 
 	protected:
 		Operation3op operation;
@@ -168,7 +171,7 @@ class IRInstrSpecial : public IRInstr
 	// === Overriden methods ===
 	
 		// Code generation inherited from IRInstr.
-		void gen_asm(std::ostream &o) const;
+		void gen_asm(Asm &toasm) const;
 	
 	protected:
 		OperationSpe operation;
@@ -194,10 +197,10 @@ class BasicBlock {
 
  	public:
 		BasicBlock(CFG* c, std::string entry_label);
-		void gen_asm(std::ostream &o); /**< x86 assembly code generation for this basic block (very simple) */
+		void gen_asm(Asm &toasm); /**< x86 assembly code generation for this basic block (very simple) */
 
-		//void add_instr(IRInstr * instr);
-		void add_instr(IRInstr1op::Operation1op op, std::string arg);
+		// void add_instr(IRInstr * instr);
+		// void add_instr(IRInstr1op::Operation1op op, std::string arg);
 		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
@@ -235,8 +238,8 @@ class CFG {
 	void add_bb(BasicBlock* bb); 
 
 	// Add the IRInstr to the current BasicBlock.
-	//void add_instr(IRInstr * instr);
-	void add_instr(IRInstr1op::Operation1op op, std::string arg);
+	// void add_instr(IRInstr * instr);
+	// void add_instr(IRInstr1op::Operation1op op, std::string arg);
 	void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 	void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 	void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
@@ -245,25 +248,23 @@ class CFG {
 	// This method has not been declared const yet, because we aren't sure
 	// that this method won't modify some attributes of the CFG, for example
 	// the basicblocks pointers...
-	void gen_asm(std::ostream& o);
+	void gen_asm();
 	
 	// Helper method : inputs a IR reg or input variable, and return
 	// e.g. "-24(%rbp)" for the proper value of 24 
 	std::string IR_reg_to_asm(std::string reg);
 	
-	void gen_asm_prologue(std::ostream& o);
-	void gen_asm_epilogue(std::ostream& o);
-
 	// symbol table methods
 	void add_to_symbol_table(std::string name); // , Type t);
 	std::string create_new_tempvar();  // Type t);
 	int get_var_index(std::string name);
+
 	//Type get_var_type(std::string name);
 
 	// basic block management
 	// TODO : check if the return of this method can be a const reference.
 	std::string new_BB_name() const;
-
+	
  protected:
 	
 	Ast* ast; /**< The AST this CFG comes from */
@@ -275,6 +276,7 @@ class CFG {
 	int nextBBnumber; /**< just for naming */
 	
 	std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
+	Asm toasm; // asm converter.
 };
 
 
