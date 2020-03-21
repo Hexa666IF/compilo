@@ -30,20 +30,11 @@ void Asm::gen_epilogue()
 void Asm::ldconst(string arg1, string arg2)
 // TODO: refactoring...
 {
-	int index1 = cfg->get_var_index(arg1);
-	int index2 = cfg->get_var_index(arg2);
+	// Getting x86 assembly code to access variables.
+	arg1 = cfg->IR_reg_to_asm(arg1);
+	arg2 = cfg->IR_reg_to_asm(arg2);
 
-	if(index1 != 0)
-			arg1 = to_string( - index1 ) + "(%rbp)";
-	else
-			arg1 = "$" + arg1;
-	
-	if(index2 != 0)
-			arg2 = to_string( - index2 ) + "(%rbp)";
-	else
-			arg2 = "$" + arg2;
-
-	cout << "movl " << arg1 << ", " << arg2 << endl;	
+	output << "movl " << arg1 << ", " << arg2 << endl;	
 }
 //------------- Constructor / Destructors ------------------------------------------------
 
