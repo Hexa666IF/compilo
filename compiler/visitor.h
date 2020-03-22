@@ -6,8 +6,10 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 
-#include "IR.h"
 #include <map>
+
+#include "IR.h"
+#include "Ast.h"
 
 /**
  * This class provides an empty implementation of ifccVisitor, which can be
@@ -24,6 +26,7 @@ public:
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
+   
   virtual antlrcpp::Any visitLDecl(ifccParser::LDeclContext *ctx) override;
 
   virtual antlrcpp::Any visitLAffect(ifccParser::LAffectContext *ctx) override;
@@ -46,6 +49,42 @@ public:
 
   virtual antlrcpp::Any visitValText(ifccParser::ValTextContext *ctx) override;
 
+// === Expression computation related methods ===
+
+  // virtual antlrcpp::Any visitExpr(ifccParser::ExprContext *ctx) override {
+  //   ctx->getCONST()->getText();
+  //   visitChildren(ctx);
+  //   return 0;
+  // }
+
+  // virtual antlrcpp::Any visitTerm(eifccParser::TermContext *ctx) override {
+  //   return 0;
+  // }
+
+  // virtual antlrcpp::Any visitF(ifccParser::FContext *ctx) override {
+  //   return 0;
+  // }
+
+  virtual antlrcpp::Any visitAdd(ifccParser::AddContext *context) override;
+
+  virtual antlrcpp::Any visitSub(ifccParser::SubContext *context) override;
+
+  virtual antlrcpp::Any visitExpr_single(ifccParser::Expr_singleContext *context) override;
+
+  virtual antlrcpp::Any visitMult(ifccParser::MultContext *context) override;
+
+  virtual antlrcpp::Any visitDiv(ifccParser::DivContext *context) override;
+
+  virtual antlrcpp::Any visitF_single(ifccParser::F_singleContext *context) override;
+
+  virtual antlrcpp::Any visitConst(ifccParser::ConstContext *context) override;
+
+  virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
+
+
 protected:
   CFG * cfg;
+  
+  // AST used for computations.
+  Ast * ast;
 };

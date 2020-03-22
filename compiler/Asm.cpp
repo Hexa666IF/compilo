@@ -28,13 +28,42 @@ void Asm::gen_epilogue()
 
 
 void Asm::ldconst(string arg1, string arg2)
-// TODO: refactoring...
 {
 	// Getting x86 assembly code to access variables.
 	arg1 = cfg->IR_reg_to_asm(arg1);
 	arg2 = cfg->IR_reg_to_asm(arg2);
 
 	output << "movq " << arg1 << ", " << arg2 << endl;	
+}
+
+void Asm::add(string arg1, string arg2, string arg3)
+{
+	arg1 = cfg->IR_reg_to_asm(arg1);	
+	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg3 = cfg->IR_reg_to_asm(arg3);
+	
+	output << "movq " << arg1 << ", " << arg3 << endl
+		   << "addq " << arg2 << ", " << arg3 << endl;
+}
+
+void Asm::sub(string arg1, string arg2, string arg3)
+{
+	arg1 = cfg->IR_reg_to_asm(arg1);	
+	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg3 = cfg->IR_reg_to_asm(arg3);
+	
+	output << "movq " << arg1 << ", " << arg3 << endl
+		   << "subq " << arg2 << ", " << arg3 << endl;
+}
+
+void Asm::mul(string arg1, string arg2, string arg3)
+{
+	arg1 = cfg->IR_reg_to_asm(arg1);	
+	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg3 = cfg->IR_reg_to_asm(arg3);
+
+	output << "movq " << arg1 << ", " << arg3 << endl
+		   << "mul " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::globl(string name)

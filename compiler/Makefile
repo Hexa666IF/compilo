@@ -17,12 +17,13 @@ ifcc: dirs antlr  main.cpp visitor.cpp visitor.h IR.cpp IR.h
 	$(CC) $(CCARGS) main.cpp  -o $(OUTPUT)/main.o 
 	$(CC) $(CCARGS) IR.cpp -o $(OUTPUT)/IR.o
 	$(CC) $(CCARGS) Asm.cpp -o $(OUTPUT)/Asm.o
+	$(CC) $(CCARGS) Ast.cpp -o $(OUTPUT)/Ast.o
 	$(CC) $(CCARGS) $(GENERATED)/ifccBaseVisitor.cpp -o $(OUTPUT)/ifccBaseVisitor.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccLexer.cpp -o $(OUTPUT)/ifccLexer.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccVisitor.cpp -o $(OUTPUT)/ifccVisitor.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccParser.cpp -o $(OUTPUT)/ifccParser.o 
 	$(CC) $(CCARGS) visitor.cpp -o $(OUTPUT)/visitor.o 
-	$(CC) $(LDARGS) $(OUTPUT)/main.o $(OUTPUT)/IR.o $(OUTPUT)/Asm.o $(OUTPUT)/ifccBaseVisitor.o $(OUTPUT)/ifccLexer.o $(OUTPUT)/ifccVisitor.o $(OUTPUT)/ifccParser.o $(OUTPUT)/visitor.o $(ANTLR4_LIBDIR)/libantlr4-runtime.a -o ifcc
+	$(CC) $(LDARGS) $(OUTPUT)/main.o $(OUTPUT)/IR.o $(OUTPUT)/Asm.o $(OUTPUT)/Ast.o $(OUTPUT)/ifccBaseVisitor.o $(OUTPUT)/ifccLexer.o $(OUTPUT)/ifccVisitor.o $(OUTPUT)/ifccParser.o $(OUTPUT)/visitor.o $(ANTLR4_LIBDIR)/libantlr4-runtime.a -o ifcc
 
 antlr: $(GRAMMAR)
 	$(ANTLR4_BINDIR)/antlr4 -visitor -no-listener -Dlanguage=Cpp -o $(GENERATED) $(GRAMMAR)

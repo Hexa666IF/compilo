@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
+Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c), ast(nullptr)
 {
 
 }
@@ -68,9 +68,16 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
-	string val = visit(ctx->val());
-	string var = visit(ctx->var());
-	cfg->add_instr(IRInstr2op::ldconst, val, var);
+	string var = visit(ctx->var());	
+
+	ast = new Ast(cfg);
+	
+	node_s * root = visit(ctx->expr());
+	ast->set_root(root);
+	ast->gen_instr();
+	cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
+	delete(ast);
+	ast = nullptr;
 
 	return 0;
 }
@@ -85,24 +92,76 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
-	// Search for symbol index into symbol table.
 	string symbol = ctx->TEXT()->getText();
 	return symbol;
 }
 
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
-	string valeur = ctx->CONST()->getText();
-	return valeur;
+	string val = ctx->CONST()->getText();
+	
+	return val;
 }
 
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
-	// Search for symbol index into symbol table.	
-	string retval = "%retval";
 	string symbol = ctx->TEXT()->getText();
-	int offset = cfg->get_var_index(symbol);
-	cfg->add_instr(IRInstr2op::ldconst, symbol, retval);
-
-	return retval;
+	
+	return symbol;
 }
+
+// === Expression computation related methods ===
+
+antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
+	node_s * left = visit(ctx->term());
+	node_s * right = visit(ctx->expr());
+	string tmpvar = ast->get_tmp_var();
+
+	node_s * add = create_node(IRInstr3op::add, tmpvar, left, right);
+	
+	return add;
+}
+
+antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
+	node_s * left = visit(ctx->term());
+	node_s * right = visit(ctx->expr());
+	string tmpvar = ast->get_tmp_var();
+
+	node_s * sub = create_node(IRInstr3op::sub, tmpvar, left, right);
+	
+	return sub;
+}
+
+antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) {
+	return visit(ctx->term());
+}
+
+antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
+	node_s * left = visit(ctx->f());
+	node_s * right = visit(ctx->term());
+	string tmpvar = ast->get_tmp_var();
+
+	node_s * mul = create_node(IRInstr3op::mul, tmpvar, left, right);
+	return mul;
+}
+
+antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) {
+	// TODO: handle division ! 
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitF_single(ifccParser::F_singleContext *ctx) {
+	return visit(ctx->f());
+}
+
+antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx) {
+	node_s * leaf = create_leaf(visit(ctx->val())); 
+	return leaf;
+}
+
+antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx) {
+	visit(ctx->expr());
+	return 0;
+}
+
+

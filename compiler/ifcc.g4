@@ -14,7 +14,7 @@ decl : TEXT ',' decl # declMultiple
      | TEXT # declSimple
      ;
 
-affect : var '=' val ;
+affect : var '=' expr ;
 
 var : 'int' TEXT # varDecl
     | TEXT # varText
@@ -23,6 +23,20 @@ var : 'int' TEXT # varDecl
 val : CONST # valConst
     | TEXT # valText
     ;
+
+expr : term '+' expr # add
+    | term '-' expr # sub
+    | term # expr_single
+    ;
+
+term : f '*' term # mult
+    | f '/' term # div
+    | f # f_single
+    ;
+
+f : val # const
+    | '(' expr ')' # par
+	;
 
 RETURN : 'return' ;
 CONST : [0-9]+ ;
