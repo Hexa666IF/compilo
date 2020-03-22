@@ -22,6 +22,15 @@ typedef struct node_s
 	std::string val;
 } node_s;
 
+// Allocate memory for a node (actually a leaf of the tree) that represent only
+// a val (meaning a variables, or a constant).
+// It is not an operation.
+node_s * create_leaf(std::string val);
+
+// Allocate memory for a node that represent an operation between two operands
+// and store the result into a third one (whose name is valname).
+node_s * create_node(IRInstr3op::Operation3op op, std::string valname);
+
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
 // the result to store somewhere in the memory.

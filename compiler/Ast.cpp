@@ -8,6 +8,22 @@ e-mail :
 
 using namespace std;
 
+// === node_s methods ==
+
+node_s * create_leaf(string val)
+{
+	node_s * leaf = new node_s { true, IRInstr3op::add, nullptr, nullptr, val};
+	// We give the 'add' value to the operation, but it will not be considered
+	// anyway.
+	return leaf;
+}
+
+node_s * create_node(IRInstr3op::Operation3op op, string valname)
+{
+	node_s * node = new node_s { false, op, nullptr, nullptr, valname };
+	return node;
+}
+
 //------------- public methods -------------------------------------------------
 
 void Ast::gen_instr() const
