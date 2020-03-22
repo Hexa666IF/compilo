@@ -24,6 +24,16 @@ node_s * create_node(IRInstr3op::Operation3op op, string valname)
 	return node;
 }
 
+void uproot_node(node_s * root)
+{
+	if(root->left != nullptr)
+			uproot_node(root->left);
+	if(root->right != nullptr)
+			uproot_node(root->right);
+
+	delete root;
+}	
+
 //------------- public methods -------------------------------------------------
 
 void Ast::gen_instr() const
@@ -52,6 +62,11 @@ Ast::Ast(CFG * control)
 		: root(nullptr), cfg(control), n_tmp_var(0)
 {
 
+}
+
+Ast::~Ast()
+{
+	uproot_node(root);	
 }
 
 //------------- protected methods -----------------------------------------------

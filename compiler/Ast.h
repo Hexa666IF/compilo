@@ -31,6 +31,9 @@ node_s * create_leaf(std::string val);
 // and store the result into a third one (whose name is valname).
 node_s * create_node(IRInstr3op::Operation3op op, std::string valname);
 
+// delete the root node and every node below.
+void uproot_node(node_s * root);
+
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
 // the result to store somewhere in the memory.
@@ -54,7 +57,8 @@ class Ast
 
 	//--- Constructor - Destructor ---
 		Ast(CFG * control);	
-	
+		~Ast();
+
 	protected:
 	//----- protected methods -----
 	

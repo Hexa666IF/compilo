@@ -68,15 +68,16 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
-	//string val = visit(ctx->expr());
-	string var = visit(ctx->var());
-	// cfg->add_instr(IRInstr2op::ldconst, val, var);
-	// TODO : compute result in the AST.
+	string var = visit(ctx->var());	
+
 	ast = new Ast(cfg);
+	
 	node_s * root = visit(ctx->expr());
 	ast->set_root(root);
 	ast->gen_instr();
 	cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
+	delete(ast);
+	ast = nullptr;
 
 	return 0;
 }
