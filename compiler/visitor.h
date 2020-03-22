@@ -6,8 +6,10 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 
-#include "IR.h"
 #include <map>
+
+#include "IR.h"
+#include "Ast.h"
 
 /**
  * This class provides an empty implementation of ifccVisitor, which can be
@@ -82,4 +84,7 @@ public:
 
 protected:
   CFG * cfg;
+  
+  // AST used for computations.
+  Ast * ast;
 };

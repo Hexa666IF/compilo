@@ -76,9 +76,23 @@ IRInstr3op::IRInstr3op(	BasicBlock * bb,
 
 void IRInstr3op::gen_asm(Asm &toasm) const
 {
-	// static const string instructions [] = { "add", "sub", "mul", "cmp_eq", "cmp_lt", "cmp_le"};
-	// o << instructions[operation] << " "  << arg1 << ", " << arg2 << ", " << arg3 << endl;
-	// TODO : handle conditionnal jump ?
+	switch(operation)
+	{
+		case add:
+				toasm.add(arg1, arg2, arg3);
+				break;
+		
+		case sub:
+				toasm.sub(arg1, arg2, arg3);
+				break;
+
+		case mul:
+				toasm.mul(arg1, arg2, arg3);
+				break;
+
+		default:
+				break;
+	}	
 }
 
 // ====== IRInstrSpecial class related stuff ======

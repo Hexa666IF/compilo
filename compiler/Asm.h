@@ -24,6 +24,10 @@ class Asm
 
 		void ldconst(std::string arg1, std::string arg2);
 	
+		void add(std::string arg1, std::string arg2, std::string arg3);
+		void sub(std::string arg1, std::string arg2, std::string arg3);
+		void mul(std::string arg1, std::string arg2, std::string arg3);
+		
 		// TODO : check if the globl exist in ARM and MSP430 ABI.
 		void globl(std::string name);
 

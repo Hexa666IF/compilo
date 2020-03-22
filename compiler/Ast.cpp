@@ -28,7 +28,8 @@ node_s * create_node(IRInstr3op::Operation3op op, string valname)
 
 void Ast::gen_instr() const
 {
-	gen_instr(root);	
+	gen_instr(root);
+	cfg->add_instr(IRInstr2op::ldconst, root->val, "%retval");	
 }
 
 string Ast::get_tmp_var()
@@ -36,15 +37,19 @@ string Ast::get_tmp_var()
 	string name = "!tmp" + to_string(n_tmp_var);
 	cfg->add_to_symbol_table(name);
 	++n_tmp_var;
-
+	
 	return name;
 }
 
+void Ast::set_root(node_s * node)
+{
+	root = node;
+}
 
 //------------- Constructor - Destructor ------------------------------------
 
-Ast::Ast(node_s * node, CFG * control)
-		: root(node), cfg(control), n_tmp_var(0)
+Ast::Ast(CFG * control)
+		: root(nullptr), cfg(control), n_tmp_var(0)
 {
 
 }

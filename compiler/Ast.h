@@ -50,8 +50,10 @@ class Ast
 		// Each call to this function reserves a name.
 		std::string get_tmp_var();
 
+		void set_root(node_s * node);
+
 	//--- Constructor - Destructor ---
-		Ast(node_s * node, CFG * control);	
+		Ast(CFG * control);	
 	
 	protected:
 	//----- protected methods -----
