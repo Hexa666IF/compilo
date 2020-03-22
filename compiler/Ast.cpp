@@ -38,7 +38,9 @@ void uproot_node(node_s * root)
 
 void Ast::gen_instr() const
 {
-	gen_instr(root);
+	if(root->isValue == false)
+		gen_instr(root);
+
 	cfg->add_instr(IRInstr2op::ldconst, root->val, "%retval");	
 }
 
@@ -78,7 +80,7 @@ void Ast::gen_instr(node_s * node) const
 
 	if(node->right->isValue == false)
 			gen_instr(node->right);
-	
+
 	switch(node->op)
 	{
 			// TODO : put the values name in the right order for the instruction.
