@@ -99,17 +99,13 @@ antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
 	string val = ctx->CONST()->getText();
-	//node_s * value = create_leaf(val);
+	
 	return val;
 }
 
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
-	// Search for symbol index into symbol table.	
-	// string retval = "%retval";
-	 string symbol = ctx->TEXT()->getText();
-	// cfg->add_instr(IRInstr2op::ldconst, symbol, retval);
-	//node_s * var = create_leaf(symbol);
+	string symbol = ctx->TEXT()->getText();
 	
 	return symbol;
 }
@@ -117,7 +113,6 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 // === Expression computation related methods ===
 
 antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
-	std::cout << "Adding";
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
 	string tmpvar = ast->get_tmp_var();
@@ -125,12 +120,11 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
 	node_s * add = create_node(IRInstr3op::add, tmpvar);
 	add->left = left;
 	add->right = right;
-	// TODO : add into the AST.
+	
 	return add;
 }
 
 antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
-	std::cout << "Subtracting";
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
 	string tmpvar = ast->get_tmp_var();
@@ -138,12 +132,11 @@ antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
 	node_s * sub = create_node(IRInstr3op::sub, tmpvar);
 	sub->left = left;
 	sub->right = right;
-	// TODO : add into the AST.
+	
 	return sub;
 }
 
 antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) {
-	std::cout << "Visiting Expr";
 	return visit(ctx->term());
 }
 
@@ -164,13 +157,10 @@ antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitF_single(ifccParser::F_singleContext *ctx) {
-	std::cout << "Visiting F_single";
 	return visit(ctx->f());
 }
 
 antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx) {
-	std::cout << "Visiting const";
-	//visit(ctx->f());
 	node_s * leaf = create_leaf(visit(ctx->val())); 
 	return leaf;
 }
