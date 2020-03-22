@@ -3,23 +3,51 @@
 
 #pragma once
 
-
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 
+#include "IR.h"
+#include <map>
 
 /**
  * This class provides an empty implementation of ifccVisitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
  */
-class  Visitor : public ifccVisitor {
+class Visitor : public ifccVisitor
+{
 public:
+    Visitor(CFG * c);
 
   virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
+
+   
+  virtual antlrcpp::Any visitLDecl(ifccParser::LDeclContext *ctx) override;
+
+  virtual antlrcpp::Any visitLAffect(ifccParser::LAffectContext *ctx) override;
+
+  virtual antlrcpp::Any visitReturn(ifccParser::ReturnContext *context) override;
+
+  virtual antlrcpp::Any visitLEpsilon(ifccParser::LEpsilonContext *ctx) override;
+
+  virtual antlrcpp::Any visitDeclMultiple(ifccParser::DeclMultipleContext *ctx) override;
+
+  virtual antlrcpp::Any visitDeclSimple(ifccParser::DeclSimpleContext *ctx) override;
+
+  virtual antlrcpp::Any visitAffect(ifccParser::AffectContext *ctx) override;
+
+  virtual antlrcpp::Any visitVarDecl(ifccParser::VarDeclContext *ctx) override;
+
+  virtual antlrcpp::Any visitVarText(ifccParser::VarTextContext *ctx) override;
+
+  virtual antlrcpp::Any visitValConst(ifccParser::ValConstContext *ctx) override;
+
+  virtual antlrcpp::Any visitValText(ifccParser::ValTextContext *ctx) override;
+
+// === Expression computation related methods ===
 
   // virtual antlrcpp::Any visitExpr(ifccParser::ExprContext *ctx) override {
   //   ctx->getCONST()->getText();
@@ -37,7 +65,7 @@ public:
 
   virtual antlrcpp::Any visitAdd(ifccParser::AddContext *context) override;
 
-  virtual antlrcpp::Any visitMoins(ifccParser::MoinsContext *context) override;
+  virtual antlrcpp::Any visitSub(ifccParser::SubContext *context) override;
 
   virtual antlrcpp::Any visitExpr_single(ifccParser::Expr_singleContext *context) override;
 
@@ -51,5 +79,7 @@ public:
 
   virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
-};
 
+protected:
+  CFG * cfg;
+};
