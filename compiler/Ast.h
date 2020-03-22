@@ -29,7 +29,12 @@ node_s * create_leaf(std::string val);
 
 // Allocate memory for a node that represent an operation between two operands
 // and store the result into a third one (whose name is valname).
-node_s * create_node(IRInstr3op::Operation3op op, std::string valname);
+node_s * create_node(	
+						IRInstr3op::Operation3op op, 
+						std::string valname, 
+						node_s * left = nullptr, 
+						node_s * right = nullptr
+					);
 
 // delete the root node and every node below.
 void uproot_node(node_s * root);

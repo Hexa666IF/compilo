@@ -117,9 +117,7 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
 	node_s * right = visit(ctx->expr());
 	string tmpvar = ast->get_tmp_var();
 
-	node_s * add = create_node(IRInstr3op::add, tmpvar);
-	add->left = left;
-	add->right = right;
+	node_s * add = create_node(IRInstr3op::add, tmpvar, left, right);
 	
 	return add;
 }
@@ -129,9 +127,7 @@ antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
 	node_s * right = visit(ctx->expr());
 	string tmpvar = ast->get_tmp_var();
 
-	node_s * sub = create_node(IRInstr3op::sub, tmpvar);
-	sub->left = left;
-	sub->right = right;
+	node_s * sub = create_node(IRInstr3op::sub, tmpvar, left, right);
 	
 	return sub;
 }
@@ -145,9 +141,7 @@ antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
 	node_s * right = visit(ctx->term());
 	string tmpvar = ast->get_tmp_var();
 
-	node_s * mul = create_node(IRInstr3op::mul, tmpvar);
-	mul->left = left;
-	mul->right = right;
+	node_s * mul = create_node(IRInstr3op::mul, tmpvar, left, right);
 	return mul;
 }
 

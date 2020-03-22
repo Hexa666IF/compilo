@@ -18,9 +18,14 @@ node_s * create_leaf(string val)
 	return leaf;
 }
 
-node_s * create_node(IRInstr3op::Operation3op op, string valname)
+node_s * create_node(	
+						IRInstr3op::Operation3op op, 
+						string valname,
+						node_s * left,
+						node_s * right
+					)
 {
-	node_s * node = new node_s { false, op, nullptr, nullptr, valname };
+	node_s * node = new node_s { false, op, left, right, valname };
 	return node;
 }
 
