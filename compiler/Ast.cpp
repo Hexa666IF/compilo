@@ -34,6 +34,7 @@ void Ast::gen_instr() const
 string Ast::get_tmp_var()
 {
 	string name = "!tmp" + to_string(n_tmp_var);
+	cfg->add_to_symbol_table(name);
 	++n_tmp_var;
 
 	return name;
