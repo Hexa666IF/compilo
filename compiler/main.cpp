@@ -9,6 +9,8 @@
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
 
+#include "IR.h"
+
 using namespace antlr4;
 using namespace std;
 
@@ -29,7 +31,10 @@ int main(int argn, const char **argv) {
 //  }
 
   if(lexer.getNumberOfSyntaxErrors() != 0)
+  {
+	cout << "Error during lexer operation... ! " << endl;
 	return lexer.getNumberOfSyntaxErrors();
+  }
 
   ifccParser parser(&tokens);
   tree::ParseTree* tree = parser.axiom();
@@ -39,8 +44,11 @@ int main(int argn, const char **argv) {
 	cout << "Error during parsing operation... ! " << endl;
 	return parser.getNumberOfSyntaxErrors();
   }
-  Visitor visitor;
+
+  CFG * cfg = new CFG(nullptr);
+  Visitor visitor(cfg);
   visitor.visit(tree);
   
+  cfg->gen_asm();
   return 0;
 }
