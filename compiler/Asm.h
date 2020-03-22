@@ -23,9 +23,14 @@ class Asm
 		void gen_epilogue();
 
 		void ldconst(std::string arg1, std::string arg2);
-	
+		
+		// add arg1 and arg2, and store the result into arg3.
 		void add(std::string arg1, std::string arg2, std::string arg3);
+
+		// sub arg1 and arg2, and store the result into arg3.
 		void sub(std::string arg1, std::string arg2, std::string arg3);
+
+		// mul arg1 and arg2, and store the result into arg3.
 		void mul(std::string arg1, std::string arg2, std::string arg3);
 		
 		// TODO : check if the globl exist in ARM and MSP430 ABI.
