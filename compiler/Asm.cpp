@@ -22,7 +22,7 @@ void Asm::gen_epilogue()
 {
 	// TODO : check if ret is allowed.
 	output << "movq %rbp, %rsp" << endl
-		   << "pop %rbp" << endl
+		   << "popq %rbp" << endl
 		   << "ret" << endl;
 }
 
