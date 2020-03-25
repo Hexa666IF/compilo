@@ -47,8 +47,8 @@ bool Errors::printErrors()
 
     for(int i = 0; i < Errors::errorsList.size(); i++)
     {
-        cout << Errors::errorsList[i] << endl;
-        cout << endl;
+        cerr << Errors::errorsList[i] << endl;
+        cerr << endl;
         print = true;
     }
     
