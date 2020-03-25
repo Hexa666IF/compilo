@@ -54,7 +54,7 @@ int main(int argn, const char **argv) {
   {
     visitor.visit(tree);
   }
-  catch(const std::exception& e)
+  catch(int e)
   {
     
   }

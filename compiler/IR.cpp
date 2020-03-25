@@ -280,8 +280,9 @@ void CFG::add_to_symbol_table(string name)
 	else
 	{
 		Errors::addError(2, name);
-		//exit
-		exit;
+		
+		//arret du visiteur et retour dans le main
+		throw 2;
 	}
 }
 
