@@ -90,6 +90,9 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 	delete(ast);
 	ast = nullptr;
 
+	//Var is now initialised
+	cfg->addVarInitialised(var);
+
 	return 0;
 }
 
@@ -105,6 +108,14 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
+
+	// If the variable is not declared
+	if( cfg->get_var_index(symbol) == 0 )
+	{
+		Errors::addError(1, symbol);
+		throw 1;
+	}
+	
 	return symbol;
 }
 
@@ -119,8 +130,12 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
 
-	
-
+	// If the variable is not initialised
+	if( !cfg->findVarInitialised(symbol) )
+	{
+		Errors::addError(2, symbol);
+		throw 2;
+	}
 
 	//The variable is now used
 	cfg->deleteVarUsed(symbol);

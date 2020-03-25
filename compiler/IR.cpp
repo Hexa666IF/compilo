@@ -279,10 +279,10 @@ void CFG::add_to_symbol_table(string name)
 	}
 	else
 	{
-		Errors::addError(2, name);
+		Errors::addError(3, name);
 		
 		//arret du visiteur et retour dans le main
-		throw 2;
+		throw 3;
 	}
 }
 
@@ -331,7 +331,26 @@ void CFG::warningsUnusedVar()
 	std::list<string>::iterator it;
 	for (it = varUnused.begin(); it != varUnused.end(); ++it)
 	{
-		Errors::addError(3, *it);
+		Errors::addError(4, *it);
 	}
 }
 
+void CFG::addVarInitialised(string var)
+{
+	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
+	{
+		varInitialised.push_back(var);
+	}
+}
+
+bool CFG::findVarInitialised(string var)
+{
+	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

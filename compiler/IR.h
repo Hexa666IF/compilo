@@ -274,6 +274,12 @@ class CFG {
 	// Trigger warnings if there are unused variables
 	void warningsUnusedVar();
 
+	// Add a new var in varInitialised
+	void addVarInitialised(std::string var);
+
+	// Find if a var has been initialised
+	bool findVarInitialised(std::string var);
+
  protected:
 	
 	Ast* ast; /**< The AST this CFG comes from */
@@ -288,6 +294,9 @@ class CFG {
 	Asm toasm; // asm converter.
 
 	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
+
+	std::list <std::string> varInitialised; /**Store the variable initialised to test them in RValues*/
+	
 };
 
 

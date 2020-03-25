@@ -21,14 +21,19 @@ void Errors::addError(int code, std::string var)
         Errors::errorCode = 1;
         break;
     case 2:
-        error = "ERROR : The variable "+var+" is declared at least twice.";
+        error = "ERROR : The variable "+var+" is used but not initialised.";
         Errors::errorsList.push_back(error);
         Errors::errorCode = 2;
         break;
     case 3:
-        error = "WARNING : The variable "+var+" is unused.";
+        error = "ERROR : The variable "+var+" is declared at least twice.";
         Errors::errorsList.push_back(error);
         Errors::errorCode = 3;
+        break;
+    case 4:
+        error = "WARNING : The variable "+var+" is unused.";
+        Errors::errorsList.push_back(error);
+        Errors::errorCode = 4;
         break;
     
     default:
@@ -56,4 +61,4 @@ int Errors::getErrorCode()
 }
 //------------- Protected Attributes ------------------------------------
 std::vector<std::string> Errors::errorsList;
-int Errors::errorCode;
+int Errors::errorCode = 0;

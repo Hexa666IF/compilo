@@ -60,23 +60,17 @@ int main(int argn, const char **argv) {
   }
 
   // Print of errors and generation of the assembler if there is none
+  Errors::printErrors();
+  int code = Errors::getErrorCode();
 
-  if( !Errors::printErrors() )
+  if( (code == 0) || (code == 4) )
   {
     cfg->gen_asm();
     return 0;
   }
   else
   {
-    int code = Errors::getErrorCode();
-    if( code == 3)
-    {
-      return 0;
-    }
-    else
-    {
-      return code;
-    }
+    return code;
   }
 
 }

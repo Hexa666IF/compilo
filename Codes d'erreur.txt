@@ -1,5 +1,6 @@
 -1 : erreur de synthaxe détectée par antlr4
 
-1 : Une variable utilisée n'a pas été déclarée ou initialisée
-2 : Une variable à été déclarée au moins deux fois
-3 : une variable déclarée n'a pas été utilisée
+1 : Une variable utilisée n'a pas été déclarée
+2 : Une variable utilisée n'a pas été initialisée
+3 : Une variable à été déclarée au moins deux fois
+4 : une variable déclarée n'a pas été utilisée
