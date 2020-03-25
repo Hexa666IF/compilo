@@ -21,7 +21,7 @@ void Asm::gen_prologue(int size)
 void Asm::gen_epilogue()
 {
 	// TODO : check if ret is allowed.
-	output << "movq %rsp, %rbp" << endl
+	output << "movq %rbp, %rsp" << endl
 		   << "pop %rbp" << endl
 		   << "ret" << endl;
 }
