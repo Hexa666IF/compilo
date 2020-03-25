@@ -42,6 +42,12 @@ class Asm
 
 	protected:
 	//----- protected methods -----
+	
+		// Loads the variable into a register so that
+		// it can be used for calculation.
+		// It returns the register in wich the variable has
+		// been put. (%eax, usually).
+		std::string loadVariable(std::string var);	
 	//----- protected attributes -----
 		CFG * cfg;
 		std::ostream &output;

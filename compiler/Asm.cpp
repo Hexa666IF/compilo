@@ -30,7 +30,7 @@ void Asm::gen_epilogue()
 void Asm::ldconst(string arg1, string arg2)
 {
 	// Getting x86 assembly code to access variables.
-	arg1 = cfg->IR_reg_to_asm(arg1);
+	arg1 = loadVariable(arg1);
 	arg2 = cfg->IR_reg_to_asm(arg2);
 
 	output << "movl " << arg1 << ", " << arg2 << endl;	
@@ -38,32 +38,32 @@ void Asm::ldconst(string arg1, string arg2)
 
 void Asm::add(string arg1, string arg2, string arg3)
 {
-	arg1 = cfg->IR_reg_to_asm(arg1);	
-	arg2 = cfg->IR_reg_to_asm(arg2);
-	arg3 = cfg->IR_reg_to_asm(arg3);
+	arg1 = loadVariable(arg1);	
+	output << "movl " << arg1 << ", " << arg3 << endl;	
 	
-	output << "movl " << arg1 << ", " << arg3 << endl
-		   << "addq " << arg2 << ", " << arg3 << endl;
+	arg2 = loadVariable(arg2);
+	arg3 = cfg->IR_reg_to_asm(arg3);
+	output << "addq " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::sub(string arg1, string arg2, string arg3)
 {
-	arg1 = cfg->IR_reg_to_asm(arg1);	
-	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg1 = loadVariable(arg1);		
+	output << "movl " << arg1 << ", " << arg3 << endl;
+
+	arg2 = loadVariable(arg2);
 	arg3 = cfg->IR_reg_to_asm(arg3);
-	
-	output << "movl " << arg1 << ", " << arg3 << endl
-		   << "subq " << arg2 << ", " << arg3 << endl;
+	output << "subq " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::mul(string arg1, string arg2, string arg3)
 {
-	arg1 = cfg->IR_reg_to_asm(arg1);	
-	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg1 = loadVariable(arg1);	
+	output << "movl " << arg1 << ", " << arg3 << endl;
+	
+	arg2 = loadVariable(arg2);
 	arg3 = cfg->IR_reg_to_asm(arg3);
-
-	output << "movl " << arg1 << ", " << arg3 << endl
-		   << "mul " << arg2 << ", " << arg3 << endl;
+	output << "mul " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::globl(string name)
@@ -79,4 +79,18 @@ Asm::Asm(CFG * graph, ostream &out) : cfg(graph), output(out)
 
 }	
 
-//------------- Protected methods ---------------------------------------------------------
+//------------- Protected methods ----------------------------------------------
+
+string Asm::loadVariable(string var)
+{
+	string asm_arg = cfg->IR_reg_to_asm(var);
+	if(asm_arg[0] != '$')
+	// asm_arg is not a constant, it needs to be put in a register to
+	// be available for computation.
+	{
+		output << "movl " << asm_arg << ", " << "%eax" << endl;
+		asm_arg = "%eax";
+	}
+
+	return asm_arg;
+}
