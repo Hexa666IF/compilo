@@ -39,30 +39,30 @@ void Asm::ldconst(string arg1, string arg2)
 void Asm::add(string arg1, string arg2, string arg3)
 {
 	arg1 = loadVariable(arg1);	
+	arg3 = cfg->IR_reg_to_asm(arg3);
 	output << "movl " << arg1 << ", " << arg3 << endl;	
 	
 	arg2 = loadVariable(arg2);
-	arg3 = cfg->IR_reg_to_asm(arg3);
-	output << "addq " << arg2 << ", " << arg3 << endl;
+	output << "addl " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::sub(string arg1, string arg2, string arg3)
 {
 	arg1 = loadVariable(arg1);		
+	arg3 = cfg->IR_reg_to_asm(arg3);
 	output << "movl " << arg1 << ", " << arg3 << endl;
 
 	arg2 = loadVariable(arg2);
-	arg3 = cfg->IR_reg_to_asm(arg3);
-	output << "subq " << arg2 << ", " << arg3 << endl;
+	output << "subl " << arg2 << ", " << arg3 << endl;
 }
 
 void Asm::mul(string arg1, string arg2, string arg3)
 {
 	arg1 = loadVariable(arg1);	
+	arg3 = cfg->IR_reg_to_asm(arg3);
 	output << "movl " << arg1 << ", " << arg3 << endl;
 	
 	arg2 = loadVariable(arg2);
-	arg3 = cfg->IR_reg_to_asm(arg3);
 	output << "mul " << arg2 << ", " << arg3 << endl;
 }
 
