@@ -75,12 +75,12 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	string var = visit(ctx->var());	
 
-	ast = new Ast(cfg);
+	ast = new Ast(cfg, var);
 	
 	node_s * root = visit(ctx->expr());
 	ast->set_root(root);
 	ast->gen_instr();
-	cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
+	//cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
 	delete(ast);
 	ast = nullptr;
 
@@ -118,9 +118,9 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 // === Expression computation related methods ===
 
 antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * add = create_node(IRInstr3op::add, tmpvar, left, right);
 	
@@ -128,9 +128,9 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * sub = create_node(IRInstr3op::sub, tmpvar, left, right);
 	
@@ -142,9 +142,9 @@ antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->f());
 	node_s * right = visit(ctx->term());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * mul = create_node(IRInstr3op::mul, tmpvar, left, right);
 	return mul;
