@@ -36,8 +36,13 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
-	string retval = visit(ctx->val());
-	cfg->add_instr(IRInstr2op::ldconst, retval, "%retval");
+	ast = new Ast(cfg);
+	
+	node_s * root = visit(ctx->expr());
+	ast->set_root(root);
+	ast->gen_instr();
+	delete(ast);
+	ast = nullptr;
 
 	return 0;
 }

@@ -6,7 +6,7 @@ prog : 'int' 'main' '(' ')' '{' l '}' ;
 
 l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
-  | RETURN val ';' # return
+  | RETURN expr ';' # return
   | /*epsilon*/ # lEpsilon
   ; 
 
