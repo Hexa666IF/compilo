@@ -152,30 +152,7 @@ void BasicBlock::add_instr(IRInstr * instr)
 //	instrs.push_back(instr);
 //}
 
-string CFG::IR_reg_to_asm(std::string reg)
-{
-	string asm_reg;
-	int index = get_var_index(reg);
 
-	if(index != 0)
-	{
-		asm_reg = to_string(-index) + "(%rbp)";
-	}
-	else if (reg[0] == '%')
-	{
-		if(reg == "%retval")
-				asm_reg = "%eax";
-
-		if(reg == "%rbp")
-				asm_reg = "%rbp";
-	}
-	else 
-	{
-		asm_reg = '$' + reg;
-	}
-
-	return asm_reg;
-}
 
 void BasicBlock::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
@@ -265,6 +242,31 @@ void CFG::gen_asm()
 }
 
 // = symbol table methods =
+
+string CFG::IR_reg_to_asm(std::string reg)
+{
+	string asm_reg;
+	int index = get_var_index(reg);
+
+	if(index != 0)
+	{
+		asm_reg = to_string(-index) + "(%rbp)";
+	}
+	else if (reg[0] == '%')
+	{
+		if(reg == "%retval")
+				asm_reg = "%eax";
+
+		if(reg == "%rbp")
+				asm_reg = "%rbp";
+	}
+	else 
+	{
+		asm_reg = '$' + reg;
+	}
+
+	return asm_reg;
+}
 
 void CFG::add_to_symbol_table(string name)
 {
