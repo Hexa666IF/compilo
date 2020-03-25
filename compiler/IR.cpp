@@ -1,4 +1,5 @@
 #include "IR.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -267,10 +268,19 @@ void CFG::gen_asm()
 
 void CFG::add_to_symbol_table(string name)
 {
-	// TODO : handle multiple declaration errors.
-	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
-	SymbolIndex.insert(p);
-	nextFreeSymbolIndex += 4;
+	// handle multiple declaration errors.
+	if (SymbolIndex.find(name) == SymbolIndex.end())
+	{
+		pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
+		SymbolIndex.insert(p);
+		nextFreeSymbolIndex += 4;
+	}
+	else
+	{
+		Errors::addError(2, name);
+		//exit
+		exit;
+	}
 }
 
 string CFG::create_new_tempvar()
@@ -298,5 +308,27 @@ int CFG::get_var_index(string name)
 string CFG::new_BB_name() const
 {
 	return current_bb->getLabel();
+}
+
+void CFG::addVarUnused(string var)
+{
+	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
+	{
+		varUnused.push_back(var);
+	}
+}
+
+void CFG::deleteVarUsed(string var)
+{
+	varUnused.remove(var);
+}
+
+void CFG::warningsUnusedVar()
+{
+	std::list<string>::iterator it;
+	for (it = varUnused.begin(); it != varUnused.end(); ++it)
+	{
+		Errors::addError(3, *it);
+	}
 }
 

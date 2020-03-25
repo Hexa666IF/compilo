@@ -8,11 +8,13 @@
 #include "antlr4-generated/ifccParser.h"
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
+// #include "Errors.h"
 
 #include "IR.h"
 
 using namespace antlr4;
 using namespace std;
+
 
 int main(int argn, const char **argv) {
   int ret = 0;
@@ -42,13 +44,39 @@ int main(int argn, const char **argv) {
   if(parser.getNumberOfSyntaxErrors() != 0) 
   {
 	cout << "Error during parsing operation... ! " << endl;
-	return parser.getNumberOfSyntaxErrors();
+	return -1;
   }
 
   CFG * cfg = new CFG(nullptr);
   Visitor visitor(cfg);
-  visitor.visit(tree);
-  
-  cfg->gen_asm();
-  return 0;
+
+  try
+  {
+    visitor.visit(tree);
+  }
+  catch(const std::exception& e)
+  {
+    
+  }
+
+  // Print of errors and generation of the assembler if there is none
+
+  if( !Errors::printErrors() )
+  {
+    cfg->gen_asm();
+    return 0;
+  }
+  else
+  {
+    int code = Errors::getErrorCode();
+    if( code == 3)
+    {
+      return 0;
+    }
+    else
+    {
+      return code;
+    }
+  }
+
 }
