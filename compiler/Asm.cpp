@@ -58,12 +58,13 @@ void Asm::sub(string arg1, string arg2, string arg3)
 
 void Asm::mul(string arg1, string arg2, string arg3)
 {
-	arg1 = loadVariable(arg1);	
+	arg1 = cfg->IR_reg_to_asm(arg1);	
+	arg2 = cfg->IR_reg_to_asm(arg2);
 	arg3 = cfg->IR_reg_to_asm(arg3);
-	output << "movl " << arg1 << ", " << arg3 << endl;
 	
-	arg2 = loadVariable(arg2);
-	output << "mul " << arg2 << ", " << arg3 << endl;
+	output << "movl " << arg1 << ", " << "%eax" << endl;
+	output << "mul " << arg2 << endl;
+	output << "movl %eax, " << arg3 << endl;
 }
 
 void Asm::globl(string name)
