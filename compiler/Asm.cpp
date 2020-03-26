@@ -63,7 +63,8 @@ void Asm::mul(string arg1, string arg2, string arg3)
 	arg3 = cfg->IR_reg_to_asm(arg3);
 	
 	output << "movl " << arg1 << ", " << "%eax" << endl;
-	output << "mul " << arg2 << endl;
+	output << "movl " << arg2 << ", " << "%ebx" << endl;
+	output << "mul %ebx" << endl;
 	output << "movl %eax, " << arg3 << endl;
 }
 
