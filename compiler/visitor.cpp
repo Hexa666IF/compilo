@@ -17,8 +17,6 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
 	visit(ctx->l());
 
-	cfg->warningsUnusedVar();
-
 	return 0;
 }
 

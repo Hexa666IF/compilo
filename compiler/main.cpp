@@ -59,6 +59,8 @@ int main(int argn, const char **argv) {
     
   }
 
+  cfg->warningsUnusedVar();
+
   // Print of errors and generation of the assembler if there is none
   Errors::printErrors();
   ErrorCode code = Errors::getErrorCode();
