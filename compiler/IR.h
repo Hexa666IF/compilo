@@ -36,45 +36,12 @@ class IRInstr {
 	virtual ~IRInstr();
 	
 	/** Actual code generation */
-	virtual void gen_asm(Asm &toasm) const = 0; /**< x86 assembly code generation for this IR instruction */
+	virtual void gen_asm(Asm &toasm) const = 0; 
 	
  protected:
-	BasicBlock* bb; /**< The BB this instruction belongs to, which provides a pointer to the CFG this instruction belong to */
+	BasicBlock* bb;
 	// Type t ?
 };
-
-/*
- * This class is useless for now.
- *
- * class IRInstr1op : public IRInstr
- * {
- * 	public:
- * 
- * 		typedef enum
- * 		{
- * 			push,
- * 			pop
- * 		} Operation1op;
- * 
- * 	// === Constructor / Destructor ===
- * 	
- * 		IRInstr1op(	BasicBlock * bb,
- * 					Operation1op op,
- * 					std::string a
- * 			  	);
- * 		virtual ~IRInstr1op();
- * 
- * 	// === Overriden method from IRInstr ===
- * 		
- * 		// Code generation.
- * 		void gen_asm(std::ostream &o) const;
- * 
- * 	protected:
- * 		Operation1op operation;
- * 		std::string arg;
- * };
- *
- */
 
 // === IRInstr2op ===
 // 		2 operands instructions.
@@ -200,7 +167,6 @@ class BasicBlock {
 		void gen_asm(Asm &toasm); /**< x86 assembly code generation for this basic block (very simple) */
 
 		// void add_instr(IRInstr * instr);
-		// void add_instr(IRInstr1op::Operation1op op, std::string arg);
 		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
@@ -255,9 +221,14 @@ class CFG {
 	std::string IR_reg_to_asm(std::string reg);
 	
 	// symbol table methods
-	void add_to_symbol_table(std::string name); // , Type t);
-	std::string create_new_tempvar();  // Type t);
-	int get_var_index(std::string name);
+	
+	// Adds a symbol to symbol table.
+	// If the symbol is already present, it will
+	// throw a multipleDeclaration Exception.
+	void add_to_symbol_table(std::string name);
+
+	std::string create_new_tempvar();
+	int get_var_index(const std::string name) const;
 
 	//Type get_var_type(std::string name);
 
@@ -272,23 +243,12 @@ class CFG {
 	void deleteVarUsed(std::string var);
 
 	// Trigger warnings if there are unused variables
-	void warningsUnusedVar();
-
-	// Add a new var in varInitialised
-	void addVarInitialised(std::string var);
-
-	// Find if a var has been initialised
-	bool findVarInitialised(std::string var);
-
-	// Check if var has been initialised.
-	// If not, throw an notInitialised Exception
-	// If it is, removed the var from unused variable list.
-	void checkInit(std::string var);
+	void warningsUnusedVar() const;
 
 	// Check if var has been declared.
 	// If it isn't, it will throw a notDeclared Exception.
 	// If it is, it will call addVarInitialised.
-	void checkDeclared(std::string var);
+	void checkDeclared(const std::string var) const;
 
  protected:
 	
@@ -304,9 +264,6 @@ class CFG {
 	Asm toasm; // asm converter.
 
 	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
-
-	// std::list <std::string> varInitialised; /**Store the variable initialised to test them in RValues*/
-	
 };
 
 

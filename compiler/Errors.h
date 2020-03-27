@@ -26,8 +26,6 @@ class Errors
 		// Print the errors stored in the list, return true if there was errors
 		static bool printErrors();
 
-		static ErrorCode getErrorCode();
-
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
 
@@ -35,7 +33,6 @@ class Errors
 	//----- protected methods -----
 	//----- protected attributes -----
 		static std::vector<std::pair<std::string, ErrorCode>> errorsList;
-        static ErrorCode errorCode; // Error code return by the program
 
 
 };

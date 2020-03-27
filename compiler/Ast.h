@@ -47,8 +47,6 @@ class Ast
 	public:
 	//----- public methods -----
 		
-		// void add(node_s * node, node_s * left_child, node_s * right_child);
-
 		// Generate the instructions computing and storing the result
 		// into the %retval register.
 		void gen_instr() const;

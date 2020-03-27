@@ -51,20 +51,6 @@ public:
 
 // === Expression computation related methods ===
 
-  // virtual antlrcpp::Any visitExpr(ifccParser::ExprContext *ctx) override {
-  //   ctx->getCONST()->getText();
-  //   visitChildren(ctx);
-  //   return 0;
-  // }
-
-  // virtual antlrcpp::Any visitTerm(eifccParser::TermContext *ctx) override {
-  //   return 0;
-  // }
-
-  // virtual antlrcpp::Any visitF(ifccParser::FContext *ctx) override {
-  //   return 0;
-  // }
-
   virtual antlrcpp::Any visitAdd(ifccParser::AddContext *context) override;
 
   virtual antlrcpp::Any visitSub(ifccParser::SubContext *context) override;

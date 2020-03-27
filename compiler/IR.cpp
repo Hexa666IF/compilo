@@ -19,31 +19,6 @@ IRInstr::~IRInstr()
 
 }
 
-
-// ====== IRInstr1op class related stuff ======
-// This class is not used anymore !
-
-// IRInstr1op::IRInstr1op(	BasicBlock * bb,
-// 						Operation1op op,
-// 						string a
-// 					)
-// : IRInstr(bb), operation(op), arg(a)
-// {
-//
-// }
-//
-// IRInstr1op::~IRInstr1op()
-// {
-//
-// }
-//
-// void IRInstr1op::gen_asm(ostream &o) const
-// {
-// 	static const string instructions [] = {"pushq", "popq"};
-// 	o <<  instructions[operation] << " " << arg << endl;
-// }
-//
-
 // ====== IRInstr2op class related stuff ======
 
 IRInstr2op::IRInstr2op(	BasicBlock * bb,
@@ -109,12 +84,7 @@ IRInstrSpecial::IRInstrSpecial(	BasicBlock * bb,
 
 void IRInstrSpecial::gen_asm(Asm &toasm) const
 {
-	// o << "call";
-	// for ( string arg : args )
-	// {
-	// 	o << ", " << arg;
-	// }
-	// o << endl;
+
 }
 
 // ============================= BasicBlock =================================
@@ -136,23 +106,6 @@ void BasicBlock::gen_asm(Asm &toasm)
 		instr->gen_asm(toasm);
 	}
 }
-
-/*
-void BasicBlock::add_instr(IRInstr * instr)
-{
-	instrs.push_back(instr);
-	// TODO : updates if the instruction is a conditionnal jump ?
-}
-*/
-
-// Not used anymore.
-// void BasicBlock::add_instr(IRInstr1op::Operation1op op, string arg)
-// {
-//	IRInstr1op * instr = new IRInstr1op(this, op, arg);
-//	instrs.push_back(instr);
-//}
-
-
 
 void BasicBlock::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
@@ -206,12 +159,6 @@ void CFG::add_bb(BasicBlock * bb)
 
 	// TODO: handle if-blocks. (differents paths, same %rbp).
 }
-
-// Not used anymore.
-// void CFG::add_instr(IRInstr1op::Operation1op op, string arg)
-// {
-// 	current_bb->add_instr(op, arg);	
-// }
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
@@ -286,7 +233,6 @@ void CFG::add_to_symbol_table(string name)
 	else
 	{
 		Errors::addError(name, multipleDeclaration);
-		//arret du visiteur et retour dans le main
 		throw multipleDeclaration;
 	}
 }
@@ -302,12 +248,11 @@ string CFG::create_new_tempvar()
 	return varName;
 }
 
-int CFG::get_var_index(string name)
-// TODO : get_var_index should be const.
+int CFG::get_var_index(const string name) const
 {
 	int index = 0;
-	map<string, int>::iterator it = SymbolIndex.find(name);
-	if(it != SymbolIndex.end())
+	map<string, int>::const_iterator it = SymbolIndex.find(name);
+	if(it != SymbolIndex.cend())
 			index = it->second;
 	
 	return index;
@@ -318,25 +263,25 @@ string CFG::new_BB_name() const
 	return current_bb->getLabel();
 }
 
-void CFG::addVarUnused(string var)
+void CFG::addVarUnused(const string var)
 {
 	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
 		varUnused.push_back(var);
 }
 
-void CFG::deleteVarUsed(string var)
+void CFG::deleteVarUsed(const string var)
 {
 	varUnused.remove(var);
 }
 
-void CFG::warningsUnusedVar()
+void CFG::warningsUnusedVar() const
 {
-	std::list<string>::iterator it;
-	for (it = varUnused.begin(); it != varUnused.end(); ++it)
+	std::list<string>::const_iterator it;
+	for (it = varUnused.cbegin(); it != varUnused.cend(); ++it)
 		Errors::addError(*it, notUsed);
 }
 
-void CFG::checkDeclared(string var)
+void CFG::checkDeclared(const string var) const
 {
 	if( isalpha(var[0]) && (get_var_index(var) == 0) )
 	{

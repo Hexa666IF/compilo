@@ -99,8 +99,6 @@ void Ast::gen_instr(node_s * node) const
 
 	switch(node->op)
 	{
-			// TODO : put the values name in the right order for the instruction.
-			// TODO : handle division ?
 			case IRInstr3op::add:
 				cfg->add_instr(	IRInstr3op::add, 
 								node->left->val, 

@@ -83,7 +83,6 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 	node_s * root = visit(ctx->expr());
 	ast->set_root(root);
 	ast->gen_instr();
-	//cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
 	delete(ast);
 	ast = nullptr;
 
@@ -155,7 +154,8 @@ antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) {
-	// TODO: handle division ! 
+	// Division is not part of the requirements.
+	// We'll handle it later maybe.
 	return 0;
 }
 
@@ -172,5 +172,4 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx) {
 	visit(ctx->expr());
 	return 0;
 }
-
 
