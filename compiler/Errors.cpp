@@ -10,30 +10,25 @@ using namespace std;
 
 //------------- public methods -------------------------------------------------
 
-void Errors::addError(int code, std::string var)
+void Errors::addError(std::string var, ErrorCode code)
 {
-    string error;
 	switch (code)
     {
-    case 1:
-        error = "ERROR : The variable "+var+" is used but not declared.";
-        Errors::errorsList.push_back(error);
-        Errors::errorCode = 1;
+    case notDeclared:
+        Errors::errorsList.push_back(make_pair(var, notDeclared));
+        Errors::errorCode = notDeclared;
         break;
-    case 2:
-        error = "ERROR : The variable "+var+" is used but not initialised.";
-        Errors::errorsList.push_back(error);
-        Errors::errorCode = 2;
+    case notInitialised:
+        Errors::errorsList.push_back(make_pair(var, notInitialised));
+        Errors::errorCode = notInitialised;
         break;
-    case 3:
-        error = "ERROR : The variable "+var+" is declared at least twice.";
-        Errors::errorsList.push_back(error);
-        Errors::errorCode = 3;
+    case multipleDeclaration:
+        Errors::errorsList.push_back(make_pair(var, multipleDeclaration));
+        Errors::errorCode = multipleDeclaration;
         break;
-    case 4:
-        error = "WARNING : The variable "+var+" is unused.";
-        Errors::errorsList.push_back(error);
-        Errors::errorCode = 4;
+    case notUsed:
+        Errors::errorsList.push_back(make_pair(var, notUsed));
+        Errors::errorCode = notUsed;
         break;
     
     default:
@@ -47,18 +42,38 @@ bool Errors::printErrors()
 
     for(int i = 0; i < Errors::errorsList.size(); i++)
     {
-        cerr << Errors::errorsList[i] << endl;
-        cerr << endl;
+        switch (errorsList[i].second)
+        {
+        case notDeclared:
+            cerr << "ERROR : The variable "+errorsList[i].first+" is used but not declared." << endl;
+            cerr << endl;
+            break;
+        case notInitialised:
+            cerr << "ERROR : The variable "+errorsList[i].first+" is used but not initialised." << endl;
+            cerr << endl;
+            break;
+        case multipleDeclaration:
+            cerr << "ERROR : The variable "+errorsList[i].first+" is declared at least twice." << endl;
+            cerr << endl;
+            break;
+        case notUsed:
+            cerr << "WARNING : The variable "+errorsList[i].first+" is unused." << endl;
+            cerr << endl;
+            break;
+        default:
+            break;
+        }
+
         print = true;
     }
     
     return print;
 }
 
-int Errors::getErrorCode()
+ErrorCode Errors::getErrorCode()
 {
     return Errors::errorCode;
 }
 //------------- Protected Attributes ------------------------------------
-std::vector<std::string> Errors::errorsList;
-int Errors::errorCode = 0;
+std::vector<std::pair<std::string, ErrorCode>> Errors::errorsList;
+ErrorCode Errors::errorCode = errorFree;

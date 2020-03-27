@@ -11,6 +11,8 @@ e-mail :
 #include <vector>
 #include <string>
 
+enum ErrorCode { lexerSyntaxError = -2, parserSyntaxError, errorFree, notDeclared, notInitialised, multipleDeclaration, notUsed };
+
 // class used to store and print the errors met during the compilation
 class Errors
 {
@@ -19,12 +21,12 @@ class Errors
 	//----- public methods -----
 
 		// Add an error in the list
-		static void addError(int code, std::string var);
+		static void addError(std::string var, ErrorCode code);
 
 		// Print the errors stored in the list, return true if there was errors
 		static bool printErrors();
 
-		static int getErrorCode();
+		static ErrorCode getErrorCode();
 
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
@@ -32,8 +34,8 @@ class Errors
 	protected:
 	//----- protected methods -----
 	//----- protected attributes -----
-		static std::vector<std::string> errorsList;
-        static int errorCode; // Errore code return by the program
+		static std::vector<std::pair<std::string, ErrorCode>> errorsList;
+        static ErrorCode errorCode; // Error code return by the program
 
 
 };

@@ -35,7 +35,7 @@ int main(int argn, const char **argv) {
   if(lexer.getNumberOfSyntaxErrors() != 0)
   {
 	cout << "Error during lexer operation... ! " << endl;
-	return lexer.getNumberOfSyntaxErrors();
+	return lexerSyntaxError;
   }
 
   ifccParser parser(&tokens);
@@ -44,7 +44,7 @@ int main(int argn, const char **argv) {
   if(parser.getNumberOfSyntaxErrors() != 0) 
   {
 	cout << "Error during parsing operation... ! " << endl;
-	return -1;
+	return parserSyntaxError;
   }
 
   CFG * cfg = new CFG(nullptr);
@@ -54,19 +54,19 @@ int main(int argn, const char **argv) {
   {
     visitor.visit(tree);
   }
-  catch(int e)
+  catch(ErrorCode e)
   {
     
   }
 
   // Print of errors and generation of the assembler if there is none
   Errors::printErrors();
-  int code = Errors::getErrorCode();
+  ErrorCode code = Errors::getErrorCode();
 
-  if( (code == 0) || (code == 4) )
+  if( (code == errorFree) || (code == notUsed) )
   {
     cfg->gen_asm();
-    return 0;
+    return errorFree;
   }
   else
   {
