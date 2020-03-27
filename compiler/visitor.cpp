@@ -2,6 +2,7 @@
 // Generated from ifcc.g4 by ANTLR 4.7.2
 
 #include "visitor.h"
+
 #include <string>
 #include <iostream>
 
@@ -15,6 +16,7 @@ Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c), ast(nullptr)
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
 	visit(ctx->l());
+
 	return 0;
 }
 
@@ -36,8 +38,13 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
-	string retval = visit(ctx->val());
-	cfg->add_instr(IRInstr2op::ldconst, retval, "%retval");
+	ast = new Ast(cfg);
+	
+	node_s * root = visit(ctx->expr());
+	ast->set_root(root);
+	ast->gen_instr();
+	delete(ast);
+	ast = nullptr;
 
 	return 0;
 }
@@ -62,6 +69,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 	// Add symbol name to symbol table.
 	string symbol = ctx->TEXT()->getText();
 	cfg->add_to_symbol_table(symbol);
+	cfg->add_instr(IRInstr2op::ldconst, "0", symbol);
 
 	return 0;
 }
@@ -70,12 +78,11 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	string var = visit(ctx->var());	
 
-	ast = new Ast(cfg);
+	ast = new Ast(cfg, var);
 	
 	node_s * root = visit(ctx->expr());
 	ast->set_root(root);
 	ast->gen_instr();
-	cfg->add_instr(IRInstr2op::ldconst, "%retval", var);
 	delete(ast);
 	ast = nullptr;
 
@@ -93,6 +100,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
+	
 	return symbol;
 }
 
@@ -113,9 +121,9 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 // === Expression computation related methods ===
 
 antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * add = create_node(IRInstr3op::add, tmpvar, left, right);
 	
@@ -123,9 +131,9 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->term());
 	node_s * right = visit(ctx->expr());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * sub = create_node(IRInstr3op::sub, tmpvar, left, right);
 	
@@ -137,16 +145,17 @@ antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
+	string tmpvar = ast->get_tmp_var();
 	node_s * left = visit(ctx->f());
 	node_s * right = visit(ctx->term());
-	string tmpvar = ast->get_tmp_var();
 
 	node_s * mul = create_node(IRInstr3op::mul, tmpvar, left, right);
 	return mul;
 }
 
 antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) {
-	// TODO: handle division ! 
+	// Division is not part of the requirements.
+	// We'll handle it later maybe.
 	return 0;
 }
 
@@ -163,5 +172,4 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx) {
 	visit(ctx->expr());
 	return 0;
 }
-
 

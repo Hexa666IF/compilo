@@ -1,0 +1,7 @@
+-1 : erreur de synthaxe détectée par le parser d'antlr4
+-2 : erreur de synthaxe détéctée par le lexer d'antlr4
+
+1 : Une variable utilisée n'a pas été déclarée
+2 : Une variable utilisée n'a pas été initialisée
+3 : Une variable à été déclarée au moins deux fois
+4 : une variable déclarée n'a pas été utilisée

@@ -47,8 +47,6 @@ class Ast
 	public:
 	//----- public methods -----
 		
-		// void add(node_s * node, node_s * left_child, node_s * right_child);
-
 		// Generate the instructions computing and storing the result
 		// into the %retval register.
 		void gen_instr() const;
@@ -61,7 +59,7 @@ class Ast
 		void set_root(node_s * node);
 
 	//--- Constructor - Destructor ---
-		Ast(CFG * control);	
+		Ast(CFG * control, std::string dest = "%retval");	
 		~Ast();
 
 	protected:
@@ -77,6 +75,10 @@ class Ast
 	//----- protected attributes -----
 		node_s * root;
 		CFG * cfg;
+		
+		// Destination is the memory location where the result
+		// need to be stored.
+		std::string destination;
 
 		// gives the next tmp variable number for symbol table.
 		unsigned int n_tmp_var;
