@@ -8,11 +8,13 @@
 #include "antlr4-generated/ifccParser.h"
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
+// #include "Errors.h"
 
 #include "IR.h"
 
 using namespace antlr4;
 using namespace std;
+
 
 int main(int argn, const char **argv) {
   int ret = 0;
@@ -33,7 +35,7 @@ int main(int argn, const char **argv) {
   if(lexer.getNumberOfSyntaxErrors() != 0)
   {
 	cout << "Error during lexer operation... ! " << endl;
-	return lexer.getNumberOfSyntaxErrors();
+	return lexerSyntaxError;
   }
 
   ifccParser parser(&tokens);
@@ -42,13 +44,33 @@ int main(int argn, const char **argv) {
   if(parser.getNumberOfSyntaxErrors() != 0) 
   {
 	cout << "Error during parsing operation... ! " << endl;
-	return parser.getNumberOfSyntaxErrors();
+	return parserSyntaxError;
   }
 
   CFG * cfg = new CFG(nullptr);
   Visitor visitor(cfg);
-  visitor.visit(tree);
-  
-  cfg->gen_asm();
-  return 0;
+
+  try
+  {
+    visitor.visit(tree);
+  }
+  catch(ErrorCode e)
+  {
+    
+  }
+
+  // Print of errors and generation of the assembler if there is none
+  Errors::printErrors();
+  ErrorCode code = Errors::getErrorCode();
+
+  if( (code == errorFree) || (code == notUsed) )
+  {
+    cfg->gen_asm();
+    return errorFree;
+  }
+  else
+  {
+    return code;
+  }
+
 }

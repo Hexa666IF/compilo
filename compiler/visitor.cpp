@@ -2,6 +2,7 @@
 // Generated from ifcc.g4 by ANTLR 4.7.2
 
 #include "visitor.h"
+
 #include <string>
 #include <iostream>
 
@@ -15,6 +16,9 @@ Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c), ast(nullptr)
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
 	visit(ctx->l());
+
+	cfg->warningsUnusedVar();
+
 	return 0;
 }
 
@@ -98,6 +102,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
+	
 	return symbol;
 }
 

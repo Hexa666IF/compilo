@@ -1,4 +1,5 @@
 #include "IR.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -214,11 +215,78 @@ void CFG::add_bb(BasicBlock * bb)
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
-		current_bb->add_instr(op, arg1, arg2);
+	// Test that arg1 is a variable
+	if(isalpha(arg1[0]) != 0)
+	{
+		// Test if the variable arg1 is initialised
+		if( !findVarInitialised(arg1) )
+		{
+			Errors::addError(arg1, notInitialised);
+			throw notInitialised;
+		}
+
+		// The variable arg1 is now used
+		deleteVarUsed(arg1);
+	}
+
+	// If the variable arg2 is not declared
+	if( (arg2[0] != '%') && (get_var_index(arg2) == 0) )
+	{
+		Errors::addError(arg2, notDeclared);
+		throw notDeclared;
+	}
+	else
+	{
+		//arg2 is now initialised
+		addVarInitialised(arg2);
+	}
+
+	current_bb->add_instr(op, arg1, arg2);
 }
 
 void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
 {
+	// Test that arg1 is a variable
+	if(isalpha(arg1[0]) != 0)
+	{
+		// Test if the variable arg1 is initialised
+		if( !findVarInitialised(arg1) )
+		{
+			Errors::addError(arg1, notInitialised);
+			throw notInitialised;
+		}
+
+		// The variable arg1 is now used
+		deleteVarUsed(arg1);
+	}
+
+	// Test that arg2 is a variable
+	if(isalpha(arg2[0]) != 0)
+	{
+		// Test if the variable arg2 is initialised
+		if( !findVarInitialised(arg2) )
+		{
+			Errors::addError(arg2, notInitialised);
+			throw notInitialised;
+		}
+
+		// The variable arg1 is now used
+		deleteVarUsed(arg2);
+	}
+
+	// If the variable arg3 is not declared
+	if( (arg3[0] != '%') && (get_var_index(arg3) == 0) )
+	{
+		Errors::addError(arg3, notDeclared);
+		throw notDeclared;
+	}
+	else
+	{
+		//arg3 is now initialised
+		addVarInitialised(arg3);
+	}
+	
+
 	current_bb->add_instr(op, arg1, arg2, arg3);
 }
 
@@ -269,10 +337,20 @@ string CFG::IR_reg_to_asm(std::string reg)
 
 void CFG::add_to_symbol_table(string name)
 {
-	// TODO : handle multiple declaration errors.
-	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
-	SymbolIndex.insert(p);
-	nextFreeSymbolIndex += 4;
+	// handle multiple declaration errors.
+	if (SymbolIndex.find(name) == SymbolIndex.end())
+	{
+		pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
+		SymbolIndex.insert(p);
+		nextFreeSymbolIndex += 4;
+		addVarUnused(name);
+	}
+	else
+	{
+		Errors::addError(name, multipleDeclaration);
+		//arret du visiteur et retour dans le main
+		throw multipleDeclaration;
+	}
 }
 
 string CFG::create_new_tempvar()
@@ -302,3 +380,44 @@ string CFG::new_BB_name() const
 	return current_bb->getLabel();
 }
 
+void CFG::addVarUnused(string var)
+{
+	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
+	{
+		varUnused.push_back(var);
+	}
+}
+
+void CFG::deleteVarUsed(string var)
+{
+	varUnused.remove(var);
+}
+
+void CFG::warningsUnusedVar()
+{
+	std::list<string>::iterator it;
+	for (it = varUnused.begin(); it != varUnused.end(); ++it)
+	{
+		Errors::addError(*it, notUsed);
+	}
+}
+
+void CFG::addVarInitialised(string var)
+{
+	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
+	{
+		varInitialised.push_back(var);
+	}
+}
+
+bool CFG::findVarInitialised(string var)
+{
+	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

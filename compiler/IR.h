@@ -2,19 +2,19 @@
 #define IR_H
 
 #include <vector>
+#include <list>
 #include <string>
 #include <iostream>
 #include <initializer_list>
 #include <map>
 
 #include "Asm.h"
+#include "Errors.h"
 // Declarations from the parser -- replace with your own
 
 class BasicBlock;
 class CFG;
 class Ast;
-
-
 
 /*
  * IRInstr classes :
@@ -264,7 +264,22 @@ class CFG {
 	// basic block management
 	// TODO : check if the return of this method can be a const reference.
 	std::string new_BB_name() const;
-	
+
+	// Add a new var in varUnused
+	void addVarUnused(std::string var);
+
+	// Delete a var in varUnused if inside
+	void deleteVarUsed(std::string var);
+
+	// Trigger warnings if there are unused variables
+	void warningsUnusedVar();
+
+	// Add a new var in varInitialised
+	void addVarInitialised(std::string var);
+
+	// Find if a var has been initialised
+	bool findVarInitialised(std::string var);
+
  protected:
 	
 	Ast* ast; /**< The AST this CFG comes from */
@@ -277,6 +292,11 @@ class CFG {
 	
 	std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
 	Asm toasm; // asm converter.
+
+	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
+
+	std::list <std::string> varInitialised; /**Store the variable initialised to test them in RValues*/
+	
 };
 
 
