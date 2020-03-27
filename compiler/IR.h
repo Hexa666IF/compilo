@@ -305,7 +305,7 @@ class CFG {
 
 	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
 
-	std::list <std::string> varInitialised; /**Store the variable initialised to test them in RValues*/
+	// std::list <std::string> varInitialised; /**Store the variable initialised to test them in RValues*/
 	
 };
 

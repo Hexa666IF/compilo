@@ -69,6 +69,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 	// Add symbol name to symbol table.
 	string symbol = ctx->TEXT()->getText();
 	cfg->add_to_symbol_table(symbol);
+	cfg->add_instr(IRInstr2op::ldconst, "0", symbol);
 
 	return 0;
 }
