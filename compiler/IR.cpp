@@ -215,12 +215,15 @@ void CFG::add_bb(BasicBlock * bb)
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
+	checkDeclared(arg1);	
 	checkDeclared(arg2);	
 	current_bb->add_instr(op, arg1, arg2);
 }
 
 void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
 {
+	checkDeclared(arg1);
+	checkDeclared(arg2);
 	checkDeclared(arg3);		
 	current_bb->add_instr(op, arg1, arg2, arg3);
 }
@@ -335,7 +338,7 @@ void CFG::warningsUnusedVar()
 
 void CFG::checkDeclared(string var)
 {
-	if( (var[0] != '%') && (get_var_index(var) == 0) )
+	if( isalpha(var[0]) && (get_var_index(var) == 0) )
 	{
 		Errors::addError(var, notDeclared);
 		throw notDeclared;
