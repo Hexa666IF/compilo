@@ -280,6 +280,16 @@ class CFG {
 	// Find if a var has been initialised
 	bool findVarInitialised(std::string var);
 
+	// Check if var has been initialised.
+	// If not, throw an notInitialised Exception
+	// If it is, removed the var from unused variable list.
+	void checkInit(std::string var);
+
+	// Check if var has been declared.
+	// If it isn't, it will throw a notDeclared Exception.
+	// If it is, it will call addVarInitialised.
+	void checkDeclared(std::string var);
+
  protected:
 	
 	Ast* ast; /**< The AST this CFG comes from */

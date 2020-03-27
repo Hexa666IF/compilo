@@ -246,46 +246,14 @@ void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 
 void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
 {
-	// Test that arg1 is a variable
+	// Performing statics checks.
 	if(isalpha(arg1[0]) != 0)
-	{
-		// Test if the variable arg1 is initialised
-		if( !findVarInitialised(arg1) )
-		{
-			Errors::addError(arg1, notInitialised);
-			throw notInitialised;
-		}
+		checkInit(arg1);
 
-		// The variable arg1 is now used
-		deleteVarUsed(arg1);
-	}
-
-	// Test that arg2 is a variable
 	if(isalpha(arg2[0]) != 0)
-	{
-		// Test if the variable arg2 is initialised
-		if( !findVarInitialised(arg2) )
-		{
-			Errors::addError(arg2, notInitialised);
-			throw notInitialised;
-		}
+		checkInit(arg2);
 
-		// The variable arg1 is now used
-		deleteVarUsed(arg2);
-	}
-
-	// If the variable arg3 is not declared
-	if( (arg3[0] != '%') && (get_var_index(arg3) == 0) )
-	{
-		Errors::addError(arg3, notDeclared);
-		throw notDeclared;
-	}
-	else
-	{
-		//arg3 is now initialised
-		addVarInitialised(arg3);
-	}
-	
+	checkDeclared(arg3);		
 
 	current_bb->add_instr(op, arg1, arg2, arg3);
 }
@@ -383,9 +351,7 @@ string CFG::new_BB_name() const
 void CFG::addVarUnused(string var)
 {
 	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
-	{
 		varUnused.push_back(var);
-	}
 }
 
 void CFG::deleteVarUsed(string var)
@@ -397,27 +363,46 @@ void CFG::warningsUnusedVar()
 {
 	std::list<string>::iterator it;
 	for (it = varUnused.begin(); it != varUnused.end(); ++it)
-	{
 		Errors::addError(*it, notUsed);
-	}
 }
 
 void CFG::addVarInitialised(string var)
 {
 	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
-	{
 		varInitialised.push_back(var);
-	}
 }
 
 bool CFG::findVarInitialised(string var)
 {
 	if( find(varInitialised.begin(), varInitialised.end(), var) == varInitialised.end() )
-	{
 		return false;
+	else
+		return true;
+}
+
+void CFG::checkInit(string var)
+{
+	// Test if the variable arg1 is initialised
+	if( !findVarInitialised(var) )
+	{
+		Errors::addError(var, notInitialised);
+		throw notInitialised;
+	}
+
+	// The variable arg1 is now used
+	deleteVarUsed(var);
+}
+
+void CFG::checkDeclared(string var)
+{
+	if( (var[0] != '%') && (get_var_index(var) == 0) )
+	{
+		Errors::addError(var, notDeclared);
+		throw notDeclared;
 	}
 	else
 	{
-		return true;
+		//var is now initialised
+		addVarInitialised(var);
 	}
 }
