@@ -56,23 +56,12 @@ int main(int argn, const char **argv) {
   }
   catch(ErrorCode e)
   {
-    
+  		Errors::printErrors();
+		return e; 
   }
 
   cfg->warningsUnusedVar();
 
-  // Print of errors and generation of the assembler if there is none
-  Errors::printErrors();
-  ErrorCode code = Errors::getErrorCode();
-
-  if( (code == errorFree) || (code == notUsed) )
-  {
-    cfg->gen_asm();
-    return errorFree;
-  }
-  else
-  {
-    return code;
-  }
-
+  cfg->gen_asm();
+  return errorFree;
 }
