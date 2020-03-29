@@ -7,3 +7,6 @@ ifcc
 # Outputs
 output
 pld-test-output
+
+# IDE
+.vscode

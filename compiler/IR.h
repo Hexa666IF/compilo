@@ -9,6 +9,8 @@
 #include <map>
 
 #include "Asm.h"
+#include "Asmx86.h"
+#include "AsmARM.h"
 #include "Errors.h"
 // Declarations from the parser -- replace with your own
 
@@ -198,7 +200,7 @@ class BasicBlock {
  */
 class CFG {
  public:
-	CFG(Ast* ast);
+	CFG(Ast* ast, std::string asm_choice);
 
 	
 	void add_bb(BasicBlock* bb); 
@@ -218,7 +220,9 @@ class CFG {
 	
 	// Helper method : inputs a IR reg or input variable, and return
 	// e.g. "-24(%rbp)" for the proper value of 24 
-	std::string IR_reg_to_asm(std::string reg);
+	std::string IR_reg_to_asm_x86(std::string reg);
+	std::string IR_reg_to_asm_arm(std::string reg);
+	std::string IR_reg_to_asm_msp430(std::string reg);
 	
 	// symbol table methods
 	
@@ -261,7 +265,7 @@ class CFG {
 	int nextBBnumber; /**< just for naming */
 	
 	std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
-	Asm toasm; // asm converter.
+	Asm* toasm; // asm converter.
 
 	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
 };
