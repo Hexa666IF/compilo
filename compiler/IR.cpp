@@ -134,9 +134,17 @@ string BasicBlock::getLabel() const
 
 // === Constructor / Destructor ===
 
-CFG::CFG(Ast * tree)
-: ast(tree), toasm(this, cout)
+CFG::CFG(Ast * tree, std::string asm_choice)
+: ast(tree)
 {
+	if (asm_choice=="-arm") {
+		toasm = new AsmARM(this,cout);
+	} else if (asm_choice=="-msp430") {
+		toasm = new Asmx86(this,cout);
+	} else {
+		toasm = new Asmx86(this,cout);
+	}
+	
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
 	
@@ -184,18 +192,18 @@ void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
 void CFG::gen_asm()
 {
 	// TODO : do not use hardcoded string for globl() call.
-	toasm.globl("main");
-	toasm.gen_prologue(SymbolIndex.size()*4);
+	toasm->globl("main");
+	toasm->gen_prologue(SymbolIndex.size()*4);
 	for(BasicBlock * b : bbs)
 	{
-		b->gen_asm(toasm);
+		b->gen_asm(*toasm);
 	}
-	toasm.gen_epilogue();
+	toasm->gen_epilogue();
 }
 
 // = symbol table methods =
 
-string CFG::IR_reg_to_asm(std::string reg)
+string CFG::IR_reg_to_asm_x86(std::string reg)
 {
 	string asm_reg;
 	int index = get_var_index(reg);
@@ -215,6 +223,28 @@ string CFG::IR_reg_to_asm(std::string reg)
 	else 
 	{
 		asm_reg = '$' + reg;
+	}
+
+	return asm_reg;
+}
+
+string CFG::IR_reg_to_asm_arm(std::string reg)
+{
+	string asm_reg;
+	int index = get_var_index(reg);
+	index = index;
+
+	if(index != 0)
+	{
+		asm_reg = "[fp, #" + to_string(-(index+4)) + "]";
+	}
+	else if (reg[0] == '%')
+	{
+		asm_reg = reg;
+	}
+	else 
+	{
+		asm_reg = '#' + reg;
 	}
 
 	return asm_reg;

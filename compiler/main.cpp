@@ -18,10 +18,17 @@ using namespace std;
 
 int main(int argn, const char **argv) {
 	int ret = 0;
+	std::string asm_choice = "-x86";
 	stringstream in;
-	if (argn==2) {
-		ifstream lecture(argv[1]);
+	if (argn>=2) {
+		int pathIndex = 1;
+		if (argn==3) {
+			pathIndex = 2;
+			asm_choice = argv[1];
+		}
+		ifstream lecture(argv[pathIndex]);
 		in << lecture.rdbuf();
+
 	}
 	ANTLRInputStream input(in.str());
 	ifccLexer lexer(&input);
@@ -47,7 +54,7 @@ int main(int argn, const char **argv) {
 		return parserSyntaxError;
 	}
 
-	CFG * cfg = new CFG(nullptr);
+	CFG * cfg = new CFG(nullptr, asm_choice);
 	Visitor visitor(cfg);
 
 	try
