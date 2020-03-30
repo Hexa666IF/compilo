@@ -213,8 +213,8 @@ void Ast::removeFromUnuseds(string variable)
 bool Ast::isDeclared(string variable) const
 {
 	bool declared = false;
-	unordered_set<string>::const_iterator cit = unuseds.find(variable);
-	if(cit != unuseds.cend())
+	map<string, int>::const_iterator cit = symbolIndex.find(variable);
+	if(cit != symbolIndex.cend())
 		declared = true;
 	
 	return declared;
