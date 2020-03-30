@@ -179,6 +179,7 @@ class Ast
 
 		std::map<std::string, int> getSymbolIndex() const;
 
+		const std::unordered_set<std::string> & getUnuseds() const;
 	//--- Constructor - Destructor ---
 		Ast();	
 		~Ast();

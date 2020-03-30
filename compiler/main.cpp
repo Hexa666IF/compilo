@@ -66,8 +66,11 @@ int main(int argn, const char **argv) {
 		return e; 
 	}
 
+	const unordered_set<string> & unuseds = visitor.getAst()->getUnuseds();
+	for(string var : unuseds)
+			cerr << "WARNING : " << var << " is declared but never used." << endl;
+
 	CFG * cfg = new CFG(visitor.getAst(), asm_choice);
-	//cfg->warningsUnusedVar();
 	cfg->gen_asm();
 	
 	// errorFree <=> 0.

@@ -225,6 +225,11 @@ map<string, int> Ast::getSymbolIndex() const
 	return symbolIndex;
 }
 
+const unordered_set<string> & Ast::getUnuseds() const
+{
+	return unuseds;
+}
+
 //------------- Constructor - Destructor ------------------------------------
 
 Ast::Ast()
