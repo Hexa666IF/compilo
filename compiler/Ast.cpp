@@ -54,7 +54,9 @@ void Ast::addSymbol(string symbol)
 {
 	pair<string, int> p = make_pair(symbol, next_index);
 	symbolIndex.insert(p);
-	next_index += 4;	
+	next_index += 4;
+
+	unuseds.insert(symbol);	
 }
 
 void Ast::gen_instr(CFG * cfg) const
@@ -63,6 +65,13 @@ void Ast::gen_instr(CFG * cfg) const
 	{
 		node->gen_instr(cfg);
 	}
+}
+
+void Ast::removeFromUnuseds(string variable)
+{
+	unordered_set<string>::iterator it = unuseds.find(variable);
+	if(it != unuseds.end())
+			unuseds.erase(it);
 }
 
 map<string, int> Ast::getSymbolIndex() const
@@ -125,11 +134,11 @@ Ast::~Ast()
 
 // ----- Constructors - Destructor ------
 
-// Node::Node()
-// : sub_nodes()
-// {
-//
-// }
+Node::Node(Ast * ast)
+: parentTree(ast)
+{
+
+}
 
 // Node::~Node()
 // {
@@ -138,7 +147,20 @@ Ast::~Ast()
 
 // ----- Public methods ------
 
+void Node::setParent(Ast * ast)
+{
+	parentTree = ast;
+}
+
 // ================== RValue related stuff ========================
+
+// Constructor
+
+RValue::RValue(Ast * ast)
+: Node(ast)
+{
+
+}
 
 // Public Methods 
 
@@ -146,14 +168,14 @@ Ast::~Ast()
 
 // ----- Constructor -----
 
-Constant::Constant(int val)
-: RValue(), value(val)
+Constant::Constant(int val, Ast * ast)
+: RValue(ast), value(val)
 {
 
 }
 
-Constant::Constant(string val)
-: RValue(), value(atoi(val.c_str()))
+Constant::Constant(string val, Ast * ast)
+: RValue(ast), value(atoi(val.c_str()))
 {
 
 }
@@ -174,8 +196,8 @@ void Constant::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Variable::Variable(string variable)
-: RValue(), name(variable)
+Variable::Variable(string variable, Ast * ast)
+: RValue(ast), name(variable)
 {
 	
 }
@@ -184,6 +206,7 @@ Variable::Variable(string variable)
 
 string Variable::getValue() const
 {
+	parentTree->removeFromUnuseds(name);
 	return name;
 }
 
@@ -196,8 +219,12 @@ void Variable::gen_instr(CFG * cfg) const
 
 // ----- Constructor - Destructor -----
 
-Operation::Operation(IRInstr3op::Operation3op op, RValue * l, RValue * r)
-: RValue(), left(l), right(r), operation(op), tmp_var(get_tmp_var())
+Operation::Operation(	IRInstr3op::Operation3op op, 
+						RValue * l, 
+						RValue * r,
+						Ast * ast
+					)
+: RValue(ast), left(l), right(r), operation(op), tmp_var(get_tmp_var())
 {
 
 }
@@ -235,10 +262,10 @@ void Operation::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Return::Return(RValue * retval)
-: Node(), retvalue(retval)
+Return::Return(RValue * retval, Ast * ast)
+: Node(ast), retvalue(retval)
 {
-
+	// TODO : perform checks.
 }
 
 // ----- public methods ------
@@ -255,8 +282,8 @@ void Return::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Assign::Assign(Variable * dest, RValue * rval)
-: Node(), lvalue(dest), rvalue(rval)
+Assign::Assign(Variable * dest, RValue * rval, Ast * ast)
+: Node(ast), lvalue(dest), rvalue(rval)
 {
 
 }

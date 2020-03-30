@@ -39,7 +39,7 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
-	Return * ret = new Return(retval);
+	Return * ret = new Return(retval, ast);
 	ast->addNode(ret);
 
 	return 0;
@@ -64,7 +64,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 	string symbol = ctx->TEXT()->getText();
 	ast->addSymbol(symbol);
 	Variable * variable = new Variable(symbol);
-	Assign * assign = new Assign(variable, new Constant(0));
+	Assign * assign = new Assign(variable, new Constant(0), ast);
 	ast->addNode(assign);
 	
 	return 0;
@@ -73,7 +73,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	Variable * var = visit(ctx->var());	
-	Assign * assign = new Assign(var, visit(ctx->expr()));
+	Assign * assign = new Assign(var, visit(ctx->expr()), ast);
 	ast->addNode(assign);
 
 	return 0;

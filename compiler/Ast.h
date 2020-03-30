@@ -9,6 +9,7 @@ e-mail :
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 #include "IR.h"
 
@@ -16,18 +17,21 @@ class Node
 {
 	public:
 	// ----- public methods -----
-	
+		
 		// Generate IRInstr and give them to the CFG.
 		virtual void gen_instr(CFG * cfg) const = 0;
 
+		void setParent(Ast * ast);
+
 	// ----- Constructor - Destructor -----
-		// Node();
+		Node(Ast * ast = nullptr);
 		// ~Node();
 
 	protected:
 	// ----- protected methods -----
 	
 	// ----- protected attributes -----
+		Ast * parentTree;
 };
 
 class RValue : public Node
@@ -41,6 +45,7 @@ class RValue : public Node
 		virtual std::string getValue() const = 0;
 
 	// ----- Constructor - Destructor -----
+		RValue(Ast * ast = nullptr);
 	
 };
 
@@ -53,8 +58,8 @@ class Constant : public RValue
 		void gen_instr(CFG * cfg) const;	
 	
 	// ----- Constructor -----
-		Constant(int val);
-		Constant(std::string val);
+		Constant(int val, Ast * ast = nullptr);
+		Constant(std::string val, Ast * = nullptr);
 	
 	protected:
 		int value;
@@ -64,12 +69,17 @@ class Variable : public RValue
 {
 	public:
 	// ----- public methods -----
+	
+		// Return the name of the variable.
+		// This function also call the removeFromUnuseds methods
+		// from the AST. Indeed, if our variable is present in the
+		// tree, that mean it is used somewhere in the source code.
 		std::string getValue() const;
 
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Variable(std::string variable);
+		Variable(std::string variable, Ast * ast = nullptr);
 
 	protected:
 		std::string name;
@@ -84,7 +94,13 @@ class Operation : public RValue
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Operation(IRInstr3op::Operation3op op, RValue * l, RValue * r);
+		Operation(	
+					IRInstr3op::Operation3op op, 
+					RValue * l, 
+					RValue * r, 
+					Ast * ast = nullptr
+					);
+
 		~Operation();
 		
 	protected:
@@ -112,7 +128,7 @@ class Return : public Node
 		void gen_instr(CFG * cfg) const;
 	
 	// ----- Constructor -----	
-		Return(RValue * rval);
+		Return(RValue * rval, Ast * ast = nullptr);
 
 	protected:
 		RValue * retvalue;
@@ -126,7 +142,7 @@ class Assign : public Node
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Assign(Variable * dest, RValue * rval);
+		Assign(Variable * dest, RValue * rval, Ast * ast = nullptr);
 	
 	protected:
 		Variable * lvalue;
@@ -149,6 +165,12 @@ class Ast
 		// Generate IRInstr and put them into the CFG by
 		// calling the cfg add_instr method.
 		void gen_instr(CFG * cfg) const;
+		
+		// Remove a variable name from the unuseds unordered_set.
+		// This method should be called by the node that can perform
+		// checks to ensure that variable is declared... or used in this case.
+		// If the variable has already been removed, the function does nothing.
+		void removeFromUnuseds(std::string variable);
 
 		std::map<std::string, int> getSymbolIndex() const;
 
@@ -168,6 +190,8 @@ class Ast
 		// addSymbol method.
 		std::map<std::string, int> symbolIndex;
 		int next_index;
+
+		std::unordered_set<std::string> unuseds;
 
 };
 
