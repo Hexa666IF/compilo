@@ -8,119 +8,246 @@ e-mail :
 
 using namespace std;
 
-// === node_s methods ==
 
-node_s * create_leaf(string val)
-{
-	node_s * leaf = new node_s { true, IRInstr3op::add, nullptr, nullptr, val};
-	// We give the 'add' value to the operation, but it will not be considered
-	// anyway.
-	return leaf;
-}
-
-node_s * create_node(	
-						IRInstr3op::Operation3op op, 
-						string valname,
-						node_s * left,
-						node_s * right
-					)
-{
-	node_s * node = new node_s { false, op, left, right, valname };
-	return node;
-}
-
-void uproot_node(node_s * root)
-{
-	if(root->left != nullptr)
-			uproot_node(root->left);
-	if(root->right != nullptr)
-			uproot_node(root->right);
-
-	delete root;
-}	
-
+// ========================== Ast related stuff ================================
 //------------- public methods -------------------------------------------------
 
-void Ast::gen_instr() const
+// void Ast::gen_instr() const
+// {
+//	if(root->isValue == false)
+//		gen_instr(root);
+//	else
+//		cfg->add_instr(IRInstr2op::ldconst, root->val, destination);	
+// }
+
+// string Ast::get_tmp_var()
+// {
+// 	string name;
+// 	if(n_tmp_var == 0)
+//	// n_tmp_var == 0 => we are creating the root calculation.
+//	// So the destination of the root calculation must be the destination of
+//	// the whole computation (stored into Ast::destination).
+//	{
+//		name = destination;
+//	}
+//	else 
+//	{
+//		name = "!tmp" + to_string(n_tmp_var);
+//		cfg->add_to_symbol_table(name);
+//	}
+//	++n_tmp_var;
+//	
+//	return name;
+// }
+
+// void Ast::set_root(node_s * node)
+// {
+// 	root = node;
+// }
+
+void Ast::addNode(Node * node)
 {
-	if(root->isValue == false)
-		gen_instr(root);
-	else
-		cfg->add_instr(IRInstr2op::ldconst, root->val, destination);	
+	childs.push_back(node);	
 }
 
-string Ast::get_tmp_var()
+void Ast::addSymbol(string symbol)
 {
-	string name;
-	if(n_tmp_var == 0)
-	// n_tmp_var == 0 => we are creating the root calculation.
-	// So the destination of the root calculation must be the destination of
-	// the whole computation (stored into Ast::destination).
-	{
-		name = destination;
-	}
-	else 
-	{
-		name = "!tmp" + to_string(n_tmp_var);
-		cfg->add_to_symbol_table(name);
-	}
-	++n_tmp_var;
-	
-	return name;
+	pair<string, unsigned int> p = make_pair(symbol, next_index);
+	symbolIndex.insert(p);
+	next_index += 4;	
 }
-
-void Ast::set_root(node_s * node)
-{
-	root = node;
-}
-
 //------------- Constructor - Destructor ------------------------------------
 
-Ast::Ast(CFG * control, string dest)
-		: root(nullptr), cfg(control), destination(dest), n_tmp_var(0)
+Ast::Ast()
+: childs(), symbolIndex(), next_index(4)
 {
 
 }
 
 Ast::~Ast()
 {
-	uproot_node(root);	
+	// uproot_node(root);	
 }
 
 //------------- protected methods -----------------------------------------------
 
-void Ast::gen_instr(node_s * node) const
+// void Ast::gen_instr(node_s * node) const
+// {
+//	if(node->left->isValue == false)
+//			gen_instr(node->left);
+//
+//	if(node->right->isValue == false)
+//			gen_instr(node->right);
+//
+//	switch(node->op)
+//	{
+//			case IRInstr3op::add:
+//				cfg->add_instr(	IRInstr3op::add, 
+//								node->left->val, 
+//								node->right->val, 
+//								node->val);
+//				break;
+//			
+//			case IRInstr3op::sub:
+//				cfg->add_instr(	IRInstr3op::sub, 
+//								node->left->val, 
+//								node->right->val, 
+//								node->val);
+//				break;
+//
+//			case IRInstr3op::mul:
+//				cfg->add_instr(	IRInstr3op::mul, 
+//								node->left->val, 
+//								node->right->val, 
+//								node->val);
+//				break;
+//
+//			default:
+//				break;
+//	}
+// }
+
+// ================= Node Related stuff ========================
+
+// ----- Constructors - Destructor ------
+
+// Node::Node()
+// : sub_nodes()
+// {
+//
+// }
+
+// Node::~Node()
+// {
+// 	delete sub_nodes;
+// }
+
+// ----- Public methods ------
+
+// ================== RValue related stuff ========================
+
+// Public Methods 
+
+// ================== Constant related stuff ======================
+
+// ----- Constructor -----
+
+Constant::Constant(int val)
+: RValue(), value(val)
 {
-	if(node->left->isValue == false)
-			gen_instr(node->left);
 
-	if(node->right->isValue == false)
-			gen_instr(node->right);
+}
 
-	switch(node->op)
-	{
-			case IRInstr3op::add:
-				cfg->add_instr(	IRInstr3op::add, 
-								node->left->val, 
-								node->right->val, 
-								node->val);
-				break;
-				
-			case IRInstr3op::sub:
-				cfg->add_instr(	IRInstr3op::sub, 
-								node->left->val, 
-								node->right->val, 
-								node->val);
-				break;
+Constant::Constant(string val)
+: RValue(), value(atoi(val.c_str()))
+{
 
-			case IRInstr3op::mul:
-				cfg->add_instr(	IRInstr3op::mul, 
-								node->left->val, 
-								node->right->val, 
-								node->val);
-				break;
+}
 
-			default:
-				break;
-	}
+// ----- public methods -----
+
+string Constant::getValue() const
+{
+	return to_string(value);
+}
+
+void Constant::gen_instr(CFG * cfg) const
+{
+	// TODO : find a way that doesn't use this blank function !
+}
+
+// ================== Variable related stuff ======================
+
+// ----- Constructor -----
+
+Variable::Variable(string variable)
+: RValue(), name(variable)
+{
+	
+}
+
+// ----- public methods -----
+
+string Variable::getValue() const
+{
+	return name;
+}
+
+void Variable::gen_instr(CFG * cfg) const
+{
+	// TODO : find a way that doesn't use this blank function !
+}
+
+// ================== Operation related stuff =====================
+
+// ----- Constructor - Destructor -----
+
+Operation::Operation(IRInstr3op::Operation3op op, RValue * l, RValue * r)
+: RValue(), left(l), right(r), operation(op), tmp_var(get_tmp_var())
+{
+
+}
+
+Operation::~Operation()
+{
+	delete left;
+	delete right;
+}
+
+// ----- public methods -----
+
+string Operation::getValue() const
+{
+	return tmp_var;
+}
+
+string Operation::get_tmp_var()
+{
+	static unsigned int next_tmp = 0;
+	return "!tmp" + to_string(next_tmp++);
+}
+
+void Operation::gen_instr(CFG * cfg) const
+{
+	// TODO: perform check to avoid calling functions that don't need to.
+	left->gen_instr(cfg);
+	right->gen_instr(cfg);
+
+	cfg->add_instr(operation, left->getValue(), right->getValue(), tmp_var);
+}
+
+// ================== Return Related stuff ========================
+
+// ----- Constructor -----
+
+Return::Return(RValue * retval)
+: Node(), retvalue(retval)
+{
+
+}
+
+// ----- public methods ------
+
+void Return::gen_instr(CFG * cfg) const
+{
+	// TODO: perform check to avoid calling methods that doesn't need to.
+	retvalue->gen_instr(cfg);
+	
+	cfg->add_instr(IRInstr2op::ldconst, retvalue->getValue(), "%retval");
+}
+
+// ================== Assign related stuff ========================
+
+// ----- Constructor -----
+
+Assign::Assign(Variable * dest, RValue * rval)
+: Node(), lvalue(dest), rvalue(rval)
+{
+
+}
+// ----- public methods -----
+void Assign::gen_instr(CFG * cfg) const
+{
+	rvalue->gen_instr(cfg);
+	cfg->add_instr(IRInstr2op::ldconst, rvalue->getValue(), lvalue->getValue());
 }
