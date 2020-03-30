@@ -250,6 +250,32 @@ string CFG::IR_reg_to_asm_arm(std::string reg)
 	return asm_reg;
 }
 
+string CFG::IR_reg_to_asm_MSP430(std::string reg)
+// to-do : find the MSP430 equivalent
+{
+	string asm_reg;
+	int index = get_var_index(reg);
+
+	if(index != 0)
+	{
+		asm_reg = "@" + reg;
+	}
+	else if (reg[0] == '%')
+	{
+		if(reg == "%retval")
+				asm_reg = "R12";
+
+		if(reg == "%rbp")
+				asm_reg = "%rbp";
+	}
+	else 
+	{
+		asm_reg = '#' + reg;
+	}
+
+	return asm_reg;
+}
+
 void CFG::add_to_symbol_table(string name)
 {
 	// handle multiple declaration errors.
