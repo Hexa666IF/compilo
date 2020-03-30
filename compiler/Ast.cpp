@@ -8,144 +8,6 @@ e-mail :
 
 using namespace std;
 
-
-// ========================== Ast related stuff ================================
-//------------- public methods -------------------------------------------------
-
-// void Ast::gen_instr() const
-// {
-//	if(root->isValue == false)
-//		gen_instr(root);
-//	else
-//		cfg->add_instr(IRInstr2op::ldconst, root->val, destination);	
-// }
-
-// string Ast::get_tmp_var()
-// {
-// 	string name;
-// 	if(n_tmp_var == 0)
-//	// n_tmp_var == 0 => we are creating the root calculation.
-//	// So the destination of the root calculation must be the destination of
-//	// the whole computation (stored into Ast::destination).
-//	{
-//		name = destination;
-//	}
-//	else 
-//	{
-//		name = "!tmp" + to_string(n_tmp_var);
-//		cfg->add_to_symbol_table(name);
-//	}
-//	++n_tmp_var;
-//	
-//	return name;
-// }
-
-// void Ast::set_root(node_s * node)
-// {
-// 	root = node;
-// }
-
-void Ast::addNode(Node * node)
-{
-	childs.push_back(node);	
-}
-
-void Ast::addSymbol(string symbol)
-{
-	if(symbolIndex.find(symbol) != symbolIndex.end())
-	{
-			Errors::addError(symbol, multipleDeclaration);
-			throw multipleDeclaration;
-	}
-
-	pair<string, int> p = make_pair(symbol, next_index);
-	symbolIndex.insert(p);
-	next_index += 4;
-
-	unuseds.insert(symbol);	
-}
-
-void Ast::gen_instr(CFG * cfg) const
-{
-	for(Node * node : childs)
-	{
-		node->gen_instr(cfg);
-	}
-}
-
-void Ast::removeFromUnuseds(string variable)
-{
-	unordered_set<string>::iterator it = unuseds.find(variable);
-	if(it != unuseds.end())
-			unuseds.erase(it);
-}
-
-bool Ast::isDeclared(string variable) const
-{
-	bool declared = false;
-	unordered_set<string>::const_iterator cit = unuseds.find(variable);
-	if(cit != unuseds.cend())
-		declared = true;
-	
-	return declared;
-}
-
-map<string, int> Ast::getSymbolIndex() const
-{
-	return symbolIndex;
-}
-
-//------------- Constructor - Destructor ------------------------------------
-
-Ast::Ast()
-: childs(), symbolIndex(), next_index(4)
-{
-
-}
-
-Ast::~Ast()
-{
-	// uproot_node(root);	
-}
-
-//------------- protected methods -----------------------------------------------
-
-// void Ast::gen_instr(node_s * node) const
-// {
-//	if(node->left->isValue == false)
-//			gen_instr(node->left);
-//
-//	if(node->right->isValue == false)
-//			gen_instr(node->right);
-//
-//	switch(node->op)
-//	{
-//			case IRInstr3op::add:
-//				cfg->add_instr(	IRInstr3op::add, 
-//								node->left->val, 
-//								node->right->val, 
-//								node->val);
-//				break;
-//			
-//			case IRInstr3op::sub:
-//				cfg->add_instr(	IRInstr3op::sub, 
-//								node->left->val, 
-//								node->right->val, 
-//								node->val);
-//				break;
-//
-//			case IRInstr3op::mul:
-//				cfg->add_instr(	IRInstr3op::mul, 
-//								node->left->val, 
-//								node->right->val, 
-//								node->val);
-//				break;
-//
-//			default:
-//				break;
-//	}
-// }
-
 // ================= Node Related stuff ========================
 
 // ----- Constructors - Destructor ------
@@ -155,11 +17,6 @@ Node::Node(Ast * ast)
 {
 
 }
-
-// Node::~Node()
-// {
-// 	delete sub_nodes;
-// }
 
 // ----- Public methods ------
 
@@ -313,3 +170,74 @@ void Assign::gen_instr(CFG * cfg) const
 	rvalue->gen_instr(cfg);
 	cfg->add_instr(IRInstr2op::ldconst, rvalue->getValue(), lvalue->getValue());
 }
+
+// ========================== Ast related stuff ================================
+
+//------------- public methods -------------------------------------------------
+
+void Ast::addNode(Node * node)
+{
+	childs.push_back(node);	
+}
+
+void Ast::addSymbol(string symbol)
+{
+	if(symbolIndex.find(symbol) != symbolIndex.end())
+	{
+			Errors::addError(symbol, multipleDeclaration);
+			throw multipleDeclaration;
+	}
+
+	pair<string, int> p = make_pair(symbol, next_index);
+	symbolIndex.insert(p);
+	next_index += 4;
+
+	unuseds.insert(symbol);	
+}
+
+void Ast::gen_instr(CFG * cfg) const
+{
+	for(Node * node : childs)
+	{
+		node->gen_instr(cfg);
+	}
+}
+
+void Ast::removeFromUnuseds(string variable)
+{
+	unordered_set<string>::iterator it = unuseds.find(variable);
+	if(it != unuseds.end())
+			unuseds.erase(it);
+}
+
+bool Ast::isDeclared(string variable) const
+{
+	bool declared = false;
+	unordered_set<string>::const_iterator cit = unuseds.find(variable);
+	if(cit != unuseds.cend())
+		declared = true;
+	
+	return declared;
+}
+
+map<string, int> Ast::getSymbolIndex() const
+{
+	return symbolIndex;
+}
+
+//------------- Constructor - Destructor ------------------------------------
+
+Ast::Ast()
+: childs(), symbolIndex(), next_index(4)
+{
+
+}
+
+Ast::~Ast()
+{
+	
+}
+
+//------------- protected methods -----------------------------------------------
+
+
