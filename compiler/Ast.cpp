@@ -227,6 +227,7 @@ void Operation::gen_instr(CFG * cfg) const
 	left->gen_instr(cfg);
 	right->gen_instr(cfg);
 
+	cfg->add_to_symbol_table(tmp_var);
 	cfg->add_instr(operation, left->getValue(), right->getValue(), tmp_var);
 }
 
