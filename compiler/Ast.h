@@ -146,6 +146,8 @@ class Ast
 		
 		void addSymbol(std::string symbol);
 
+		std::map<std::string, int> getSymbolIndex() const;
+
 	//--- Constructor - Destructor ---
 		Ast();	
 		~Ast();
@@ -160,8 +162,8 @@ class Ast
 		// The symbol table held by the AST.
 		// Variable will be inserted inside this map by the
 		// addSymbol method.
-		std::map<std::string, unsigned int> symbolIndex;
-		unsigned int next_index;
+		std::map<std::string, int> symbolIndex;
+		int next_index;
 
 };
 

@@ -3,6 +3,8 @@
 
 using namespace std;
 
+#include "Ast.h"
+
 // ========================= IRInstr =========================================
 
 // ====== IRInstr class related stuff ======
@@ -139,7 +141,7 @@ CFG::CFG(Ast * tree)
 {
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
-	
+	SymbolIndex = tree->getSymbolIndex();	
 	nextFreeSymbolIndex = 4;
 	// TODO: check that nextBBnumber is correctly initialised.
 	nextBBnumber = 0;

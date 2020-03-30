@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c)
+Visitor::Visitor() : ifccVisitor()
 {
 	ast = new Ast();
 }
@@ -82,7 +82,7 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	cfg->add_to_symbol_table(symbol);
+	ast->addSymbol(symbol);
 	Variable * variable = new Variable(symbol);
 	
 	return variable;
@@ -171,5 +171,10 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx)
 	RValue * op = visit(ctx->expr());
 	
 	return op;
+}
+
+Ast * Visitor::getAst() const
+{
+	return ast;
 }
 

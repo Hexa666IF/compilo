@@ -52,10 +52,16 @@ void Ast::addNode(Node * node)
 
 void Ast::addSymbol(string symbol)
 {
-	pair<string, unsigned int> p = make_pair(symbol, next_index);
+	pair<string, int> p = make_pair(symbol, next_index);
 	symbolIndex.insert(p);
 	next_index += 4;	
 }
+
+map<string, int> Ast::getSymbolIndex() const
+{
+	return symbolIndex;
+}
+
 //------------- Constructor - Destructor ------------------------------------
 
 Ast::Ast()

@@ -198,7 +198,7 @@ class BasicBlock {
  */
 class CFG {
  public:
-	CFG(Ast* ast);
+	CFG(Ast * ast);
 
 	
 	void add_bb(BasicBlock* bb); 

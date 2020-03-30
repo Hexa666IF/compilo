@@ -47,8 +47,7 @@ int main(int argn, const char **argv) {
 		return parserSyntaxError;
 	}
 
-	CFG * cfg = new CFG(nullptr);
-	Visitor visitor(cfg);
+	Visitor visitor;
 
 	try
 	{
@@ -60,6 +59,7 @@ int main(int argn, const char **argv) {
 		return e; 
 	}
 
+	CFG * cfg = new CFG(visitor.getAst());
 	cfg->warningsUnusedVar();
 	cfg->gen_asm();
 	
