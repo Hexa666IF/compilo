@@ -53,7 +53,10 @@ void Ast::addNode(Node * node)
 void Ast::addSymbol(string symbol)
 {
 	if(symbolIndex.find(symbol) != symbolIndex.end())
+	{
+			Errors::addError(symbol, multipleDeclaration);
 			throw multipleDeclaration;
+	}
 
 	pair<string, int> p = make_pair(symbol, next_index);
 	symbolIndex.insert(p);
@@ -213,7 +216,10 @@ Variable::Variable(string variable, Ast * ast)
 : RValue(ast), name(variable)
 {
 	if(parentTree->isDeclared(name) == false)
+	{
+		Errors::addError(name, notDeclared);
 		throw notDeclared;
+	}
 }
 
 // ----- public methods -----
