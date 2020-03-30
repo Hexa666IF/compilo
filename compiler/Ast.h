@@ -12,6 +12,7 @@ e-mail :
 #include <unordered_set>
 
 #include "IR.h"
+#include "Errors.h"
 
 class Node
 {
@@ -58,8 +59,8 @@ class Constant : public RValue
 		void gen_instr(CFG * cfg) const;	
 	
 	// ----- Constructor -----
-		Constant(int val, Ast * ast = nullptr);
-		Constant(std::string val, Ast * = nullptr);
+		Constant(int val, Ast * ast);
+		Constant(std::string val, Ast * ast);
 	
 	protected:
 		int value;
@@ -79,7 +80,7 @@ class Variable : public RValue
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Variable(std::string variable, Ast * ast = nullptr);
+		Variable(std::string variable, Ast * ast);
 
 	protected:
 		std::string name;
@@ -98,7 +99,7 @@ class Operation : public RValue
 					IRInstr3op::Operation3op op, 
 					RValue * l, 
 					RValue * r, 
-					Ast * ast = nullptr
+					Ast * ast
 					);
 
 		~Operation();
@@ -128,7 +129,7 @@ class Return : public Node
 		void gen_instr(CFG * cfg) const;
 	
 	// ----- Constructor -----	
-		Return(RValue * rval, Ast * ast = nullptr);
+		Return(RValue * rval, Ast * ast);
 
 	protected:
 		RValue * retvalue;
@@ -142,7 +143,7 @@ class Assign : public Node
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Assign(Variable * dest, RValue * rval, Ast * ast = nullptr);
+		Assign(Variable * dest, RValue * rval, Ast * ast);
 	
 	protected:
 		Variable * lvalue;
@@ -171,6 +172,10 @@ class Ast
 		// checks to ensure that variable is declared... or used in this case.
 		// If the variable has already been removed, the function does nothing.
 		void removeFromUnuseds(std::string variable);
+
+		// Return true if variable is in symbolIndex, 
+		// return false otherwise.
+		bool isDeclared(std::string variable) const;
 
 		std::map<std::string, int> getSymbolIndex() const;
 

@@ -52,6 +52,9 @@ void Ast::addNode(Node * node)
 
 void Ast::addSymbol(string symbol)
 {
+	if(symbolIndex.find(symbol) != symbolIndex.end())
+			throw multipleDeclaration;
+
 	pair<string, int> p = make_pair(symbol, next_index);
 	symbolIndex.insert(p);
 	next_index += 4;
@@ -72,6 +75,16 @@ void Ast::removeFromUnuseds(string variable)
 	unordered_set<string>::iterator it = unuseds.find(variable);
 	if(it != unuseds.end())
 			unuseds.erase(it);
+}
+
+bool Ast::isDeclared(string variable) const
+{
+	bool declared = false;
+	unordered_set<string>::const_iterator cit = unuseds.find(variable);
+	if(cit != unuseds.cend())
+		declared = true;
+	
+	return declared;
 }
 
 map<string, int> Ast::getSymbolIndex() const
@@ -199,7 +212,8 @@ void Constant::gen_instr(CFG * cfg) const
 Variable::Variable(string variable, Ast * ast)
 : RValue(ast), name(variable)
 {
-	
+	if(parentTree->isDeclared(name) == false)
+		throw notDeclared;
 }
 
 // ----- public methods -----

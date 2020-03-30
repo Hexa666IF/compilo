@@ -63,8 +63,8 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
 	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol);
-	Assign * assign = new Assign(variable, new Constant(0), ast);
+	Variable * variable = new Variable(symbol, ast);
+	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
 	ast->addNode(assign);
 	
 	return 0;
@@ -83,7 +83,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
 	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol);
+	Variable * variable = new Variable(symbol, ast);
 	
 	return variable;
 }
@@ -91,7 +91,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	Variable * variable = new Variable(symbol);
+	Variable * variable = new Variable(symbol, ast);
 	
 	return variable;
 }
@@ -99,7 +99,7 @@ antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
 	string val = ctx->CONST()->getText();
-	RValue * constant = new Constant(val);
+	RValue * constant = new Constant(val, ast);
 	
 	return constant;
 }
@@ -107,7 +107,7 @@ antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	RValue * variable = new Variable(symbol);
+	RValue * variable = new Variable(symbol, ast);
 	
 	return variable;
 }
@@ -118,7 +118,7 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * add = new Operation(IRInstr3op::add, left, right);
+	RValue * add = new Operation(IRInstr3op::add, left, right, ast);
 	
 	return add;
 }
@@ -127,7 +127,7 @@ antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * sub = new Operation(IRInstr3op::sub, left, right);
+	RValue * sub = new Operation(IRInstr3op::sub, left, right, ast);
 	
 	return sub;
 }
@@ -142,7 +142,7 @@ antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx)
 {
 	RValue * left = visit(ctx->f());
 	RValue * right = visit(ctx->term());
-	RValue * mul = new Operation(IRInstr3op::mul, left, right); 
+	RValue * mul = new Operation(IRInstr3op::mul, left, right, ast); 
 	
 	return mul;
 }
