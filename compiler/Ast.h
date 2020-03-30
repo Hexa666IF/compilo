@@ -146,6 +146,10 @@ class Ast
 		
 		void addSymbol(std::string symbol);
 
+		// Generate IRInstr and put them into the CFG by
+		// calling the cfg add_instr method.
+		void gen_instr(CFG * cfg) const;
+
 		std::map<std::string, int> getSymbolIndex() const;
 
 	//--- Constructor - Destructor ---

@@ -57,6 +57,14 @@ void Ast::addSymbol(string symbol)
 	next_index += 4;	
 }
 
+void Ast::gen_instr(CFG * cfg) const
+{
+	for(Node * node : childs)
+	{
+		node->gen_instr(cfg);
+	}
+}
+
 map<string, int> Ast::getSymbolIndex() const
 {
 	return symbolIndex;
