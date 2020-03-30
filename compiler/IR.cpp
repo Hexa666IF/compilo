@@ -174,16 +174,11 @@ void CFG::add_bb(BasicBlock * bb)
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
-	checkDeclared(arg1);	
-	checkDeclared(arg2);	
 	current_bb->add_instr(op, arg1, arg2);
 }
 
 void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
 {
-	checkDeclared(arg1);
-	checkDeclared(arg2);
-	checkDeclared(arg3);		
 	current_bb->add_instr(op, arg1, arg2, arg3);
 }
 
@@ -257,18 +252,9 @@ string CFG::IR_reg_to_asm_arm(std::string reg)
 void CFG::add_to_symbol_table(string name)
 {
 	// handle multiple declaration errors.
-	if (SymbolIndex.find(name) == SymbolIndex.end())
-	{
-		pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
-		SymbolIndex.insert(p);
-		nextFreeSymbolIndex += 4;
-		addVarUnused(name);
-	}
-	else
-	{
-		Errors::addError(name, multipleDeclaration);
-		throw multipleDeclaration;
-	}
+	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
+	SymbolIndex.insert(p);
+	nextFreeSymbolIndex += 4;
 }
 
 string CFG::create_new_tempvar()
@@ -297,29 +283,3 @@ string CFG::new_BB_name() const
 	return current_bb->getLabel();
 }
 
-void CFG::addVarUnused(const string var)
-{
-	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
-		varUnused.push_back(var);
-}
-
-void CFG::deleteVarUsed(const string var)
-{
-	varUnused.remove(var);
-}
-
-void CFG::warningsUnusedVar() const
-{
-	std::list<string>::const_iterator it;
-	for (it = varUnused.cbegin(); it != varUnused.cend(); ++it)
-		Errors::addError(*it, notUsed);
-}
-
-void CFG::checkDeclared(const string var) const
-{
-	if( isalpha(var[0]) && (get_var_index(var) == 0) )
-	{
-		Errors::addError(var, notDeclared);
-		throw notDeclared;
-	}
-}

@@ -67,7 +67,7 @@ int main(int argn, const char **argv) {
 	}
 
 	CFG * cfg = new CFG(visitor.getAst(), asm_choice);
-	cfg->warningsUnusedVar();
+	//cfg->warningsUnusedVar();
 	cfg->gen_asm();
 	
 	// errorFree <=> 0.
