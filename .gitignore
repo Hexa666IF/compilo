@@ -1,5 +1,6 @@
 # Antlr generated
 antlr4-generated
+.antlr
 
 # Executables
 ifcc
@@ -10,3 +11,6 @@ pld-test-output
 
 # IDE
 .vscode
+
+# tests link
+compiler/tests
