@@ -167,7 +167,7 @@ if args.debug:
 for jobname in jobs:
     os.chdir(orig_cwd)
 
-    print('TEST-CASE: '+jobname)
+    os.system('echo -e "\e[39mTEST-CASE:"'+jobname)
     os.chdir(jobname)
     
     ## JEDI compiler, aka GCC
@@ -187,15 +187,15 @@ for jobname in jobs:
     
     if gccstatus != 0 and pldstatus != 0:
         ## padawan correctly rejects invalid program -> test-case ok
-        print("TEST OK (both compilers fail to compile the program)")
+        os.system('echo -e "\e[32mTEST OK (both compilers fail to compile the program)"')
         continue
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
-        print("TEST FAIL (your compiler accepts an invalid program)")
+        os.system('echo -e "\e[31mTEST FAIL (your compiler accepts an invalid program)"')
         continue
     elif gccstatus == 0 and pldstatus != 0:
         ## padawan wrongly rejects valid program -> error
-        print("TEST FAIL (your compiler rejects a valid program)")
+        os.system('echo -e "\e[31mTEST FAIL (your compiler rejects a valid program)"')
         if args.verbose:
             dumpfile("pld-compile.txt")
         continue
@@ -203,7 +203,7 @@ for jobname in jobs:
         ## padawan accepts to compile valid program -> let's link it
         ldstatus=command("gcc -o exe-pld asm-pld.s", "pld-link.txt")
         if ldstatus:
-            print("TEST FAIL (your compiler produces incorrect assembly)")
+            os.system('echo -e "\e[31mTEST FAIL (your compiler produces incorrect assembly)"')
             if args.verbose:
                 dumpfile("pld-link.txt")
             continue
@@ -213,7 +213,7 @@ for jobname in jobs:
         
     exepldstatus=command("./exe-pld","pld-execute.txt")
     if open("gcc-execute.txt").read() != open("pld-execute.txt").read() :
-        print("TEST FAIL (different results at execution)")
+        os.system('echo -e "\e[31mTEST FAIL (different results at execution)"')
         if args.verbose:
             print("GCC:")
             dumpfile("gcc-execute.txt")
@@ -222,4 +222,4 @@ for jobname in jobs:
         continue
 
     ## last but not least
-    print("TEST OK (its a all good man)")
+    os.system('echo -e "\e[31mTEST OK (its a all good man)"')
