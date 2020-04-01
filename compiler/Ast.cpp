@@ -5,6 +5,7 @@ e-mail :
 *******************************************************************************************/
 
 #include "Ast.h"
+#include "reg.h"
 
 using namespace std;
 
@@ -152,7 +153,7 @@ void Return::gen_instr(CFG * cfg) const
 	// TODO: perform check to avoid calling methods that doesn't need to.
 	retvalue->gen_instr(cfg);
 	
-	cfg->add_instr(IRInstr2op::ldconst, retvalue->getValue(), "%retval");
+	cfg->add_instr(IRInstr2op::ldconst, retvalue->getValue(), RETVAL);
 }
 
 // ================== Assign related stuff ========================
