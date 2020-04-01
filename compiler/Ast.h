@@ -177,7 +177,9 @@ class Ast
 		// return false otherwise.
 		bool isDeclared(std::string variable) const;
 
-		std::map<std::string, int> getSymbolIndex() const;
+		std::map<std::string, int> & getSymbolIndex();
+		int & getNextIndex();
+
 
 		const std::unordered_set<std::string> & getUnuseds() const;
 	//--- Constructor - Destructor ---

@@ -224,9 +224,14 @@ bool Ast::isDeclared(string variable) const
 	return declared;
 }
 
-map<string, int> Ast::getSymbolIndex() const
+map<string, int> & Ast::getSymbolIndex()
 {
 	return symbolIndex;
+}
+
+int & Ast::getNextIndex()
+{
+	return next_index;
 }
 
 const unordered_set<string> & Ast::getUnuseds() const

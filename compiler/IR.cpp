@@ -138,7 +138,7 @@ string BasicBlock::getLabel() const
 // === Constructor / Destructor ===
 
 CFG::CFG(Ast * tree, std::string asm_choice)
-: ast(tree)
+: ast(tree), SymbolIndex(ast->getSymbolIndex()), nextFreeSymbolIndex(ast->getNextIndex())
 {
 	if (asm_choice=="-arm") {
 		toasm = new AsmARM(this,cout);
@@ -151,8 +151,8 @@ CFG::CFG(Ast * tree, std::string asm_choice)
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
 	
-	SymbolIndex = ast->getSymbolIndex();
-	nextFreeSymbolIndex = SymbolIndex.size()*4;
+	//SymbolIndex = ast->getSymbolIndex();
+	//nextFreeSymbolIndex = ast->getNextIndex();
 	// TODO: check that nextBBnumber is correctly initialised.
 	nextBBnumber = 0;
 	ast->gen_instr(this);
