@@ -8,7 +8,7 @@
 #include "antlr4-generated/ifccParser.h"
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
-// #include "Errors.h"
+#include "Errors.h"
 
 #include "IR.h"
 
@@ -18,10 +18,17 @@ using namespace std;
 
 int main(int argn, const char **argv) {
 	int ret = 0;
+	std::string asm_choice = "-x86";
 	stringstream in;
-	if (argn==2) {
-		ifstream lecture(argv[1]);
+	if (argn>=2) {
+		int pathIndex = 1;
+		if (argn==3) {
+			pathIndex = 2;
+			asm_choice = argv[1];
+		}
+		ifstream lecture(argv[pathIndex]);
 		in << lecture.rdbuf();
+
 	}
 	ANTLRInputStream input(in.str());
 	ifccLexer lexer(&input);
@@ -47,8 +54,7 @@ int main(int argn, const char **argv) {
 		return parserSyntaxError;
 	}
 
-	CFG * cfg = new CFG(nullptr);
-	Visitor visitor(cfg);
+	Visitor visitor;
 
 	try
 	{
@@ -60,7 +66,11 @@ int main(int argn, const char **argv) {
 		return e; 
 	}
 
-	cfg->warningsUnusedVar();
+	const unordered_set<string> & unuseds = visitor.getAst()->getUnuseds();
+	for(string var : unuseds)
+			cerr << "WARNING : " << var << " is declared but never used." << endl;
+
+	CFG * cfg = new CFG(visitor.getAst(), asm_choice);
 	cfg->gen_asm();
 	
 	// errorFree <=> 0.

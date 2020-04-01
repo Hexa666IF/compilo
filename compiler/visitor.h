@@ -18,7 +18,7 @@
 class Visitor : public ifccVisitor
 {
 public:
-    Visitor(CFG * c);
+    Visitor();
 
   virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override {
     return visitChildren(ctx);
@@ -68,9 +68,12 @@ public:
   virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
 
+	Ast * getAst() const;
+
 protected:
-  CFG * cfg;
   
-  // AST used for computations.
-  Ast * ast;
+	// Abstract Syntax Tree.
+	// This is the semantic representation of the program
+	// parsed by the visitor.
+	Ast * ast;
 };

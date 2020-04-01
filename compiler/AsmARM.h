@@ -4,42 +4,44 @@ par : pierre
 e-mail :
 ******************************************************************/
 
-#if ! defined ( ASM_H )
-#define ASM_H
+#if ! defined ( ASMARM_H )
+#define ASMARM_H
 
 #include <iostream>
 #include <string>
+
+#include "Asm.h"
+
 
 class CFG;
 //-----------------------------------------------------------------
 
 // class used for converting IR instructions to x86 assembly
-class Asm
+class AsmARM : public Asm
 {
 	public:
 
 	//----- public methods -----
-		virtual void gen_prologue(int size) = 0;
-		virtual void gen_epilogue() = 0;
+		void gen_prologue(int size);
+		void gen_epilogue();
 
-		virtual void ldconst(std::string arg1, std::string arg2) = 0;
+		void ldconst(std::string arg1, std::string arg2);
 		
 		// add arg1 and arg2, and store the result into arg3.
-		virtual void add(std::string arg1, std::string arg2, std::string arg3) = 0;
+		void add(std::string arg1, std::string arg2, std::string arg3);
 
 		// sub arg1 and arg2, and store the result into arg3.
-		virtual void sub(std::string arg1, std::string arg2, std::string arg3) = 0;
+		void sub(std::string arg1, std::string arg2, std::string arg3);
 
 		// mul arg1 and arg2, and store the result into arg3.
-		virtual void mul(std::string arg1, std::string arg2, std::string arg3) = 0;
+		void mul(std::string arg1, std::string arg2, std::string arg3);
 		
-		// TODO : check if the globl exist in ARM and MSP430 ABI.
-		virtual void globl(std::string name) = 0;
+		// TODO : check if the globl exist in ARM and MSP430 ABI. It exists in ARM
+		void globl(std::string name);
 
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
-		Asm(){};
-		Asm(CFG * graph, std::ostream &out){};
+		AsmARM(CFG * graph, std::ostream &out);
 
 	protected:
 	//----- protected methods -----
@@ -48,12 +50,12 @@ class Asm
 		// it can be used for calculation.
 		// It returns the register in wich the variable has
 		// been put. (%eax, usually).
-		virtual std::string loadVariable(std::string var) = 0;	
+		std::string loadVariable(std::string var);	
 	//----- protected attributes -----
-		// CFG * cfg;
-		// std::ostream &output;
+		CFG * cfg;
+		std::ostream &output;
 
 
 };
 
-#endif // ! defined ( ASM_H )
+#endif // ! defined ( ASMARM_H )
