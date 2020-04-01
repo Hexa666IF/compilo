@@ -83,7 +83,7 @@ void Asmx86::call(vector<string> args)
 		string arg = cfg->IR_reg_to_asm_x86(args[i]);
 		string dest = cfg->IR_reg_to_asm_x86("%farg"+to_string(i));
 
-		output << "movl " << arg << ", " << dest << endl;
+		output << "movq " << arg << ", " << dest << endl;
 	}
 	
 	output << "call " << args[0] << endl;
