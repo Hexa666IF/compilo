@@ -14,8 +14,16 @@ using namespace std;
 void Asmx86::gen_prologue(int size)
 {
 	output << "pushq %rbp" << endl
-		   << "movq %rsp, %rbp" << endl
-		   << "subq $" << size << ", %rsp" << endl;
+		   << "movq %rsp, %rbp" << endl;
+	
+	//subq the stack pointeur by the nearest upper 16 multiple of the allocated memory
+	int decalage = size;
+	int reste = decalage % 16;
+	if(reste){
+		decalage = ((decalage / 16) * 16) + 16;
+	}
+
+	output << "subq $" << decalage << ", %rsp" << endl;
 }
 
 void Asmx86::gen_epilogue()
@@ -69,7 +77,6 @@ void Asmx86::mul(string arg1, string arg2, string arg3)
 
 void Asmx86::call(vector<string> args)
 {
-	cout << "taille vecteur" << args.size() << endl;
 	for(int i = 1; i < args.size(); i++)
 	{
 		string arg = cfg->IR_reg_to_asm_x86(args[i]);
@@ -78,14 +85,6 @@ void Asmx86::call(vector<string> args)
 		output << "movl " << arg << ", " << dest << endl;
 	}
 	
-	//subq the stack pointeur by the nearest upper 16 multiple
-	int decalage = cfg->get_symbol_table_length() * 4;
-	int reste = decalage % 16;
-	if(reste){
-		decalage = ((decalage / 16) * 16) + 16;
-	}
-
-	output << "subq $" << decalage << ", %rsp" << endl;
 	output << "call " << args[0] << endl;
 	output << "leave" << endl;
 }
