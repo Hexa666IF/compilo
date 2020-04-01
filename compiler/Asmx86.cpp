@@ -28,10 +28,9 @@ void Asmx86::gen_prologue(int size)
 
 void Asmx86::gen_epilogue()
 {
-	output << "leave" << endl;
-			//<< "movq %rbp, %rsp" << endl
-		   //<< "popq %rbp" << endl
-		   output << "ret" << endl;
+	output << "movq %rbp, %rsp" << endl
+		   << "popq %rbp" << endl
+		   << "ret" << endl;
 }
 
 
@@ -87,7 +86,7 @@ void Asmx86::call(vector<string> args)
 	}
 	
 	output << "call " << args[0] << endl;
-	//output << "leave" << endl;
+	output << "movl %eax, %edx" << endl;
 }
 
 void Asmx86::globl(string name)

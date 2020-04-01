@@ -111,8 +111,7 @@ FunctionCall::FunctionCall(string functionName, vector<RValue *> args, Ast * ast
 
 string FunctionCall::getValue() const
 {
-	//TODO : faire une enum des %
-	string retvald = "%retvald";
+	string retvald = "RETVALD";
 	return retvald;
 }
 
