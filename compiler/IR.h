@@ -11,6 +11,7 @@
 #include "Asm.h"
 #include "Asmx86.h"
 #include "AsmARM.h"
+#include "AsmMSP430.h"
 #include "Errors.h"
 // Declarations from the parser -- replace with your own
 

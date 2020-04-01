@@ -18,7 +18,7 @@ void Asmx86::gen_prologue(int size)
 		   << "subq $" << size << ", %rsp" << endl;
 }
 
-void Asmx86::gen_epilogue()
+void Asmx86::gen_epilogue(int size)
 {
 	output << "movq %rbp, %rsp" << endl
 		   << "popq %rbp" << endl

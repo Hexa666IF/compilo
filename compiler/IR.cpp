@@ -140,7 +140,7 @@ CFG::CFG(Ast * tree, std::string asm_choice)
 	if (asm_choice=="-arm") {
 		toasm = new AsmARM(this,cout);
 	} else if (asm_choice=="-msp430") {
-		toasm = new Asmx86(this,cout);
+		toasm = new AsmMSP430(this,cout);
 	} else {
 		toasm = new Asmx86(this,cout);
 	}
@@ -193,12 +193,13 @@ void CFG::gen_asm()
 {
 	// TODO : do not use hardcoded string for globl() call.
 	toasm->globl("main");
-	toasm->gen_prologue(SymbolIndex.size()*4);
+	int size = SymbolIndex.size()*4;
+	toasm->gen_prologue(size);
 	for(BasicBlock * b : bbs)
 	{
 		b->gen_asm(*toasm);
 	}
-	toasm->gen_epilogue();
+	toasm->gen_epilogue(size);
 }
 
 // = symbol table methods =
@@ -250,24 +251,30 @@ string CFG::IR_reg_to_asm_arm(std::string reg)
 	return asm_reg;
 }
 
-string CFG::IR_reg_to_asm_MSP430(std::string reg)
-// to-do : find the MSP430 equivalent
+string CFG::IR_reg_to_asm_msp430(std::string reg)
 {
 	string asm_reg;
 	int index = get_var_index(reg);
 
+	// Variable stored in memory
 	if(index != 0)
 	{
-		asm_reg = "@" + reg;
+		int address = (SymbolIndex.size()*4) - index;
+		// Last block
+		if (address==0) {
+			asm_reg = "@R1";
+		// Other blocks
+		} else {
+			asm_reg = to_string(address) + "(R1)";
+		}
+		
 	}
+	// Return
 	else if (reg[0] == '%')
 	{
-		if(reg == "%retval")
-				asm_reg = "R12";
-
-		if(reg == "%rbp")
-				asm_reg = "%rbp";
+		if(reg == "%retval") asm_reg = "R12";
 	}
+	// Constant
 	else 
 	{
 		asm_reg = '#' + reg;

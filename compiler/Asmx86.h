@@ -23,7 +23,7 @@ class Asmx86 : public Asm
 
 	//----- public methods -----
 		void gen_prologue(int size);
-		void gen_epilogue();
+		void gen_epilogue(int size);
 
 		void ldconst(std::string arg1, std::string arg2);
 		

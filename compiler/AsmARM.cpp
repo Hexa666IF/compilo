@@ -20,7 +20,7 @@ void AsmARM::gen_prologue(int size)
 		
 }
 
-void AsmARM::gen_epilogue()
+void AsmARM::gen_epilogue(int size)
 {
 	// to-do : if no return do a "mov	r3, #0"
 	output << "mov	r0, r3" << endl
