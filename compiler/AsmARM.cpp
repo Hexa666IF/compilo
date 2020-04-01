@@ -36,8 +36,17 @@ void AsmARM::ldconst(string arg1, string arg2)
 	arg1 = cfg->IR_reg_to_asm_arm(arg1);
 	arg2 = cfg->IR_reg_to_asm_arm(arg2);
 
+	// Case return
 	if (arg2 == "%retval") {
-		output << "ldr	r3, " << arg1 << endl;	
+		//output << "ldr	r3, " << arg1 << endl;
+		// Case of returning a constant
+		if (arg1[0] == '#') {
+			output << "mov	r3, " << arg1 << endl;
+		// Case of returning a variable
+		} else {
+			output << "ldr	r3, " << arg1 << endl;
+		}
+	// Regular ldconst
 	} else {
 		output << "mov	r3, " << arg1 << endl;	
 		output << "str	r3, " << arg2 << endl;
