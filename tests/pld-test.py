@@ -257,5 +257,5 @@ else:
     print("success : ", ok_tests, "/", nb_tests, "     failure : Marie")
     print("\n          (\__/)    All tests ok :3")
     print("good boi (  •ω• )-__/)")
-    print("         (      ( •ω•o)    *pat pat*")
+    print("         (      (o•ω•o)    *pat pat*")
     print("          V----V( n n/)")
