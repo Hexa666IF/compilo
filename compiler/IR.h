@@ -224,7 +224,8 @@ class CFG {
 		std::string IR_reg_to_asm_msp430(std::string reg);
 	
 		// symbol table methods
-	
+		int get_symbol_table_length() const;
+
 		// Adds a symbol to symbol table.
 		// If the symbol is already present, it will
 		// throw a multipleDeclaration Exception.

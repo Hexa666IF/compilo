@@ -82,6 +82,12 @@ void AsmARM::mul(string arg1, string arg2, string arg3)
 		   << "str	r3, " << arg3 << endl;
 }
 
+void AsmARM::call(vector<string> args)
+{
+
+	
+}
+
 void AsmARM::globl(string name)
 {
 	output << ".globl " << name << endl

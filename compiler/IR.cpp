@@ -87,7 +87,15 @@ IRInstrSpecial::IRInstrSpecial(	BasicBlock * bb,
 
 void IRInstrSpecial::gen_asm(Asm &toasm) const
 {
+	switch(operation)
+	{
+		case call:
+				toasm.call(args);
+				break;
 
+		default:
+				break;
+	}	
 }
 
 // ============================= BasicBlock =================================
@@ -264,6 +272,11 @@ string CFG::IR_reg_to_asm_arm(std::string reg)
 	}
 
 	return asm_reg;
+}
+
+int CFG::get_symbol_table_length() const
+{
+	return SymbolIndex.size();
 }
 
 void CFG::add_to_symbol_table(string name)

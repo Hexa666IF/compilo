@@ -6,6 +6,7 @@ prog : 'int' 'main' '(' ')' '{' l '}' ;
 
 l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
+  | call ';' l #lCall
   | RETURN expr ';' # return
   | /*epsilon*/ # lEpsilon
   ; 
@@ -14,7 +15,8 @@ decl : TEXT ',' decl # declMultiple
      | TEXT # declSimple
      ;
 
-affect : var '=' expr ;
+affect : var '=' expr 
+    ;
 
 var : 'int' TEXT # varDecl
     | TEXT # varText
@@ -22,6 +24,7 @@ var : 'int' TEXT # varDecl
 
 val : CONST # valConst
     | TEXT # valText
+    | call # valCall
     ;
 
 expr : term '+' expr # add
@@ -37,6 +40,14 @@ term : f '*' term # mult
 f : val # const
     | '(' expr ')' # par
 	;
+
+call : TEXT '(' ')' # callNoParam
+     | TEXT '(' param ')' # callParam
+     ;
+
+param : expr ',' param # paramMultiple
+      | expr # paramSimple
+      ;
 
 RETURN : 'return' ;
 CONST : [0-9]+ ;

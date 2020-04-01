@@ -96,6 +96,40 @@ void Variable::gen_instr(CFG * cfg) const
 	// TODO : find a way that doesn't use this blank function !
 }
 
+
+// ================== functionCall related stuff ======================
+
+// ----- Constructor -----
+
+FunctionCall::FunctionCall(string functionName, vector<RValue *> args, Ast * ast)
+: RValue(ast), arguments(args), name(functionName)
+{
+	
+}
+
+// ----- public methods -----
+
+string FunctionCall::getValue() const
+{
+	return RETVALD;
+}
+
+void FunctionCall::gen_instr(CFG * cfg) const
+{
+	vector<string> args;
+	args.push_back(name);
+
+	//TODO : faire une enum des %
+	for(int i = 0; i < arguments.size() ; i++)
+	{
+		arguments[i]->gen_instr(cfg);
+		string value = arguments[i]->getValue();
+		args.push_back(value);
+	}
+
+	cfg->add_instr(IRInstrSpecial::call, args);
+}
+
 // ================== Operation related stuff =====================
 
 // ----- Constructor - Destructor -----
