@@ -204,6 +204,19 @@ void CFG::gen_asm()
 
 string CFG::IR_reg_to_asm_x86(std::string reg)
 {
+	static const unsigned int n_reg = 10;
+	static const string abstract_reg [] = 
+		{ 	"%retval", "%retvald", "%basep", "%stackp",
+			"%farg1", "%farg2", "%farg3", "%farg4",
+			"%farg5", "%farg6"
+		};
+
+	static const string x86_reg [] =
+		{	"%eax", "%edx", "%rbp", "%rsp",
+			"%rdi", "%rsi", "%rdx", "%rcx",
+			"%r8", "%r9"
+		};
+
 	string asm_reg;
 	int index = get_var_index(reg);
 
@@ -213,11 +226,14 @@ string CFG::IR_reg_to_asm_x86(std::string reg)
 	}
 	else if (reg[0] == '%')
 	{
-		if(reg == "%retval")
-				asm_reg = "%eax";
+			unsigned int i = 0;
+			while(i < n_reg && reg != abstract_reg[i])
+				++i;
 
-		if(reg == "%rbp")
-				asm_reg = "%rbp";
+			if(i < 10)
+				asm_reg = x86_reg[i];
+			else
+				asm_reg = "BAD ABSTRACT REG : " + reg;
 	}
 	else 
 	{
