@@ -6,19 +6,19 @@ e-mail :
 
 using namespace std;
 
-#include "Asm.h"
+#include "Asmx86.h"
 #include "IR.h"
 
 //------------- public methods ---------------------------------------------------------
 
-void Asm::gen_prologue(int size)
+void Asmx86::gen_prologue(int size)
 {
 	output << "pushq %rbp" << endl
 		   << "movq %rsp, %rbp" << endl
 		   << "subq $" << size << ", %rsp" << endl;
 }
 
-void Asm::gen_epilogue()
+void Asmx86::gen_epilogue()
 {
 	output << "movq %rbp, %rsp" << endl
 		   << "popq %rbp" << endl
@@ -26,40 +26,40 @@ void Asm::gen_epilogue()
 }
 
 
-void Asm::ldconst(string arg1, string arg2)
+void Asmx86::ldconst(string arg1, string arg2)
 {
 	// Getting x86 assembly code to access variables.
 	arg1 = loadVariable(arg1);
-	arg2 = cfg->IR_reg_to_asm(arg2);
+	arg2 = cfg->IR_reg_to_asm_x86(arg2);
 
 	output << "movl " << arg1 << ", " << arg2 << endl;	
 }
 
-void Asm::add(string arg1, string arg2, string arg3)
+void Asmx86::add(string arg1, string arg2, string arg3)
 {
 	arg1 = loadVariable(arg1);	
-	arg3 = cfg->IR_reg_to_asm(arg3);
+	arg3 = cfg->IR_reg_to_asm_x86(arg3);
 	output << "movl " << arg1 << ", " << arg3 << endl;	
 	
 	arg2 = loadVariable(arg2);
 	output << "addl " << arg2 << ", " << arg3 << endl;
 }
 
-void Asm::sub(string arg1, string arg2, string arg3)
+void Asmx86::sub(string arg1, string arg2, string arg3)
 {
 	arg1 = loadVariable(arg1);		
-	arg3 = cfg->IR_reg_to_asm(arg3);
+	arg3 = cfg->IR_reg_to_asm_x86(arg3);
 	output << "movl " << arg1 << ", " << arg3 << endl;
 
 	arg2 = loadVariable(arg2);
 	output << "subl " << arg2 << ", " << arg3 << endl;
 }
 
-void Asm::mul(string arg1, string arg2, string arg3)
+void Asmx86::mul(string arg1, string arg2, string arg3)
 {
-	arg1 = cfg->IR_reg_to_asm(arg1);	
-	arg2 = cfg->IR_reg_to_asm(arg2);
-	arg3 = cfg->IR_reg_to_asm(arg3);
+	arg1 = cfg->IR_reg_to_asm_x86(arg1);	
+	arg2 = cfg->IR_reg_to_asm_x86(arg2);
+	arg3 = cfg->IR_reg_to_asm_x86(arg3);
 	
 	output << "movl " << arg1 << ", " << "%eax" << endl;
 	output << "movl " << arg2 << ", " << "%ebx" << endl;
@@ -67,7 +67,7 @@ void Asm::mul(string arg1, string arg2, string arg3)
 	output << "movl %eax, " << arg3 << endl;
 }
 
-void Asm::globl(string name)
+void Asmx86::globl(string name)
 {
 	output << ".globl " << name << endl
 		   << name << ":" << endl;
@@ -75,16 +75,16 @@ void Asm::globl(string name)
 
 //------------- Constructor / Destructors ------------------------------------------------
 
-Asm::Asm(CFG * graph, ostream &out) : cfg(graph), output(out)
+Asmx86::Asmx86(CFG * graph, ostream &out) : cfg(graph), output(out)
 {
 
 }	
 
 //------------- Protected methods ----------------------------------------------
 
-string Asm::loadVariable(string var)
+string Asmx86::loadVariable(string var)
 {
-	string asm_arg = cfg->IR_reg_to_asm(var);
+	string asm_arg = cfg->IR_reg_to_asm_x86(var);
 	if(asm_arg[0] != '$')
 	// asm_arg is not a constant, it needs to be put in a register to
 	// be available for computation.

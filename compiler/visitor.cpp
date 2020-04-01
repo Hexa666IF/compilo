@@ -8,9 +8,9 @@
 
 using namespace std;
 
-Visitor::Visitor(CFG * c) : ifccVisitor(), cfg(c), ast(nullptr)
+Visitor::Visitor() : ifccVisitor()
 {
-
+	ast = new Ast();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
@@ -38,13 +38,9 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
-	ast = new Ast(cfg);
-	
-	node_s * root = visit(ctx->expr());
-	ast->set_root(root);
-	ast->gen_instr();
-	delete(ast);
-	ast = nullptr;
+	RValue * retval = visit(ctx->expr());
+	Return * ret = new Return(retval, ast);
+	ast->addNode(ret);
 
 	return 0;
 }
@@ -56,9 +52,8 @@ antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 {
-	// Add symbol name to symbol table.
 	string symbol = ctx->TEXT()->getText();
-	cfg->add_to_symbol_table(symbol);
+	ast->addSymbol(symbol);
 	visit(ctx->decl());
 
 	return 0;
@@ -66,110 +61,120 @@ antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 
 antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 {
-	// Add symbol name to symbol table.
 	string symbol = ctx->TEXT()->getText();
-	cfg->add_to_symbol_table(symbol);
-	cfg->add_instr(IRInstr2op::ldconst, "0", symbol);
-
+	ast->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, ast);
+	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
+	ast->addNode(assign);
+	
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
-	string var = visit(ctx->var());	
-
-	ast = new Ast(cfg, var);
-	
-	node_s * root = visit(ctx->expr());
-	ast->set_root(root);
-	ast->gen_instr();
-	delete(ast);
-	ast = nullptr;
+	Variable * var = visit(ctx->var());	
+	Assign * assign = new Assign(var, visit(ctx->expr()), ast);
+	ast->addNode(assign);
 
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 {
-	// Add symbol name to symbol table.
 	string symbol = ctx->TEXT()->getText();
-	cfg->add_to_symbol_table(symbol);
-	return symbol;
+	ast->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, ast);
+	
+	return variable;
 }
 
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
+	Variable * variable = new Variable(symbol, ast);
 	
-	return symbol;
+	return variable;
 }
 
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
 	string val = ctx->CONST()->getText();
+	RValue * constant = new Constant(val, ast);
 	
-	return val;
+	return constant;
 }
 
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
+	RValue * variable = new Variable(symbol, ast);
 	
-	return symbol;
+	return variable;
 }
 
 // === Expression computation related methods ===
 
-antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) {
-	string tmpvar = ast->get_tmp_var();
-	node_s * left = visit(ctx->term());
-	node_s * right = visit(ctx->expr());
-
-	node_s * add = create_node(IRInstr3op::add, tmpvar, left, right);
+antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx) 
+{
+	RValue * left = visit(ctx->term());
+	RValue * right = visit(ctx->expr());
+	RValue * add = new Operation(IRInstr3op::add, left, right, ast);
 	
 	return add;
 }
 
-antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) {
-	string tmpvar = ast->get_tmp_var();
-	node_s * left = visit(ctx->term());
-	node_s * right = visit(ctx->expr());
-
-	node_s * sub = create_node(IRInstr3op::sub, tmpvar, left, right);
+antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx) 
+{
+	RValue * left = visit(ctx->term());
+	RValue * right = visit(ctx->expr());
+	RValue * sub = new Operation(IRInstr3op::sub, left, right, ast);
 	
 	return sub;
 }
 
-antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) {
-	return visit(ctx->term());
+antlrcpp::Any Visitor::visitExpr_single(ifccParser::Expr_singleContext *ctx) 
+{	
+	RValue * op = visit(ctx->term());
+	return op;
 }
 
-antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) {
-	string tmpvar = ast->get_tmp_var();
-	node_s * left = visit(ctx->f());
-	node_s * right = visit(ctx->term());
-
-	node_s * mul = create_node(IRInstr3op::mul, tmpvar, left, right);
+antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx) 
+{
+	RValue * left = visit(ctx->f());
+	RValue * right = visit(ctx->term());
+	RValue * mul = new Operation(IRInstr3op::mul, left, right, ast); 
+	
 	return mul;
 }
 
-antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) {
+antlrcpp::Any Visitor::visitDiv(ifccParser::DivContext *ctx) 
+{
 	// Division is not part of the requirements.
 	// We'll handle it later maybe.
 	return 0;
 }
 
-antlrcpp::Any Visitor::visitF_single(ifccParser::F_singleContext *ctx) {
-	return visit(ctx->f());
+antlrcpp::Any Visitor::visitF_single(ifccParser::F_singleContext *ctx) 
+{
+	RValue * rvalue = visit(ctx->f());
+	return rvalue;
 }
 
-antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx) {
-	node_s * leaf = create_leaf(visit(ctx->val())); 
-	return leaf;
+antlrcpp::Any Visitor::visitConst(ifccParser::ConstContext *ctx) 
+{
+	RValue * rvalue = visit(ctx->val());	
+	return rvalue;
 }
 
-antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx) {
-	visit(ctx->expr());
-	return 0;
+antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx) 
+{
+	RValue * op = visit(ctx->expr());
+	
+	return op;
+}
+
+Ast * Visitor::getAst() const
+{
+	return ast;
 }
 

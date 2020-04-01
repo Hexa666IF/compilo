@@ -14,28 +14,8 @@ std::vector<std::pair<std::string, ErrorCode>> Errors::errorsList;
 //------------- public methods -------------------------------------------------
 
 void Errors::addError(std::string var, ErrorCode code)
-{
-	switch (code)
-    {
-    case notDeclared:
-        Errors::errorsList.push_back(make_pair(var, notDeclared));
-        break;
-
-    case notInitialised:
-        Errors::errorsList.push_back(make_pair(var, notInitialised));
-        break;
-
-    case multipleDeclaration:
-        Errors::errorsList.push_back(make_pair(var, multipleDeclaration));
-        break;
-
-    case notUsed:
-        Errors::errorsList.push_back(make_pair(var, notUsed));
-        break;
-    
-    default:
-        break;
-    }
+{	
+	Errors::errorsList.push_back(make_pair(var, code));
 }
 
 bool Errors::printErrors()
