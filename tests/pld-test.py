@@ -165,6 +165,7 @@ if args.debug:
 ## TEST step: actually compile all test-cases with both compilers
 ok_tests = 0
 failed_tests = 0
+failure_messages = []
 nb_tests = len(jobs)
 
 for jobname in jobs:
@@ -196,11 +197,13 @@ for jobname in jobs:
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
         failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : compiler accepts an invalid program")
         os.system('echo "\e[31mTEST FAIL (your compiler accepts an invalid program)\e[39m"')
         continue
     elif gccstatus == 0 and pldstatus != 0:
         ## padawan wrongly rejects valid program -> error
         failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : compiler rejects a valid program")
         os.system('echo "\e[31mTEST FAIL (your compiler rejects a valid program)\e[39m"')
         if args.verbose:
             dumpfile("pld-compile.txt")
@@ -210,6 +213,7 @@ for jobname in jobs:
         ldstatus=command("gcc -o exe-pld asm-pld.s", "pld-link.txt")
         if ldstatus:
             failed_tests = failed_tests + 1
+            failure_messages.append(jobname + " : compiler produces incorrect assembly")
             os.system('echo "\e[31mTEST FAIL (your compiler produces incorrect assembly)\e[39m"')
             if args.verbose:
                 dumpfile("pld-link.txt")
@@ -221,6 +225,7 @@ for jobname in jobs:
     exepldstatus=command("./exe-pld","pld-execute.txt")
     if open("gcc-execute.txt").read() != open("pld-execute.txt").read() :
         failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : different results at execution")
         os.system('echo "\e[31mTEST FAIL (different results at execution)\e[39m"')
         if args.verbose:
             print("GCC:")
@@ -235,5 +240,22 @@ for jobname in jobs:
 
 if failed_tests != 0 :
     print("success : ", ok_tests, "/", nb_tests, "     failures : ", failed_tests, "/", nb_tests)
+    print("\nFAILURES :")
+    for m in failure_messages:
+        print(m)
+    print("              ░▄▀▄▀▀▀▀▄▀▄░░░░░░░░░")
+    print("              ░█░░░░░░░░▀▄░░░░░░▄░")
+    print(" much failure █░░▀░░▀░░░░░▀▄▄░░█░█")
+    print("              █░▄░█▀░▄░░░░░░░▀▀░░█  such disappointment")
+    print("              █░░▀▀▀▀░░░░░░░░░░░░█")
+    print("              █░░░░░░░░░░░░░░░░░░█")
+    print("              █░░░░░░░░░░░░░░░░░░█")
+    print("        wow   ░█░░▄▄░░▄▄▄▄░░▄▄░░█░")
+    print("              ░█░▄▀█░▄▀░░█░▄▀█░▄▀░")
+    print("              ░░▀░░░▀░░░░░▀░░░▀░░░")
 else:
     print("success : ", ok_tests, "/", nb_tests, "     failure : Marie")
+    print("\n          (\__/)    All tests ok :3")
+    print("good boi (  •ω• )-__/)")
+    print("         (      (o•ω•o)    *pat pat*")
+    print("          V----V( n n/)")
