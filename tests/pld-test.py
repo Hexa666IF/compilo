@@ -163,6 +163,9 @@ if args.debug:
 
 ######################################################################################
 ## TEST step: actually compile all test-cases with both compilers
+ok_tests = 0
+failed_tests = 0
+nb_tests = len(jobs)
 
 for jobname in jobs:
     os.chdir(orig_cwd)
@@ -187,14 +190,17 @@ for jobname in jobs:
     
     if gccstatus != 0 and pldstatus != 0:
         ## padawan correctly rejects invalid program -> test-case ok
+        ok_tests = ok_tests + 1
         os.system('echo "\e[32mTEST OK (both compilers fail to compile the program)\e[39m"')
         continue
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
+        failed_tests = failed_tests + 1
         os.system('echo "\e[31mTEST FAIL (your compiler accepts an invalid program)\e[39m"')
         continue
     elif gccstatus == 0 and pldstatus != 0:
         ## padawan wrongly rejects valid program -> error
+        failed_tests = failed_tests + 1
         os.system('echo "\e[31mTEST FAIL (your compiler rejects a valid program)\e[39m"')
         if args.verbose:
             dumpfile("pld-compile.txt")
@@ -203,6 +209,7 @@ for jobname in jobs:
         ## padawan accepts to compile valid program -> let's link it
         ldstatus=command("gcc -o exe-pld asm-pld.s", "pld-link.txt")
         if ldstatus:
+            failed_tests = failed_tests + 1
             os.system('echo "\e[31mTEST FAIL (your compiler produces incorrect assembly)\e[39m"')
             if args.verbose:
                 dumpfile("pld-link.txt")
@@ -213,6 +220,7 @@ for jobname in jobs:
         
     exepldstatus=command("./exe-pld","pld-execute.txt")
     if open("gcc-execute.txt").read() != open("pld-execute.txt").read() :
+        failed_tests = failed_tests + 1
         os.system('echo "\e[31mTEST FAIL (different results at execution)\e[39m"')
         if args.verbose:
             print("GCC:")
@@ -222,4 +230,10 @@ for jobname in jobs:
         continue
 
     ## last but not least
+    ok_tests = ok_tests + 1
     os.system('echo "\e[32mTEST OK (its a all good man)\e[39m"')
+
+if failed_tests != 0 :
+    print("success : ", ok_tests, "/", nb_tests, "     failures : ", failed_tests, "/", nb_tests)
+else:
+    print("success : ", ok_tests, "/", nb_tests, "     failure : Marie")
