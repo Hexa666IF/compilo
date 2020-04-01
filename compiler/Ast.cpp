@@ -78,13 +78,16 @@ Variable::Variable(string variable, Ast * ast)
 		Errors::addError(name, notDeclared);
 		throw notDeclared;
 	}
+	else
+	{
+		parentTree->removeFromUnuseds(name);
+	}
 }
 
 // ----- public methods -----
 
 string Variable::getValue() const
 {
-	parentTree->removeFromUnuseds(name);
 	return name;
 }
 
