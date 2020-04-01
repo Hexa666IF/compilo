@@ -5,6 +5,7 @@ e-mail :
 *******************************************************************************************/
 
 #include "Ast.h"
+#include "reg.h"
 
 using namespace std;
 
@@ -77,13 +78,16 @@ Variable::Variable(string variable, Ast * ast)
 		Errors::addError(name, notDeclared);
 		throw notDeclared;
 	}
+	else
+	{
+		parentTree->removeFromUnuseds(name);
+	}
 }
 
 // ----- public methods -----
 
 string Variable::getValue() const
 {
-	parentTree->removeFromUnuseds(name);
 	return name;
 }
 
@@ -188,7 +192,7 @@ void Return::gen_instr(CFG * cfg) const
 	// TODO: perform check to avoid calling methods that doesn't need to.
 	retvalue->gen_instr(cfg);
 	
-	cfg->add_instr(IRInstr2op::ldconst, retvalue->getValue(), "%retval");
+	cfg->add_instr(IRInstr2op::ldconst, retvalue->getValue(), RETVAL);
 }
 
 // ================== Assign related stuff ========================

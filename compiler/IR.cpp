@@ -4,6 +4,7 @@
 using namespace std;
 
 #include "Ast.h"
+#include "reg.h"
 
 // ========================= IRInstr =========================================
 
@@ -214,9 +215,9 @@ string CFG::IR_reg_to_asm_x86(std::string reg)
 {
 	static const unsigned int n_reg = 10;
 	static const string abstract_reg [] = 
-		{ 	"%retval", "%retvald", "%basep", "%stackp",
-			"%farg1", "%farg2", "%farg3", "%farg4",
-			"%farg5", "%farg6"
+		{ 	RETVAL, RETVALD, RBASEP, RSTACKP,
+			FARG1, FARG2, FARG3, FARG4,
+			FARG5, FARG6
 		};
 
 	static const string x86_reg [] =
