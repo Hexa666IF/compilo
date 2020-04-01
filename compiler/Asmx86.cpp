@@ -28,10 +28,10 @@ void Asmx86::gen_prologue(int size)
 
 void Asmx86::gen_epilogue()
 {
-	output << "leave" << endl
-			<< "movq %rbp, %rsp" << endl
-		   << "popq %rbp" << endl
-		   << "ret" << endl;
+	output << "leave" << endl;
+			//<< "movq %rbp, %rsp" << endl
+		   //<< "popq %rbp" << endl
+		   output << "ret" << endl;
 }
 
 
