@@ -86,6 +86,22 @@ class Variable : public RValue
 		std::string name;
 };
 
+class FunctionCall : public RValue
+{
+	public:
+	// ----- public methods -----
+		std::string getValue() const;
+
+		void gen_instr(CFG * cfg) const;
+
+	// ----- Constructor -----
+		FunctionCall(std::string functionName, std::vector<RValue *> args, Ast * ast);
+
+	protected:
+		std::string name;
+		std::vector<RValue *> arguments;
+};
+
 class Operation : public RValue
 {
 	public:

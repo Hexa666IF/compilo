@@ -30,6 +30,8 @@ public:
   virtual antlrcpp::Any visitLDecl(ifccParser::LDeclContext *ctx) override;
 
   virtual antlrcpp::Any visitLAffect(ifccParser::LAffectContext *ctx) override;
+  
+  virtual antlrcpp::Any visitLCall(ifccParser::LCallContext *ctx) override;
 
   virtual antlrcpp::Any visitReturn(ifccParser::ReturnContext *context) override;
 
@@ -48,6 +50,16 @@ public:
   virtual antlrcpp::Any visitValConst(ifccParser::ValConstContext *ctx) override;
 
   virtual antlrcpp::Any visitValText(ifccParser::ValTextContext *ctx) override;
+
+  virtual antlrcpp::Any visitValCall(ifccParser::ValCallContext *ctx) override;
+
+  virtual antlrcpp::Any visitCallParam(ifccParser::CallParamContext *ctx) override;
+
+  virtual antlrcpp::Any visitCallNoParam(ifccParser::CallNoParamContext *ctx) override;
+
+  virtual antlrcpp::Any visitParamSimple(ifccParser::ParamSimpleContext *ctx) override;
+
+  virtual antlrcpp::Any visitParamMultiple(ifccParser::ParamMultipleContext *ctx) override;
 
 // === Expression computation related methods ===
 

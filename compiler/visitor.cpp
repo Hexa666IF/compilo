@@ -36,6 +36,16 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 	return 0;
 }
 
+antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
+{
+	RValue * call = visit(ctx->call());
+	ast->addNode(call);
+
+	visit(ctx->l());
+	
+	return 0;
+}
+
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
@@ -110,6 +120,47 @@ antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 	RValue * variable = new Variable(symbol, ast);
 	
 	return variable;
+}
+
+antlrcpp::Any Visitor::visitValCall(ifccParser::ValCallContext *ctx)
+{
+	RValue * call = visit(ctx->call());
+
+	return call;
+}
+
+antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
+{
+	string name = ctx->TEXT()->getText();
+	vector<RValue *> args = visit(ctx->param());
+	RValue * function = new FunctionCall(name, args, ast);
+
+	return function;
+}
+
+antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
+{
+	string name = ctx->TEXT()->getText();
+	vector<RValue *> args;
+	RValue * function = new FunctionCall(name, args, ast);
+
+	return function;
+}
+
+antlrcpp::Any Visitor::visitParamSimple(ifccParser::ParamSimpleContext *ctx)
+{
+	vector<RValue *> args;
+	args.insert(args.begin(), visit(ctx->expr()));
+	
+	return args;
+}
+
+antlrcpp::Any Visitor::visitParamMultiple(ifccParser::ParamMultipleContext *ctx)
+{
+	vector<RValue *> args = visit(ctx->param());
+	args.insert(args.begin(), visit(ctx->expr()));
+	
+	return args;
 }
 
 // === Expression computation related methods ===

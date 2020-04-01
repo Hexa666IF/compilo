@@ -86,7 +86,15 @@ IRInstrSpecial::IRInstrSpecial(	BasicBlock * bb,
 
 void IRInstrSpecial::gen_asm(Asm &toasm) const
 {
+	switch(operation)
+	{
+		case call:
+				toasm.call(args);
+				break;
 
+		default:
+				break;
+	}	
 }
 
 // ============================= BasicBlock =================================
