@@ -35,6 +35,9 @@ class AsmARM : public Asm
 
 		// mul arg1 and arg2, and store the result into arg3.
 		void mul(std::string arg1, std::string arg2, std::string arg3);
+
+		// call the function wich is the first string of the vector with the rest of the arguments.
+		void call(std::vector<std::string> args);
 		
 		// TODO : check if the globl exist in ARM and MSP430 ABI. It exists in ARM
 		void globl(std::string name);

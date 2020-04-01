@@ -9,6 +9,7 @@ e-mail :
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 class CFG;
 //-----------------------------------------------------------------
@@ -32,6 +33,9 @@ class Asm
 
 		// mul arg1 and arg2, and store the result into arg3.
 		virtual void mul(std::string arg1, std::string arg2, std::string arg3) = 0;
+
+		// call the function wich is the first string of the vector with the rest of the arguments.
+		virtual void call(std::vector<std::string> args) = 0;
 		
 		// TODO : check if the globl exist in ARM and MSP430 ABI.
 		virtual void globl(std::string name) = 0;

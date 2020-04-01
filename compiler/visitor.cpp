@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -150,16 +151,15 @@ antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
 antlrcpp::Any Visitor::visitParamSimple(ifccParser::ParamSimpleContext *ctx)
 {
 	vector<RValue *> args;
-	args.insert(args.begin(), visit(ctx->expr()));
-	
+	args.insert(args.begin(), 1, visit(ctx->expr()));
+
 	return args;
 }
 
 antlrcpp::Any Visitor::visitParamMultiple(ifccParser::ParamMultipleContext *ctx)
 {
 	vector<RValue *> args = visit(ctx->param());
-	args.insert(args.begin(), visit(ctx->expr()));
-	
+	args.insert(args.begin(), 1, visit(ctx->expr()));
 	return args;
 }
 

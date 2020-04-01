@@ -67,6 +67,29 @@ void Asmx86::mul(string arg1, string arg2, string arg3)
 	output << "movl %eax, " << arg3 << endl;
 }
 
+void Asmx86::call(vector<string> args)
+{
+	cout << "taille vecteur" << args.size() << endl;
+	for(int i = 1; i < args.size(); i++)
+	{
+		string arg = cfg->IR_reg_to_asm_x86(args[i]);
+		string dest = cfg->IR_reg_to_asm_x86("%farg"+to_string(i));
+
+		output << "movl " << arg << ", " << dest << endl;
+	}
+	
+	//subq the stack pointeur by the nearest upper 16 multiple
+	int decalage = cfg->get_symbol_table_length() * 4;
+	int reste = decalage % 16;
+	if(reste){
+		decalage = ((decalage / 16) * 16) + 16;
+	}
+
+	output << "subq $" << decalage << ", %rsp" << endl;
+	output << "call " << args[0] << endl;
+	output << "leave" << endl;
+}
+
 void Asmx86::globl(string name)
 {
 	output << ".globl " << name << endl

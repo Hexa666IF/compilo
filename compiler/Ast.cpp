@@ -114,30 +114,18 @@ string FunctionCall::getValue() const
 
 void FunctionCall::gen_instr(CFG * cfg) const
 {
+	vector<string> args;
+	args.push_back(name);
+
 	//TODO : faire une enum des %
 	for(int i = 0; i < arguments.size() ; i++)
 	{
 		arguments[i]->gen_instr(cfg);
 		string value = arguments[i]->getValue();
-		
-		//string dest = "%farg"+to_string(i+1);
-		//cfg->add_instr(IRInstr2op::ldconst, value, dest);
+		args.push_back(value);
 	}
 
-	//move the stack pointeur by the nearest upper 16 multiple
-	int decalage = parentTree->getSymbolIndex().size() * 4;
-	int reste = decalage % 16;
-	if(reste){
-		decalage = ((decalage / 16) * 16) + 16;
-	}
-	else
-	{
-		decalage = ((decalage / 16) * 16);
-	}
-
-	string stackp = "%stackp";
-	cfg->add_instr(IRInstr3op::sub, stackp, to_string(decalage), stackp);
-
+	cfg->add_instr(IRInstrSpecial::call, args);
 }
 
 // ================== Operation related stuff =====================
