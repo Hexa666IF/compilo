@@ -58,19 +58,31 @@ void IRInstr3op::gen_asm(Asm &toasm) const
 	switch(operation)
 	{
 		case add:
-				toasm.add(arg1, arg2, arg3);
-				break;
+			toasm.add(arg1, arg2, arg3);
+			break;
 		
 		case sub:
-				toasm.sub(arg1, arg2, arg3);
-				break;
+			toasm.sub(arg1, arg2, arg3);
+			break;
 
 		case mul:
-				toasm.mul(arg1, arg2, arg3);
-				break;
+			toasm.mul(arg1, arg2, arg3);
+			break;
+
+		case cmp_eq:
+			toasm.cmp_eq(arg1, arg2, arg3);
+			break;
+
+		case cmp_lt:
+			toasm.cmp_lt(arg1, arg2, arg3);
+			break;
+
+		case cmp_le:
+			toasm.cmp_le(arg1, arg2, arg3);
+			break;
 
 		default:
-				break;
+			break;
 	}	
 }
 

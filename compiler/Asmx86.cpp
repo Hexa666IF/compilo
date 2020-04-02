@@ -33,6 +33,13 @@ void Asmx86::gen_epilogue()
 		   << "ret" << endl;
 }
 
+void Asmx86::globl(string name)
+{
+	output << ".globl " << name << endl
+		   << name << ":" << endl;
+}
+
+// =============== 2 operands instructions =====================
 
 void Asmx86::ldconst(string arg1, string arg2)
 {
@@ -42,6 +49,8 @@ void Asmx86::ldconst(string arg1, string arg2)
 
 	output << "movl " << arg1 << ", " << arg2 << endl;	
 }
+
+// =============== 3 operands instructions =====================
 
 void Asmx86::add(string arg1, string arg2, string arg3)
 {
@@ -75,6 +84,26 @@ void Asmx86::mul(string arg1, string arg2, string arg3)
 	output << "movl %eax, " << arg3 << endl;
 }
 
+void Asmx86::cmp_le(string arg1, string arg2, string label)
+{
+	setup_cmp(arg1, arg2);
+	output << "jle " << label << endl;
+}
+
+void Asmx86::cmp_lt(string arg1, string arg2, string label)
+{
+	setup_cmp(arg1, arg2);
+	output << "jl " << label << endl;
+}
+
+void Asmx86::cmp_eq(string arg1, string arg2, string label)
+{
+	setup_cmp(arg1, arg2);
+	output << "jz " << label << endl;
+}
+
+// =============== Special instructions =====================
+
 void Asmx86::call(vector<string> args)
 {
 	for(int i = 1; i < args.size(); i++)
@@ -89,12 +118,6 @@ void Asmx86::call(vector<string> args)
 	output << "movl %eax, %edx" << endl;
 }
 
-void Asmx86::globl(string name)
-{
-	output << ".globl " << name << endl
-		   << name << ":" << endl;
-}
-
 //------------- Constructor / Destructors ------------------------------------------------
 
 Asmx86::Asmx86(CFG * graph, ostream &out) : cfg(graph), output(out)
@@ -104,16 +127,32 @@ Asmx86::Asmx86(CFG * graph, ostream &out) : cfg(graph), output(out)
 
 //------------- Protected methods ----------------------------------------------
 
-string Asmx86::loadVariable(string var)
+string Asmx86::loadVariable(string var, string dest)
 {
 	string asm_arg = cfg->IR_reg_to_asm_x86(var);
 	if(asm_arg[0] != '$')
 	// asm_arg is not a constant, it needs to be put in a register to
 	// be available for computation.
 	{
-		output << "movl " << asm_arg << ", " << "%eax" << endl;
-		asm_arg = "%eax";
+		output << "movl " << asm_arg << ", " << dest << endl;
+		asm_arg = dest;
 	}
 
 	return asm_arg;
+}
+
+void Asmx86::setup_cmp(string & arg1, string & arg2)
+{
+	// Test to avoid putting the two values in the same register...
+	// Not very clean, I admit.
+	if(arg2 != "%eax")
+		arg1 = loadVariable(arg1, "%eax");
+	else
+		arg1 = loadVariable(arg1, "%ebx");
+
+	arg2 = loadVariable(arg2, "%ebx");
+	
+	// Arg2 is put first to check (arg1 - arg2). see x86 doc.
+	output << "cmp " << arg2 << ", " << arg1 << endl;
+
 }
