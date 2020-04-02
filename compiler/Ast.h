@@ -166,6 +166,42 @@ class Assign : public Node
 		RValue * rvalue;
 };
 
+// Represent a condition of the type :
+// "left comparison right"
+// For example : "a < 2" 
+class Condition : public Node
+{
+	public :
+		typedef enum { gt, ge, lt, le, eq } Comparison;
+	
+	// ----- Public methods -----
+		virtual void gen_instr(CFG * cfg) const;
+
+	// ----- Constructor -----
+		Condition(RValue * l, Comparison comp, RValue * r);
+	
+	protected:
+		RValue * left;
+		RValue * right;
+		Comparison comparison;
+
+};
+
+class If
+{
+	public :
+	// ------ Public methods -----
+		virtual void gen_instr(CFG * cfg) const;
+	
+	// ----- Constructor -----
+		If(Condition * c, std::vector<Node *> content);
+	
+	protected:
+		Condition * condition;
+		std::vector<Node *> sub_nodes;
+};
+
+
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
 // the result to store somewhere in the memory.

@@ -209,6 +209,90 @@ void Assign::gen_instr(CFG * cfg) const
 	cfg->add_instr(IRInstr2op::ldconst, rvalue->getValue(), lvalue->getValue());
 }
 
+// ================== Condition Related stuff =====================
+
+// ----- Constructor -----
+
+Condition::Condition(RValue * l, Comparison comp, RValue * r)
+: left(l), right(r), comparison(comp)
+{
+	
+}
+
+// ----- public methods -----
+
+void Condition::gen_instr(CFG * cfg) const
+{
+	switch(comparison)
+	// Because of Assembly code instructions, few instructions generated here can
+	// look like they're wrong. It is not the case.
+	// Checking that a > b in assembly code is equivalent to : 
+	// 		"Don't jump if a <= b"
+	// This is why left and right are swapped sometimes, and why a "than" becomes
+	// an "equal" and vice versa.
+	{
+		case gt:
+			cfg->add_instr(	IRInstr3op::cmp_le, 
+							left->getValue(), 
+							right->getValue(),
+							"label");
+			break;
+
+		case ge:
+			cfg->add_instr(	IRInstr3op::cmp_lt,
+							left->getValue(), 
+							right->getValue(),
+							"label");
+			break;
+
+		case lt:
+			cfg->add_instr(	IRInstr3op::cmp_le, 
+							right->getValue(), 
+							left->getValue(),
+							"label");
+			break;
+
+		case le:
+			cfg->add_instr(	IRInstr3op::cmp_lt, 
+							right->getValue(), 
+							left->getValue(),
+							"label");
+			break;
+
+		case eq:
+			cfg->add_instr(	IRInstr3op::cmp_eq, 
+							left->getValue(), 
+							right->getValue(),
+							"label");
+			break;
+	}
+}
+
+// ==================   If   related stuff   ========================
+
+// ----- Constructor -----
+
+If::If(Condition * c, vector<Node *> content)
+: condition(c), sub_nodes(content)
+{
+	
+}
+
+// ----- public methods -----
+
+void If::gen_instr(CFG * cfg) const
+{
+	// TODO: handle the creation of new BasicBlocks !
+	condition->gen_instr(cfg);
+	
+	for(Node * node : sub_nodes)
+		node->gen_instr(cfg);
+
+	// TODO: make sure that there is a label in the code !
+
+}
+
+
 // ========================== Ast related stuff ================================
 
 //------------- public methods -------------------------------------------------
