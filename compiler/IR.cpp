@@ -112,6 +112,10 @@ void IRInstrSpecial::gen_asm(Asm &toasm) const
 
 // ============================= BasicBlock =================================
 
+// === Static attribute initialisation ===
+
+unsigned int BasicBlock::nextId = 0;
+
 // === Constructor / Destructor  ===
 
 BasicBlock::BasicBlock(CFG * c, string entry_label)
@@ -120,7 +124,22 @@ BasicBlock::BasicBlock(CFG * c, string entry_label)
 
 }
 
+BasicBlock::BasicBlock(CFG * c)
+: 	exit_true(nullptr), 
+	exit_false(nullptr), 
+	label("label_" + to_string(nextId++)), 
+	cfg(c)
+{
+	
+}
+
 // === public methods ===
+
+// Static method
+string BasicBlock::getNextLabel()
+{
+	return "label_" + to_string(nextId);
+}
 
 void BasicBlock::gen_asm(Asm &toasm)
 {
@@ -173,8 +192,6 @@ CFG::CFG(Ast * tree, std::string asm_choice)
 	
 	//SymbolIndex = ast->getSymbolIndex();
 	//nextFreeSymbolIndex = ast->getNextIndex();
-	// TODO: check that nextBBnumber is correctly initialised.
-	nextBBnumber = 0;
 	ast->gen_instr(this);
 }
 
@@ -184,13 +201,6 @@ void CFG::add_bb(BasicBlock * bb)
 {
 	bbs.push_back(bb);
 	current_bb = bb;
-
-	// not sure about this increment, but seems like the right thing to do with
-	// it...
-	++nextBBnumber;	
-	nextFreeSymbolIndex = 4;
-
-	// TODO: handle if-blocks. (differents paths, same %rbp).
 }
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
@@ -318,10 +328,5 @@ int CFG::get_var_index(const string name) const
 			index = it->second;
 	
 	return index;
-}
-
-string CFG::new_BB_name() const
-{
-	return current_bb->getLabel();
 }
 

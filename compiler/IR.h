@@ -165,7 +165,16 @@ class IRInstrSpecial : public IRInstr
 class BasicBlock {
 
  	public:
-		BasicBlock(CFG* c, std::string entry_label);
+		// TODO : find a way to avoid using a public static variable.
+		static unsigned int nextId;
+
+	// ----- Constructor -----
+		BasicBlock(CFG * c, std::string entry_label);
+		BasicBlock(CFG * c);
+	// ----- public methods -----
+	
+		static std::string getNextLabel();
+
 		void gen_asm(Asm &toasm); /**< x86 assembly code generation for this basic block (very simple) */
 
 		// void add_instr(IRInstr * instr);
@@ -179,15 +188,16 @@ class BasicBlock {
 		std::string getLabel() const;
 
 	protected:
+		
+
 		BasicBlock* exit_true;  /**< pointer to the next basic block, true branch. If nullptr, return from procedure */ 
 		BasicBlock* exit_false; /**< pointer to the next basic block, false branch. If null_ptr, the basic block ends with an unconditional jump */
 		std::string label; /**< label of the BB, also will be the label in the generated code */
 		CFG* cfg; /** < the CFG where this block belongs */
 		std::vector<IRInstr*> instrs; /** < the instructions themselves. */
+
+
 };
-
-
-
 
 /** The class for the control flow graph, also includes the symbol table */
 
@@ -202,8 +212,8 @@ class CFG {
  	public:
 		CFG(Ast * ast, std::string asm_choice);
 	
-		void add_bb(BasicBlock* bb); 
-
+		void add_bb(BasicBlock* bb);
+	
 		// Add the IRInstr to the current BasicBlock.
 		// void add_instr(IRInstr * instr);
 		// void add_instr(IRInstr1op::Operation1op op, std::string arg);
@@ -236,10 +246,6 @@ class CFG {
 
 		//Type get_var_type(std::string name);
 
-		// basic block management
-		// TODO : check if the return of this method can be a const reference.
-		std::string new_BB_name() const;
-
 	protected:
 	
 		Ast* ast; /**< The AST this CFG comes from */
@@ -248,8 +254,6 @@ class CFG {
 		//std::map <std::string, Type> SymbolType; /**< part of the symbol table  */
 		std::map <std::string, int> & SymbolIndex; /**< part of the symbol table  */
 		int & nextFreeSymbolIndex; /**< to allocate new symbols in the symbol table */
-		int nextBBnumber; /**< just for naming */
-	
 		std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
 		Asm* toasm; // asm converter.
 
