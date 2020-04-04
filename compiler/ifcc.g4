@@ -16,7 +16,7 @@ l : 'int' decl ';' l # lDecl
 
 ifblock : 'if' '(' condition ')' block ;
 
-condition : val COMPARISON val ;
+condition : expr COMPARISON expr;
 
 decl : TEXT ',' decl # declMultiple
      | TEXT # declSimple

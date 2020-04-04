@@ -108,8 +108,8 @@ antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)
 			Condition::Comparison::ge, 
 			Condition::Comparison::eq 
 	};
-	RValue * left = visit(ctx->val(0));
-	RValue * right = visit(ctx->val(1));
+	RValue * left = visit(ctx->expr(0));
+	RValue * right = visit(ctx->expr(1));
 	string str_comp = ctx->COMPARISON()->getText();
 	unsigned int i = 0;
 	while(i < 5 && str_comp != operators[i])
