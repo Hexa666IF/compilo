@@ -35,6 +35,11 @@ void AsmARM::globl(string name)
 		   << name << ":" << endl;
 }
 
+void AsmARM::label(string label)
+{
+	
+}
+
 // =============== 2 operands instructions =====================
 
 void AsmARM::ldconst(string arg1, string arg2)

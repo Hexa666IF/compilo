@@ -11,7 +11,7 @@
 #include "IR.h"
 #include "Ast.h"
 
-/**
+/*
  * This class provides an empty implementation of ifccVisitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
  */
@@ -26,7 +26,10 @@ public:
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
-   
+
+  virtual antlrcpp::Any visitBlock(ifccParser::BlockContext *context) override;
+
+
   virtual antlrcpp::Any visitLDecl(ifccParser::LDeclContext *ctx) override;
 
   virtual antlrcpp::Any visitLAffect(ifccParser::LAffectContext *ctx) override;
@@ -35,7 +38,15 @@ public:
 
   virtual antlrcpp::Any visitReturn(ifccParser::ReturnContext *context) override;
 
+  virtual antlrcpp::Any visitLIf(ifccParser::LIfContext *context) override;
+  
   virtual antlrcpp::Any visitLEpsilon(ifccParser::LEpsilonContext *ctx) override;
+
+
+  virtual antlrcpp::Any visitIfblock(ifccParser::IfblockContext *context) override;
+
+  virtual antlrcpp::Any visitCondition(ifccParser::ConditionContext *context) override;
+
 
   virtual antlrcpp::Any visitDeclMultiple(ifccParser::DeclMultipleContext *ctx) override;
 

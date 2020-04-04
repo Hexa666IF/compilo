@@ -8,6 +8,7 @@ e-mail :
 #define AST_H
 
 #include <vector>
+#include <deque>
 #include <string>
 #include <unordered_set>
 
@@ -187,18 +188,18 @@ class Condition : public Node
 
 };
 
-class If
+class If : public Node
 {
 	public :
 	// ------ Public methods -----
 		virtual void gen_instr(CFG * cfg) const;
 	
 	// ----- Constructor -----
-		If(Condition * c, std::vector<Node *> content);
+		If(Condition * c, std::deque<Node *> * content);
 	
 	protected:
 		Condition * condition;
-		std::vector<Node *> sub_nodes;
+		std::deque<Node *> * sub_nodes;
 };
 
 
@@ -228,11 +229,17 @@ class Ast
 		// Return true if variable is in symbolIndex, 
 		// return false otherwise.
 		bool isDeclared(std::string variable) const;
+		
+		// Temporary function used to set the block of main function in the
+		// AST.
+		// In the future, we'll have a function vector, and functions will hold
+		// their own deque<Node *>.
+		void setChilds(std::deque<Node *> * block);
 
 		std::map<std::string, int> & getSymbolIndex();
 		int & getNextIndex();
 
-
+		
 		const std::unordered_set<std::string> & getUnuseds() const;
 	//--- Constructor - Destructor ---
 		Ast();	
@@ -243,7 +250,7 @@ class Ast
 	
 	//----- protected attributes -----
 		
-		std::vector<Node *> childs;
+		std::deque<Node *> * childs;
 
 		// The symbol table held by the AST.
 		// Variable will be inserted inside this map by the

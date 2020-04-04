@@ -35,8 +35,13 @@ void Asmx86::gen_epilogue()
 
 void Asmx86::globl(string name)
 {
-	output << ".globl " << name << endl
-		   << name << ":" << endl;
+	output << ".globl " << name << endl;
+		 //  << name << ":" << endl;
+}
+
+void Asmx86::label(string label)
+{
+	output << label << ":" << endl;
 }
 
 // =============== 2 operands instructions =====================
@@ -130,7 +135,7 @@ Asmx86::Asmx86(CFG * graph, ostream &out) : cfg(graph), output(out)
 string Asmx86::loadVariable(string var, string dest)
 {
 	string asm_arg = cfg->IR_reg_to_asm_x86(var);
-	if(asm_arg[0] != '$')
+	// if(asm_arg[0] != '$')
 	// asm_arg is not a constant, it needs to be put in a register to
 	// be available for computation.
 	{
@@ -143,15 +148,23 @@ string Asmx86::loadVariable(string var, string dest)
 
 void Asmx86::setup_cmp(string & arg1, string & arg2)
 {
+	arg1 = cfg->IR_reg_to_asm_x86(arg1);
+	arg2 = cfg->IR_reg_to_asm_x86(arg2);
 	// Test to avoid putting the two values in the same register...
 	// Not very clean, I admit.
 	if(arg2 != "%eax")
-		arg1 = loadVariable(arg1, "%eax");
+	{
+		output << "movl " << arg1 << ", %eax" << endl;
+		arg1 = "%eax";
+		output << "movl " << arg2 << ", %ebx" << endl;
+		arg2 = "%ebx";
+	}
 	else
-		arg1 = loadVariable(arg1, "%ebx");
-
-	arg2 = loadVariable(arg2, "%ebx");
-	
+	{
+		output << "movl " << arg1 << ", %ebx" << endl;
+		arg1 = "%ebx";
+	}
+		
 	// Arg2 is put first to check (arg1 - arg2). see x86 doc.
 	output << "cmp " << arg2 << ", " << arg1 << endl;
 

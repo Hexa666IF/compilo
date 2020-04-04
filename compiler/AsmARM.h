@@ -25,7 +25,7 @@ class AsmARM : public Asm
 		void gen_prologue(int size);
 		void gen_epilogue();
 		void globl(std::string name);
-
+		void label(std::string label);
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);

@@ -214,7 +214,7 @@ void Assign::gen_instr(CFG * cfg) const
 // ----- Constructor -----
 
 Condition::Condition(RValue * l, Comparison comp, RValue * r)
-: left(l), right(r), comparison(comp)
+: Node(), left(l), right(r), comparison(comp)
 {
 	
 }
@@ -223,6 +223,7 @@ Condition::Condition(RValue * l, Comparison comp, RValue * r)
 
 void Condition::gen_instr(CFG * cfg) const
 {
+	string jLabel = BasicBlock::getNextLabel();
 	switch(comparison)
 	// Because of Assembly code instructions, few instructions generated here can
 	// look like they're wrong. It is not the case.
@@ -235,35 +236,35 @@ void Condition::gen_instr(CFG * cfg) const
 			cfg->add_instr(	IRInstr3op::cmp_le, 
 							left->getValue(), 
 							right->getValue(),
-							"label");
+							jLabel);
 			break;
 
 		case ge:
 			cfg->add_instr(	IRInstr3op::cmp_lt,
 							left->getValue(), 
 							right->getValue(),
-							"label");
+							jLabel);
 			break;
 
 		case lt:
 			cfg->add_instr(	IRInstr3op::cmp_le, 
 							right->getValue(), 
 							left->getValue(),
-							"label");
+							jLabel);
 			break;
 
 		case le:
 			cfg->add_instr(	IRInstr3op::cmp_lt, 
 							right->getValue(), 
 							left->getValue(),
-							"label");
+							jLabel);
 			break;
 
 		case eq:
 			cfg->add_instr(	IRInstr3op::cmp_eq, 
 							left->getValue(), 
 							right->getValue(),
-							"label");
+							jLabel);
 			break;
 	}
 }
@@ -272,8 +273,8 @@ void Condition::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-If::If(Condition * c, vector<Node *> content)
-: condition(c), sub_nodes(content)
+If::If(Condition * c, deque<Node *> * content)
+: Node(), condition(c), sub_nodes(content)
 {
 	
 }
@@ -282,14 +283,19 @@ If::If(Condition * c, vector<Node *> content)
 
 void If::gen_instr(CFG * cfg) const
 {
-	// TODO: handle the creation of new BasicBlocks !
-	condition->gen_instr(cfg);
+	// This bb is the place where the code inside the if will be placed.
+	// It is important to create it before entering into the Condition,
+	// Because of BasicBlock::getNextLabel().
+	BasicBlock * ifBlock = new BasicBlock(cfg);
 	
-	for(Node * node : sub_nodes)
+	condition->gen_instr(cfg);	
+	
+	cfg->add_bb(ifBlock);
+	for(Node * node : *sub_nodes)
 		node->gen_instr(cfg);
-
-	// TODO: make sure that there is a label in the code !
-
+	
+	BasicBlock * nextBlock = new BasicBlock(cfg);
+	cfg->add_bb(nextBlock);
 }
 
 
@@ -299,7 +305,7 @@ void If::gen_instr(CFG * cfg) const
 
 void Ast::addNode(Node * node)
 {
-	childs.push_back(node);	
+	childs->push_back(node);	
 }
 
 void Ast::addSymbol(string symbol)
@@ -319,7 +325,7 @@ void Ast::addSymbol(string symbol)
 
 void Ast::gen_instr(CFG * cfg) const
 {
-	for(Node * node : childs)
+	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);
 	}
@@ -342,6 +348,11 @@ bool Ast::isDeclared(string variable) const
 	return declared;
 }
 
+void Ast::setChilds(deque<Node *> * block)
+{
+	childs = block;
+}
+
 map<string, int> & Ast::getSymbolIndex()
 {
 	return symbolIndex;
@@ -360,7 +371,7 @@ const unordered_set<string> & Ast::getUnuseds() const
 //------------- Constructor - Destructor ------------------------------------
 
 Ast::Ast()
-: childs(), symbolIndex(), next_index(4)
+: childs(nullptr), symbolIndex(), next_index(4)
 {
 
 }
