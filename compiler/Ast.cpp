@@ -305,7 +305,7 @@ void If::gen_instr(CFG * cfg) const
 
 void Ast::addNode(Node * node)
 {
-	childs.push_back(node);	
+	childs->push_back(node);	
 }
 
 void Ast::addSymbol(string symbol)
@@ -325,7 +325,7 @@ void Ast::addSymbol(string symbol)
 
 void Ast::gen_instr(CFG * cfg) const
 {
-	for(Node * node : childs)
+	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);
 	}
@@ -348,6 +348,11 @@ bool Ast::isDeclared(string variable) const
 	return declared;
 }
 
+void Ast::setChilds(deque<Node *> * block)
+{
+	childs = block;
+}
+
 map<string, int> & Ast::getSymbolIndex()
 {
 	return symbolIndex;
@@ -366,7 +371,7 @@ const unordered_set<string> & Ast::getUnuseds() const
 //------------- Constructor - Destructor ------------------------------------
 
 Ast::Ast()
-: childs(), symbolIndex(), next_index(4)
+: childs(nullptr), symbolIndex(), next_index(4)
 {
 
 }

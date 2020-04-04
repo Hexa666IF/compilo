@@ -2,14 +2,21 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' '{' l '}' ;
+prog : 'int' 'main' '(' ')' block ;
+
+block : '{' l '}' ;
 
 l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
   | call ';' l #lCall
-  | RETURN expr ';' # return
+  | RETURN expr ';' l # return
+  | ifblock l # lIf
   | /*epsilon*/ # lEpsilon
   ; 
+
+ifblock : 'if' '(' condition ')' block ;
+
+condition : val COMPARISON val ;
 
 decl : TEXT ',' decl # declMultiple
      | TEXT # declSimple
@@ -52,6 +59,7 @@ param : expr ',' param # paramMultiple
 RETURN : 'return' ;
 CONST : [0-9]+ ;
 TEXT : [a-z]+ ;
+COMPARISON : '>' '>=' '<' '<=' '==';
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

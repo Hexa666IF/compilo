@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <deque>
 
 using namespace std;
 
@@ -16,25 +17,35 @@ Visitor::Visitor() : ifccVisitor()
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
-	visit(ctx->l());
-
+	deque<Node *> * block = visit(ctx->block());
+	ast->setChilds(block);
 	return 0;
+}
+
+antlrcpp::Any Visitor::visitBlock(ifccParser::BlockContext * ctx)
+{
+	deque<Node *> * block = visit(ctx->l());
+	return block; 
 }
 
 antlrcpp::Any Visitor::visitLDecl(ifccParser::LDeclContext *ctx)
 {	
-	visit(ctx->decl());
-	visit(ctx->l());
+	// Declaration are 0 initialised variables.
+	// That's why we still get an Assign object here.
+	Assign * assign = visit(ctx->decl());
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(assign);
 
-	return 0;
+	return block;
 }
 
 antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 {
-	visit(ctx->affect());
-	visit(ctx->l());
+	Assign * assign = visit(ctx->affect());
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(assign);
 
-	return 0;
+	return block;
 }
 
 antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
@@ -42,32 +53,58 @@ antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 	RValue * call = visit(ctx->call());
 	ast->addNode(call);
 
-	visit(ctx->l());
-	
-	return 0;
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(call);
+	return block;
 }
 
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
 	Return * ret = new Return(retval, ast);
-	ast->addNode(ret);
+	// ast->addNode(ret);
+	
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(ret);
+	return block;
+}
 
+antlrcpp::Any Visitor::visitLIf(ifccParser::LIfContext * ctx)
+{
+	// TODO: create a IF node, put it in the vector and return it.
 	return 0;
 }
 
 antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 {
-	return 0;
+	// This deque represent the whole block we're in.
+	// It will go through all the lines backwards, and will contains
+	// each line representation.
+	deque<Node *> * blockNodes = new deque<Node *>();
+	return blockNodes;
+}
+
+antlrcpp::Any Visitor::visitIfblock(ifccParser::IfblockContext * ctx)
+{
+	// TODO : create a IF node, and return it to the upper rule.
+}
+
+antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)
+{
+	// TODO : create a Condition node and return it to the upper rule.
 }
 
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
 	ast->addSymbol(symbol);
-	visit(ctx->decl());
 
-	return 0;
+	// Is the initialisation here a good idea ?
+	Variable * variable = new Variable(symbol, ast);
+	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
+	visit(ctx->decl());
+	
+	return assign;
 }
 
 antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
@@ -76,18 +113,18 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 	ast->addSymbol(symbol);
 	Variable * variable = new Variable(symbol, ast);
 	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
-	ast->addNode(assign);
+	// ast->addNode(assign);
 	
-	return 0;
+	return assign;
 }
 
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	Variable * var = visit(ctx->var());	
 	Assign * assign = new Assign(var, visit(ctx->expr()), ast);
-	ast->addNode(assign);
+	// ast->addNode(assign);
 
-	return 0;
+	return assign;
 }
 
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
