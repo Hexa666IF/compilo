@@ -223,10 +223,13 @@ void CFG::gen_asm()
 {
 	// TODO : do not use hardcoded string for globl() call.
 	toasm->globl("main");
+	toasm->label("main");
 	toasm->gen_prologue(SymbolIndex.size()*4);
-	for(BasicBlock * b : bbs)
+	bbs[0]->gen_asm(*toasm);
+	for(unsigned int i = 1; i < bbs.size(); ++i)
 	{
-		b->gen_asm(*toasm);
+		toasm->label(bbs[i]->getLabel());
+		bbs[i]->gen_asm(*toasm);
 	}
 	toasm->gen_epilogue();
 }

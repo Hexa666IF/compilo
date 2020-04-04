@@ -23,6 +23,7 @@ class Asm
 		virtual void gen_prologue(int size) = 0;
 		virtual void gen_epilogue() = 0;
 		virtual void globl(std::string name) = 0;
+		virtual void label(std::string label) = 0;
 
 // =============== 2 operands instructions =====================
 

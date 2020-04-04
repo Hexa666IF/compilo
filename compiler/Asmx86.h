@@ -25,6 +25,7 @@ class Asmx86 : public Asm
 		void gen_prologue(int size);
 		void gen_epilogue();
 		void globl(std::string name);
+		void label(std::string label);
 
 // =============== 2 operands instructions =====================
 

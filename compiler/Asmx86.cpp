@@ -35,8 +35,13 @@ void Asmx86::gen_epilogue()
 
 void Asmx86::globl(string name)
 {
-	output << ".globl " << name << endl
-		   << name << ":" << endl;
+	output << ".globl " << name << endl;
+		 //  << name << ":" << endl;
+}
+
+void Asmx86::label(string label)
+{
+	output << label << ":" << endl;
 }
 
 // =============== 2 operands instructions =====================
