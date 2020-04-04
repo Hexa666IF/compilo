@@ -188,18 +188,18 @@ class Condition : public Node
 
 };
 
-class If
+class If : public Node
 {
 	public :
 	// ------ Public methods -----
 		virtual void gen_instr(CFG * cfg) const;
 	
 	// ----- Constructor -----
-		If(Condition * c, std::vector<Node *> content);
+		If(Condition * c, std::deque<Node *> * content);
 	
 	protected:
 		Condition * condition;
-		std::vector<Node *> sub_nodes;
+		std::deque<Node *> * sub_nodes;
 };
 
 

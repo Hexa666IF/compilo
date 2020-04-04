@@ -214,7 +214,7 @@ void Assign::gen_instr(CFG * cfg) const
 // ----- Constructor -----
 
 Condition::Condition(RValue * l, Comparison comp, RValue * r)
-: left(l), right(r), comparison(comp)
+: Node(), left(l), right(r), comparison(comp)
 {
 	
 }
@@ -273,8 +273,8 @@ void Condition::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-If::If(Condition * c, vector<Node *> content)
-: condition(c), sub_nodes(content)
+If::If(Condition * c, deque<Node *> * content)
+: Node(), condition(c), sub_nodes(content)
 {
 	
 }
@@ -291,7 +291,7 @@ void If::gen_instr(CFG * cfg) const
 	condition->gen_instr(cfg);	
 	
 	cfg->add_bb(ifBlock);
-	for(Node * node : sub_nodes)
+	for(Node * node : *sub_nodes)
 		node->gen_instr(cfg);
 	
 	BasicBlock * nextBlock = new BasicBlock(cfg);

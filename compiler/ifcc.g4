@@ -59,7 +59,7 @@ param : expr ',' param # paramMultiple
 RETURN : 'return' ;
 CONST : [0-9]+ ;
 TEXT : [a-z]+ ;
-COMPARISON : '>' '>=' '<' '<=' '==';
+COMPARISON : '>' | '>=' | '<' | '<=' | '==';
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

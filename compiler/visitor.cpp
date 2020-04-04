@@ -71,8 +71,11 @@ antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 
 antlrcpp::Any Visitor::visitLIf(ifccParser::LIfContext * ctx)
 {
-	// TODO: create a IF node, put it in the vector and return it.
-	return 0;
+	If * ifNode = visit(ctx->ifblock());
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(ifNode);
+
+	return block;
 }
 
 antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
@@ -86,12 +89,34 @@ antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 
 antlrcpp::Any Visitor::visitIfblock(ifccParser::IfblockContext * ctx)
 {
-	// TODO : create a IF node, and return it to the upper rule.
+	Condition * condition = visit(ctx->condition());
+	
+	// the block inside the if.
+	deque<Node *> * ifBlock = visit(ctx->block());
+	If * ifNode = new If(condition, ifBlock);
+
+	return ifNode;
 }
 
 antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)
 {
-	// TODO : create a Condition node and return it to the upper rule.
+	static const string operators [] = { "<", "<=", ">", ">=", "==" };
+	static const Condition::Comparison types [] = { 
+			Condition::Comparison::lt, 
+			Condition::Comparison::le, 
+			Condition::Comparison::gt, 
+			Condition::Comparison::ge, 
+			Condition::Comparison::eq 
+	};
+	RValue * left = visit(ctx->val(0));
+	RValue * right = visit(ctx->val(1));
+	string str_comp = ctx->COMPARISON()->getText();
+	unsigned int i = 0;
+	while(i < 5 && str_comp != operators[i])
+		++i;
+
+	Condition * cond = new Condition(left, types[i], right);
+	return cond;
 }
 
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
