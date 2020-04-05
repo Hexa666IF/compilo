@@ -22,6 +22,22 @@ IRInstr::~IRInstr()
 
 }
 
+// ====== IRInstr1op class related stuff ======
+
+IRInstr1op::IRInstr1op( BasicBlock * bb,
+						Operation1op op,
+						string a1
+					  )
+: IRInstr(bb), operation(op), arg1(a1)
+{
+
+}
+
+void IRInstr1op::gen_asm(Asm & toasm) const
+{
+	toasm.jump(arg1);
+}
+
 // ====== IRInstr2op class related stuff ======
 
 IRInstr2op::IRInstr2op(	BasicBlock * bb,
@@ -149,6 +165,12 @@ void BasicBlock::gen_asm(Asm &toasm)
 	}
 }
 
+void BasicBlock::add_instr(IRInstr1op::Operation1op op, string arg1)
+{
+	IRInstr1op * instr = new IRInstr1op(this, op, arg1);
+	instrs.push_back(instr);
+}
+
 void BasicBlock::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
 	IRInstr2op * instr = new IRInstr2op(this, op, arg1, arg2);
@@ -201,6 +223,11 @@ void CFG::add_bb(BasicBlock * bb)
 {
 	bbs.push_back(bb);
 	current_bb = bb;
+}
+
+void CFG::add_instr(IRInstr1op::Operation1op op, string arg1)
+{
+	current_bb->add_instr(op, arg1);
 }
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)

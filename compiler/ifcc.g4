@@ -14,7 +14,8 @@ l : 'int' decl ';' l # lDecl
   | /*epsilon*/ # lEpsilon
   ; 
 
-ifblock : 'if' '(' condition ')' block ;
+ifblock : 'if' '(' condition ')' block # ifBlock
+        | 'if' '(' condition ')' block 'else' block # ifElseBlock;
 
 condition : expr COMPARISON expr;
 

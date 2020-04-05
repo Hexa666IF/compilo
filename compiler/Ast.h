@@ -202,6 +202,22 @@ class If : public Node
 		std::deque<Node *> * sub_nodes;
 };
 
+class IfElse : public If
+{
+	public :
+	// ----- Public methods -----
+		void gen_instr(CFG * cfg) const;
+
+	// ----- Constructor -----
+		IfElse(	Condition * c, 
+				std::deque<Node *> * ifContent,
+				std::deque<Node *> * elseContent
+			  );
+	
+	protected:
+		std::deque<Node *> * else_sub_nodes;
+};
+
 
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
