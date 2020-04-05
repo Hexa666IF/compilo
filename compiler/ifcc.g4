@@ -2,19 +2,32 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' '{' l '}' ;
+prog : 'int' 'main' '(' ')' block ;
+
+block : '{' l '}' ;
 
 l : 'int' decl ';' l # lDecl
   | affect ';' l # lAffect
-  | RETURN expr ';' # return
+  | call ';' l #lCall
+  | RETURN expr ';' l # return
+  | ifblock l # lIf
+  | whileblock l # lWhile
   | /*epsilon*/ # lEpsilon
   ; 
+
+whileblock : 'while' '(' condition ')' block;
+
+ifblock : 'if' '(' condition ')' block # ifBlock
+        | 'if' '(' condition ')' block 'else' block # ifElseBlock;
+
+condition : expr COMPARISON expr;
 
 decl : TEXT ',' decl # declMultiple
      | TEXT # declSimple
      ;
 
-affect : var '=' expr ;
+affect : var '=' expr 
+    ;
 
 var : 'int' TEXT # varDecl
     | TEXT # varText
@@ -22,6 +35,7 @@ var : 'int' TEXT # varDecl
 
 val : CONST # valConst
     | TEXT # valText
+    | call # valCall
     ;
 
 expr : term '+' expr # add
@@ -38,9 +52,18 @@ f : val # const
     | '(' expr ')' # par
 	;
 
+call : TEXT '(' ')' # callNoParam
+     | TEXT '(' param ')' # callParam
+     ;
+
+param : expr ',' param # paramMultiple
+      | expr # paramSimple
+      ;
+
 RETURN : 'return' ;
 CONST : [0-9]+ ;
 TEXT : [a-z]+ ;
+COMPARISON : '>' | '>=' | '<' | '<=' | '==';
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

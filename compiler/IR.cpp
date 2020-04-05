@@ -3,6 +3,9 @@
 
 using namespace std;
 
+#include "Ast.h"
+#include "reg.h"
+
 // ========================= IRInstr =========================================
 
 // ====== IRInstr class related stuff ======
@@ -17,6 +20,22 @@ IRInstr::IRInstr(BasicBlock * bb) : bb(bb)
 IRInstr::~IRInstr()
 {
 
+}
+
+// ====== IRInstr1op class related stuff ======
+
+IRInstr1op::IRInstr1op( BasicBlock * bb,
+						Operation1op op,
+						string a1
+					  )
+: IRInstr(bb), operation(op), arg1(a1)
+{
+
+}
+
+void IRInstr1op::gen_asm(Asm & toasm) const
+{
+	toasm.jump(arg1);
 }
 
 // ====== IRInstr2op class related stuff ======
@@ -55,19 +74,31 @@ void IRInstr3op::gen_asm(Asm &toasm) const
 	switch(operation)
 	{
 		case add:
-				toasm.add(arg1, arg2, arg3);
-				break;
+			toasm.add(arg1, arg2, arg3);
+			break;
 		
 		case sub:
-				toasm.sub(arg1, arg2, arg3);
-				break;
+			toasm.sub(arg1, arg2, arg3);
+			break;
 
 		case mul:
-				toasm.mul(arg1, arg2, arg3);
-				break;
+			toasm.mul(arg1, arg2, arg3);
+			break;
+
+		case cmp_eq:
+			toasm.cmp_eq(arg1, arg2, arg3);
+			break;
+
+		case cmp_lt:
+			toasm.cmp_lt(arg1, arg2, arg3);
+			break;
+
+		case cmp_le:
+			toasm.cmp_le(arg1, arg2, arg3);
+			break;
 
 		default:
-				break;
+			break;
 	}	
 }
 
@@ -84,10 +115,22 @@ IRInstrSpecial::IRInstrSpecial(	BasicBlock * bb,
 
 void IRInstrSpecial::gen_asm(Asm &toasm) const
 {
+	switch(operation)
+	{
+		case call:
+				toasm.call(args);
+				break;
 
+		default:
+				break;
+	}	
 }
 
 // ============================= BasicBlock =================================
+
+// === Static attribute initialisation ===
+
+unsigned int BasicBlock::nextId = 0;
 
 // === Constructor / Destructor  ===
 
@@ -97,7 +140,22 @@ BasicBlock::BasicBlock(CFG * c, string entry_label)
 
 }
 
+BasicBlock::BasicBlock(CFG * c)
+: 	exit_true(nullptr), 
+	exit_false(nullptr), 
+	label("label_" + to_string(nextId++)), 
+	cfg(c)
+{
+	
+}
+
 // === public methods ===
+
+// Static method
+string BasicBlock::getNextLabel()
+{
+	return "label_" + to_string(nextId);
+}
 
 void BasicBlock::gen_asm(Asm &toasm)
 {
@@ -105,6 +163,12 @@ void BasicBlock::gen_asm(Asm &toasm)
 	{
 		instr->gen_asm(toasm);
 	}
+}
+
+void BasicBlock::add_instr(IRInstr1op::Operation1op op, string arg1)
+{
+	IRInstr1op * instr = new IRInstr1op(this, op, arg1);
+	instrs.push_back(instr);
 }
 
 void BasicBlock::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
@@ -134,15 +198,23 @@ string BasicBlock::getLabel() const
 
 // === Constructor / Destructor ===
 
-CFG::CFG(Ast * tree)
-: ast(tree), toasm(this, cout)
+CFG::CFG(Ast * tree, std::string asm_choice)
+: ast(tree), SymbolIndex(ast->getSymbolIndex()), nextFreeSymbolIndex(ast->getNextIndex())
 {
+	if (asm_choice=="-arm") {
+		toasm = new AsmARM(this,cout);
+	} else if (asm_choice=="-msp430") {
+		toasm = new Asmx86(this,cout);
+	} else {
+		toasm = new Asmx86(this,cout);
+	}
+	
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
 	
-	nextFreeSymbolIndex = 4;
-	// TODO: check that nextBBnumber is correctly initialised.
-	nextBBnumber = 0;
+	//SymbolIndex = ast->getSymbolIndex();
+	//nextFreeSymbolIndex = ast->getNextIndex();
+	ast->gen_instr(this);
 }
 
 // === public methods ===
@@ -151,27 +223,20 @@ void CFG::add_bb(BasicBlock * bb)
 {
 	bbs.push_back(bb);
 	current_bb = bb;
+}
 
-	// not sure about this increment, but seems like the right thing to do with
-	// it...
-	++nextBBnumber;	
-	nextFreeSymbolIndex = 4;
-
-	// TODO: handle if-blocks. (differents paths, same %rbp).
+void CFG::add_instr(IRInstr1op::Operation1op op, string arg1)
+{
+	current_bb->add_instr(op, arg1);
 }
 
 void CFG::add_instr(IRInstr2op::Operation2op op, string arg1, string arg2)
 {
-	checkDeclared(arg1);	
-	checkDeclared(arg2);	
 	current_bb->add_instr(op, arg1, arg2);
 }
 
 void CFG::add_instr(IRInstr3op::Operation3op op, string arg1, string arg2, string arg3)
 {
-	checkDeclared(arg1);
-	checkDeclared(arg2);
-	checkDeclared(arg3);		
 	current_bb->add_instr(op, arg1, arg2, arg3);
 }
 
@@ -184,19 +249,35 @@ void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
 void CFG::gen_asm()
 {
 	// TODO : do not use hardcoded string for globl() call.
-	toasm.globl("main");
-	toasm.gen_prologue(SymbolIndex.size()*4);
-	for(BasicBlock * b : bbs)
+	toasm->globl("main");
+	toasm->label("main");
+	toasm->gen_prologue(SymbolIndex.size()*4);
+	bbs[0]->gen_asm(*toasm);
+	for(unsigned int i = 1; i < bbs.size(); ++i)
 	{
-		b->gen_asm(toasm);
+		toasm->label(bbs[i]->getLabel());
+		bbs[i]->gen_asm(*toasm);
 	}
-	toasm.gen_epilogue();
+	toasm->gen_epilogue();
 }
 
 // = symbol table methods =
 
-string CFG::IR_reg_to_asm(std::string reg)
+string CFG::IR_reg_to_asm_x86(std::string reg)
 {
+	static const unsigned int n_reg = 10;
+	static const string abstract_reg [] = 
+		{ 	RETVAL, RETVALD, RBASEP, RSTACKP,
+			FARG1, FARG2, FARG3, FARG4,
+			FARG5, FARG6
+		};
+
+	static const string x86_reg [] =
+		{	"%eax", "%edx", "%rbp", "%rsp",
+			"%rdi", "%rsi", "%rdx", "%rcx",
+			"%r8", "%r9"
+		};
+
 	string asm_reg;
 	int index = get_var_index(reg);
 
@@ -206,11 +287,14 @@ string CFG::IR_reg_to_asm(std::string reg)
 	}
 	else if (reg[0] == '%')
 	{
-		if(reg == "%retval")
-				asm_reg = "%eax";
+			unsigned int i = 0;
+			while(i < n_reg && reg != abstract_reg[i])
+				++i;
 
-		if(reg == "%rbp")
-				asm_reg = "%rbp";
+			if(i < 10)
+				asm_reg = x86_reg[i];
+			else
+				asm_reg = "BAD ABSTRACT REG : " + reg;
 	}
 	else 
 	{
@@ -220,21 +304,39 @@ string CFG::IR_reg_to_asm(std::string reg)
 	return asm_reg;
 }
 
+string CFG::IR_reg_to_asm_arm(std::string reg)
+{
+	string asm_reg;
+	int index = get_var_index(reg);
+	index = index;
+
+	if(index != 0)
+	{
+		asm_reg = "[fp, #" + to_string(-(index+4)) + "]";
+	}
+	else if (reg[0] == '%')
+	{
+		asm_reg = reg;
+	}
+	else 
+	{
+		asm_reg = '#' + reg;
+	}
+
+	return asm_reg;
+}
+
+int CFG::get_symbol_table_length() const
+{
+	return SymbolIndex.size();
+}
+
 void CFG::add_to_symbol_table(string name)
 {
 	// handle multiple declaration errors.
-	if (SymbolIndex.find(name) == SymbolIndex.end())
-	{
-		pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
-		SymbolIndex.insert(p);
-		nextFreeSymbolIndex += 4;
-		addVarUnused(name);
-	}
-	else
-	{
-		Errors::addError(name, multipleDeclaration);
-		throw multipleDeclaration;
-	}
+	pair<string, int> p = make_pair(name, nextFreeSymbolIndex);
+	SymbolIndex.insert(p);
+	nextFreeSymbolIndex += 4;
 }
 
 string CFG::create_new_tempvar()
@@ -258,34 +360,3 @@ int CFG::get_var_index(const string name) const
 	return index;
 }
 
-string CFG::new_BB_name() const
-{
-	return current_bb->getLabel();
-}
-
-void CFG::addVarUnused(const string var)
-{
-	if( find(varUnused.begin(), varUnused.end(), var) == varUnused.end() )
-		varUnused.push_back(var);
-}
-
-void CFG::deleteVarUsed(const string var)
-{
-	varUnused.remove(var);
-}
-
-void CFG::warningsUnusedVar() const
-{
-	std::list<string>::const_iterator it;
-	for (it = varUnused.cbegin(); it != varUnused.cend(); ++it)
-		Errors::addError(*it, notUsed);
-}
-
-void CFG::checkDeclared(const string var) const
-{
-	if( isalpha(var[0]) && (get_var_index(var) == 0) )
-	{
-		Errors::addError(var, notDeclared);
-		throw notDeclared;
-	}
-}

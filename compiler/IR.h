@@ -9,6 +9,8 @@
 #include <map>
 
 #include "Asm.h"
+#include "Asmx86.h"
+#include "AsmARM.h"
 #include "Errors.h"
 // Declarations from the parser -- replace with your own
 
@@ -42,6 +44,32 @@ class IRInstr {
 	BasicBlock* bb;
 	// Type t ?
 };
+
+// === IRInstr1op ===
+
+class IRInstr1op : public IRInstr
+{
+	public:
+		typedef enum {
+			jmp
+		} Operation1op;
+
+	// === Constructors / Destructor ===
+	
+		IRInstr1op(	BasicBlock * bb,
+					Operation1op op,
+					std::string a1
+				  );
+	// === Overriden methods ===
+	
+		// code generation inherited from IRInstr.
+		void gen_asm(Asm &toasm) const;
+	
+	protected:
+		Operation1op operation;
+		std::string arg1;
+};
+
 
 // === IRInstr2op ===
 // 		2 operands instructions.
@@ -163,10 +191,20 @@ class IRInstrSpecial : public IRInstr
 class BasicBlock {
 
  	public:
-		BasicBlock(CFG* c, std::string entry_label);
+		// TODO : find a way to avoid using a public static variable.
+		static unsigned int nextId;
+
+	// ----- Constructor -----
+		BasicBlock(CFG * c, std::string entry_label);
+		BasicBlock(CFG * c);
+	// ----- public methods -----
+	
+		static std::string getNextLabel();
+
 		void gen_asm(Asm &toasm); /**< x86 assembly code generation for this basic block (very simple) */
 
 		// void add_instr(IRInstr * instr);
+		void add_instr(IRInstr1op::Operation1op op, std::string arg1);
 		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
@@ -177,15 +215,16 @@ class BasicBlock {
 		std::string getLabel() const;
 
 	protected:
+		
+
 		BasicBlock* exit_true;  /**< pointer to the next basic block, true branch. If nullptr, return from procedure */ 
 		BasicBlock* exit_false; /**< pointer to the next basic block, false branch. If null_ptr, the basic block ends with an unconditional jump */
 		std::string label; /**< label of the BB, also will be the label in the generated code */
 		CFG* cfg; /** < the CFG where this block belongs */
 		std::vector<IRInstr*> instrs; /** < the instructions themselves. */
+
+
 };
-
-
-
 
 /** The class for the control flow graph, also includes the symbol table */
 
@@ -197,73 +236,55 @@ class BasicBlock {
 
  */
 class CFG {
- public:
-	CFG(Ast* ast);
-
+ 	public:
+		CFG(Ast * ast, std::string asm_choice);
 	
-	void add_bb(BasicBlock* bb); 
-
-	// Add the IRInstr to the current BasicBlock.
-	// void add_instr(IRInstr * instr);
-	// void add_instr(IRInstr1op::Operation1op op, std::string arg);
-	void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
-	void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
-	void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
-
-	// x86 code generation: could be encapsulated in a processor class in a retargetable compiler
-	// This method has not been declared const yet, because we aren't sure
-	// that this method won't modify some attributes of the CFG, for example
-	// the basicblocks pointers...
-	void gen_asm();
+		void add_bb(BasicBlock* bb);
 	
-	// Helper method : inputs a IR reg or input variable, and return
-	// e.g. "-24(%rbp)" for the proper value of 24 
-	std::string IR_reg_to_asm(std::string reg);
+		// Add the IRInstr to the current BasicBlock.
+		// void add_instr(IRInstr * instr);
+		void add_instr(IRInstr1op::Operation1op op, std::string arg);
+		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
+		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
+		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
+
+		// x86 code generation: could be encapsulated in a processor class in a retargetable compiler
+		// This method has not been declared const yet, because we aren't sure
+		// that this method won't modify some attributes of the CFG, for example
+		// the basicblocks pointers...
+		void gen_asm();
 	
-	// symbol table methods
+		// Helper method : inputs a IR reg or input variable, and return
+		// e.g. "-24(%rbp)" for the proper value of 24 
+		std::string IR_reg_to_asm_x86(std::string reg);
+		std::string IR_reg_to_asm_arm(std::string reg);
+		std::string IR_reg_to_asm_msp430(std::string reg);
 	
-	// Adds a symbol to symbol table.
-	// If the symbol is already present, it will
-	// throw a multipleDeclaration Exception.
-	void add_to_symbol_table(std::string name);
+		// symbol table methods
+		int get_symbol_table_length() const;
 
-	std::string create_new_tempvar();
-	int get_var_index(const std::string name) const;
+		// Adds a symbol to symbol table.
+		// If the symbol is already present, it will
+		// throw a multipleDeclaration Exception.
+		void add_to_symbol_table(std::string name);
 
-	//Type get_var_type(std::string name);
+		std::string create_new_tempvar();
+		int get_var_index(const std::string name) const;
 
-	// basic block management
-	// TODO : check if the return of this method can be a const reference.
-	std::string new_BB_name() const;
+		//Type get_var_type(std::string name);
 
-	// Add a new var in varUnused
-	void addVarUnused(std::string var);
-
-	// Delete a var in varUnused if inside
-	void deleteVarUsed(std::string var);
-
-	// Trigger warnings if there are unused variables
-	void warningsUnusedVar() const;
-
-	// Check if var has been declared.
-	// If it isn't, it will throw a notDeclared Exception.
-	// If it is, it will call addVarInitialised.
-	void checkDeclared(const std::string var) const;
-
- protected:
+	protected:
 	
-	Ast* ast; /**< The AST this CFG comes from */
-	BasicBlock* current_bb;
+		Ast* ast; /**< The AST this CFG comes from */
+		BasicBlock* current_bb;
 	
-	//std::map <std::string, Type> SymbolType; /**< part of the symbol table  */
-	std::map <std::string, int> SymbolIndex; /**< part of the symbol table  */
-	int nextFreeSymbolIndex; /**< to allocate new symbols in the symbol table */
-	int nextBBnumber; /**< just for naming */
-	
-	std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
-	Asm toasm; // asm converter.
+		//std::map <std::string, Type> SymbolType; /**< part of the symbol table  */
+		std::map <std::string, int> & SymbolIndex; /**< part of the symbol table  */
+		int & nextFreeSymbolIndex; /**< to allocate new symbols in the symbol table */
+		std::vector <BasicBlock*> bbs; /**< all the basic blocks of this CFG*/
+		Asm* toasm; // asm converter.
 
-	std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
+		std::list <std::string> varUnused; /**Store the variable unused to trigger warnings at the end of the compilation */
 };
 
 
