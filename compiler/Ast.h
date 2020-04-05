@@ -8,6 +8,7 @@ e-mail :
 #define AST_H
 
 #include <vector>
+#include <deque>
 #include <string>
 #include <unordered_set>
 
@@ -166,6 +167,71 @@ class Assign : public Node
 		RValue * rvalue;
 };
 
+// Represent a condition of the type :
+// "left comparison right"
+// For example : "a < 2" 
+class Condition : public Node
+{
+	public :
+		typedef enum { gt, ge, lt, le, eq } Comparison;
+	
+	// ----- Public methods -----
+		virtual void gen_instr(CFG * cfg) const;
+
+	// ----- Constructor -----
+		Condition(RValue * l, Comparison comp, RValue * r);
+	
+	protected:
+		RValue * left;
+		RValue * right;
+		Comparison comparison;
+
+};
+
+class If : public Node
+{
+	public :
+	// ------ Public methods -----
+		virtual void gen_instr(CFG * cfg) const;
+	
+	// ----- Constructor -----
+		If(Condition * c, std::deque<Node *> * content);
+	
+	protected:
+		Condition * condition;
+		std::deque<Node *> * sub_nodes;
+};
+
+class IfElse : public If
+{
+	public :
+	// ----- Public methods -----
+		void gen_instr(CFG * cfg) const;
+
+	// ----- Constructor -----
+		IfElse(	Condition * c, 
+				std::deque<Node *> * ifContent,
+				std::deque<Node *> * elseContent
+			  );
+	
+	protected:
+		std::deque<Node *> * else_sub_nodes;
+};
+
+class While : public Node
+{
+	public:
+	// ---- Public methods -----
+		void gen_instr(CFG * cfg) const;
+	
+	// ---- Constructor ----
+		While(Condition * c, std::deque<Node *> * content);
+
+	protected:
+		Condition * condition;
+		std::deque<Node *> * sub_nodes;
+};
+
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
 // the result to store somewhere in the memory.
@@ -192,9 +258,17 @@ class Ast
 		// Return true if variable is in symbolIndex, 
 		// return false otherwise.
 		bool isDeclared(std::string variable) const;
+		
+		// Temporary function used to set the block of main function in the
+		// AST.
+		// In the future, we'll have a function vector, and functions will hold
+		// their own deque<Node *>.
+		void setChilds(std::deque<Node *> * block);
 
-		std::map<std::string, int> getSymbolIndex() const;
+		std::map<std::string, int> & getSymbolIndex();
+		int & getNextIndex();
 
+		
 		const std::unordered_set<std::string> & getUnuseds() const;
 	//--- Constructor - Destructor ---
 		Ast();	
@@ -205,7 +279,7 @@ class Ast
 	
 	//----- protected attributes -----
 		
-		std::vector<Node *> childs;
+		std::deque<Node *> * childs;
 
 		// The symbol table held by the AST.
 		// Variable will be inserted inside this map by the

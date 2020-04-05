@@ -22,9 +22,19 @@ class Asm
 	//----- public methods -----
 		virtual void gen_prologue(int size) = 0;
 		virtual void gen_epilogue() = 0;
+		virtual void globl(std::string name) = 0;
+		virtual void label(std::string label) = 0;
+
+// =============== 1 operands instructions =====================
+
+		virtual void jump(std::string label) = 0;
+
+// =============== 2 operands instructions =====================
 
 		virtual void ldconst(std::string arg1, std::string arg2) = 0;
-		
+	
+// =============== 3 operands instructions =====================
+
 		// add arg1 and arg2, and store the result into arg3.
 		virtual void add(std::string arg1, std::string arg2, std::string arg3) = 0;
 
@@ -33,12 +43,21 @@ class Asm
 
 		// mul arg1 and arg2, and store the result into arg3.
 		virtual void mul(std::string arg1, std::string arg2, std::string arg3) = 0;
+		
+		// Compare that arg1 is less or equal than arg2. (Jump to label if it is the case).
+		virtual void cmp_le(std::string arg1, std::string arg2, std::string label) = 0;
+		
+		// Compare that arg1 is less than arg2. (Jump to label if it is the case).
+		virtual void cmp_lt(std::string arg1, std::string arg2, std::string label) = 0;
+		
+		// Compare that arg1 equal to arg2. (Jump to label if it is the case).
+		virtual void cmp_eq(std::string arg1, std::string arg2, std::string label) = 0;
 
+// =============== Special instructions ========================
+		
 		// call the function wich is the first string of the vector with the rest of the arguments.
 		virtual void call(std::vector<std::string> args) = 0;
-		
-		// TODO : check if the globl exist in ARM and MSP430 ABI.
-		virtual void globl(std::string name) = 0;
+			
 
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
@@ -51,8 +70,8 @@ class Asm
 		// Loads the variable into a register so that
 		// it can be used for calculation.
 		// It returns the register in wich the variable has
-		// been put. (%eax, usually).
-		virtual std::string loadVariable(std::string var) = 0;	
+		// been put : dest if provided.
+		virtual std::string loadVariable(std::string var, std::string dest) = 0;	
 	//----- protected attributes -----
 		// CFG * cfg;
 		// std::ostream &output;

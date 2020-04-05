@@ -29,6 +29,25 @@ void AsmARM::gen_epilogue()
 		   << "bx	lr" << endl;
 }
 
+void AsmARM::globl(string name)
+{
+	output << ".globl " << name << endl
+		   << name << ":" << endl;
+}
+
+void AsmARM::label(string label)
+{
+	
+}
+
+// =============== 1 operand  instructions =====================
+
+void AsmARM::jump(string label)
+{
+
+}
+
+// =============== 2 operands instructions =====================
 
 void AsmARM::ldconst(string arg1, string arg2)
 {
@@ -43,6 +62,8 @@ void AsmARM::ldconst(string arg1, string arg2)
 		output << "str	r3, " << arg2 << endl;
 	}
 }
+
+// =============== 3 operands instructions =====================
 
 void AsmARM::add(string arg1, string arg2, string arg3)
 {
@@ -82,16 +103,27 @@ void AsmARM::mul(string arg1, string arg2, string arg3)
 		   << "str	r3, " << arg3 << endl;
 }
 
+void AsmARM::cmp_le(string arg1, string arg2, string label)
+{
+
+}	
+
+void AsmARM::cmp_lt(string arg1, string arg2, string label)
+{
+
+}	
+
+void AsmARM::cmp_eq(string arg1, string arg2, string label)
+{
+
+}
+
+// =============== special instructions ========================
+
 void AsmARM::call(vector<string> args)
 {
 
 	
-}
-
-void AsmARM::globl(string name)
-{
-	output << ".globl " << name << endl
-		   << name << ":" << endl;
 }
 
 //------------- Constructor / Destructors ------------------------------------------------
@@ -103,7 +135,7 @@ AsmARM::AsmARM(CFG * graph, ostream &out) : cfg(graph), output(out)
 
 //------------- Protected methods ---------------------------------------------------------
 
-string AsmARM::loadVariable(string var)
+string AsmARM::loadVariable(string var, string dest)
 {
 	return var;
 }

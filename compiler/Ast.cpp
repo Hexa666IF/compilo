@@ -209,13 +209,167 @@ void Assign::gen_instr(CFG * cfg) const
 	cfg->add_instr(IRInstr2op::ldconst, rvalue->getValue(), lvalue->getValue());
 }
 
+// ================== Condition Related stuff =====================
+
+// ----- Constructor -----
+
+Condition::Condition(RValue * l, Comparison comp, RValue * r)
+: Node(), left(l), right(r), comparison(comp)
+{
+	
+}
+
+// ----- public methods -----
+
+void Condition::gen_instr(CFG * cfg) const
+{
+	string jLabel = BasicBlock::getNextLabel();
+	left->gen_instr(cfg);
+	right->gen_instr(cfg);
+	switch(comparison)
+	// Because of Assembly code instructions, few instructions generated here can
+	// look like they're wrong. It is not the case.
+	// Checking that a > b in assembly code is equivalent to : 
+	// 		"Don't jump if a <= b"
+	// This is why left and right are swapped sometimes, and why a "than" becomes
+	// an "equal" and vice versa.
+	{
+		case gt:
+			cfg->add_instr(	IRInstr3op::cmp_le, 
+							left->getValue(), 
+							right->getValue(),
+							jLabel);
+			break;
+
+		case ge:
+			cfg->add_instr(	IRInstr3op::cmp_lt,
+							left->getValue(), 
+							right->getValue(),
+							jLabel);
+			break;
+
+		case lt:
+			cfg->add_instr(	IRInstr3op::cmp_le, 
+							right->getValue(), 
+							left->getValue(),
+							jLabel);
+			break;
+
+		case le:
+			cfg->add_instr(	IRInstr3op::cmp_lt, 
+							right->getValue(), 
+							left->getValue(),
+							jLabel);
+			break;
+
+		case eq:
+			cfg->add_instr(	IRInstr3op::cmp_eq, 
+							left->getValue(), 
+							right->getValue(),
+							jLabel);
+			break;
+	}
+}
+
+// ==================   If   related stuff   ========================
+
+// ----- Constructor -----
+
+If::If(Condition * c, deque<Node *> * content)
+: Node(), condition(c), sub_nodes(content)
+{
+	
+}
+
+// ----- public methods -----
+
+void If::gen_instr(CFG * cfg) const
+{
+	// This bb is the place where the code inside the if will be placed.
+	// It is important to create it before entering into the Condition,
+	// Because of BasicBlock::getNextLabel().
+	BasicBlock * ifBlock = new BasicBlock(cfg);
+	
+	condition->gen_instr(cfg);	
+	
+	cfg->add_bb(ifBlock);
+	for(Node * node : *sub_nodes)
+		node->gen_instr(cfg);
+	
+	BasicBlock * nextBlock = new BasicBlock(cfg);
+	cfg->add_bb(nextBlock);
+}
+
+// ========================== IfElse related stuff =============================
+
+// ----- Constructor -----
+
+IfElse::IfElse( Condition * c,
+				deque<Node *> * ifblock,
+				deque<Node *> * elseblock
+			  )
+: If(c, ifblock), else_sub_nodes(elseblock)
+{
+
+}
+
+// ----- Public methods ------
+
+void IfElse::gen_instr(CFG * cfg) const
+{
+	BasicBlock * ifBlock = new BasicBlock(cfg);
+
+	condition->gen_instr(cfg);
+
+	// If block code generation.
+	cfg->add_bb(ifBlock);
+	for(Node * node : *sub_nodes)
+		node->gen_instr(cfg);
+		
+	BasicBlock * elseBlock = new BasicBlock(cfg);
+	cfg->add_instr(IRInstr1op::jmp, BasicBlock::getNextLabel());
+	
+	cfg->add_bb(elseBlock);
+	for(Node * node : *else_sub_nodes)
+		node->gen_instr(cfg);
+
+	BasicBlock * nextBlock = new BasicBlock(cfg);
+	cfg->add_bb(nextBlock);
+}
+
+// =========================  While related stuff ==============================
+
+// ----- Constructor -----
+
+While::While(Condition * c, deque<Node *> * content)
+: Node(), condition(c), sub_nodes(content)
+{
+	
+}
+
+// ----- Public methods -----
+
+void While::gen_instr(CFG * cfg) const
+{
+	BasicBlock * whileBlock = new BasicBlock(cfg);
+	cfg->add_bb(whileBlock);
+
+	condition->gen_instr(cfg);
+	BasicBlock * next = new BasicBlock(cfg);
+
+	for(Node * node : *sub_nodes)
+		node->gen_instr(cfg);
+	cfg->add_instr(IRInstr1op::jmp, whileBlock->getLabel());
+	cfg->add_bb(next);
+}
+
 // ========================== Ast related stuff ================================
 
 //------------- public methods -------------------------------------------------
 
 void Ast::addNode(Node * node)
 {
-	childs.push_back(node);	
+	childs->push_back(node);	
 }
 
 void Ast::addSymbol(string symbol)
@@ -235,7 +389,7 @@ void Ast::addSymbol(string symbol)
 
 void Ast::gen_instr(CFG * cfg) const
 {
-	for(Node * node : childs)
+	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);
 	}
@@ -258,9 +412,19 @@ bool Ast::isDeclared(string variable) const
 	return declared;
 }
 
-map<string, int> Ast::getSymbolIndex() const
+void Ast::setChilds(deque<Node *> * block)
+{
+	childs = block;
+}
+
+map<string, int> & Ast::getSymbolIndex()
 {
 	return symbolIndex;
+}
+
+int & Ast::getNextIndex()
+{
+	return next_index;
 }
 
 const unordered_set<string> & Ast::getUnuseds() const
@@ -271,7 +435,7 @@ const unordered_set<string> & Ast::getUnuseds() const
 //------------- Constructor - Destructor ------------------------------------
 
 Ast::Ast()
-: childs(), symbolIndex(), next_index(4)
+: childs(nullptr), symbolIndex(), next_index(4)
 {
 
 }
