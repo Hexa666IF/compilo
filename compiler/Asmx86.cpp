@@ -111,7 +111,7 @@ void Asmx86::cmp_lt(string arg1, string arg2, string label)
 void Asmx86::cmp_eq(string arg1, string arg2, string label)
 {
 	setup_cmp(arg1, arg2);
-	output << "jz " << label << endl;
+	output << "jnz " << label << endl;
 }
 
 // =============== Special instructions =====================

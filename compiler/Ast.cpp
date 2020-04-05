@@ -224,6 +224,8 @@ Condition::Condition(RValue * l, Comparison comp, RValue * r)
 void Condition::gen_instr(CFG * cfg) const
 {
 	string jLabel = BasicBlock::getNextLabel();
+	left->gen_instr(cfg);
+	right->gen_instr(cfg);
 	switch(comparison)
 	// Because of Assembly code instructions, few instructions generated here can
 	// look like they're wrong. It is not the case.
@@ -333,6 +335,32 @@ void IfElse::gen_instr(CFG * cfg) const
 
 	BasicBlock * nextBlock = new BasicBlock(cfg);
 	cfg->add_bb(nextBlock);
+}
+
+// =========================  While related stuff ==============================
+
+// ----- Constructor -----
+
+While::While(Condition * c, deque<Node *> * content)
+: Node(), condition(c), sub_nodes(content)
+{
+	
+}
+
+// ----- Public methods -----
+
+void While::gen_instr(CFG * cfg) const
+{
+	BasicBlock * whileBlock = new BasicBlock(cfg);
+	cfg->add_bb(whileBlock);
+
+	condition->gen_instr(cfg);
+	BasicBlock * next = new BasicBlock(cfg);
+
+	for(Node * node : *sub_nodes)
+		node->gen_instr(cfg);
+	cfg->add_instr(IRInstr1op::jmp, whileBlock->getLabel());
+	cfg->add_bb(next);
 }
 
 // ========================== Ast related stuff ================================

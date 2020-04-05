@@ -77,6 +77,14 @@ antlrcpp::Any Visitor::visitLIf(ifccParser::LIfContext * ctx)
 
 	return block;
 }
+antlrcpp::Any Visitor::visitLWhile(ifccParser::LWhileContext * ctx)
+{
+	While * whileNode = visit(ctx->whileblock());
+	deque<Node *> * block = visit(ctx->l());
+	block->push_front(whileNode);
+
+	return block;
+}
 
 antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 {
@@ -85,6 +93,15 @@ antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 	// each line representation.
 	deque<Node *> * blockNodes = new deque<Node *>();
 	return blockNodes;
+}
+
+antlrcpp::Any Visitor::visitWhileblock(ifccParser::WhileblockContext * ctx)
+{
+	Condition * condition = visit(ctx->condition());
+	deque<Node *> * whileBlock = visit(ctx->block());
+	While * whileNode = new While(condition, whileBlock);
+
+	return whileNode;
 }
 
 antlrcpp::Any Visitor::visitIfBlock(ifccParser::IfBlockContext * ctx)

@@ -11,8 +11,11 @@ l : 'int' decl ';' l # lDecl
   | call ';' l #lCall
   | RETURN expr ';' l # return
   | ifblock l # lIf
+  | whileblock l # lWhile
   | /*epsilon*/ # lEpsilon
   ; 
+
+whileblock : 'while' '(' condition ')' block;
 
 ifblock : 'if' '(' condition ')' block # ifBlock
         | 'if' '(' condition ')' block 'else' block # ifElseBlock;
