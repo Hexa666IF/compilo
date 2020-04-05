@@ -2,7 +2,8 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : function
+prog : function prog #progFunction
+	 | /*epsilon*/ #progEpsilon
 	 ;
 
 function : 'int' TEXT '(' ')' block;

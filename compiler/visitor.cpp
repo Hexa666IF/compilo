@@ -16,13 +16,20 @@ Visitor::Visitor()
 	ast = new Ast();
 }
 
-antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
+antlrcpp::Any Visitor::visitProgFunction(ifccParser::ProgFunctionContext * ctx)
 {
+	//vector<Function *> * functions = visit(ctx->prog());
 	Function * f = visit(ctx->function());
 	ast->add_function(f);
+	visit(ctx->prog());
 	return 0;
 }
 
+antlrcpp::Any Visitor::visitProgEpsilon(ifccParser::ProgEpsilonContext * ctx)
+{
+	//vector<Function *> * functions = new vector<Function *>();
+	return nullptr;
+}
 antlrcpp::Any Visitor::visitFunction(ifccParser::FunctionContext * ctx)
 {
 	string name = ctx->TEXT()->getText();
