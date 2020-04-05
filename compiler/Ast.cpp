@@ -421,6 +421,11 @@ void Function::setChilds(deque<Node *> * block)
 	childs = block;
 }
 
+string Function::getName() const
+{
+	return name;
+}
+
 map<string, int> & Function::getSymbolIndex()
 {
 	return symbolIndex;

@@ -263,6 +263,7 @@ class Function
 
 		void setChilds(std::deque<Node *> * block);
 
+		std::string getName() const;
 		std::map<std::string, int> & getSymbolIndex();
 		int & getNextIndex();
 

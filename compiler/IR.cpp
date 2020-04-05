@@ -244,9 +244,12 @@ void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
 
 void CFG::gen_asm()
 {
-	// TODO : do not use hardcoded string for globl() call.
-	toasm->globl("main");
-	toasm->label("main");
+	string name = func->getName();
+	if(name == "main")
+	{
+		toasm->globl("main");
+	}
+	toasm->label(name);
 	toasm->gen_prologue(SymbolIndex.size()*4);
 	bbs[0]->gen_asm(*toasm);
 	for(unsigned int i = 1; i < bbs.size(); ++i)
