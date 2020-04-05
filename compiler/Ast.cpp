@@ -298,6 +298,42 @@ void If::gen_instr(CFG * cfg) const
 	cfg->add_bb(nextBlock);
 }
 
+// ========================== IfElse related stuff =============================
+
+// ----- Constructor -----
+
+IfElse::IfElse( Condition * c,
+				deque<Node *> * ifblock,
+				deque<Node *> * elseblock
+			  )
+: If(c, ifblock), else_sub_nodes(elseblock)
+{
+
+}
+
+// ----- Public methods ------
+
+void IfElse::gen_instr(CFG * cfg) const
+{
+	BasicBlock * ifBlock = new BasicBlock(cfg);
+
+	condition->gen_instr(cfg);
+
+	// If block code generation.
+	cfg->add_bb(ifBlock);
+	for(Node * node : *sub_nodes)
+		node->gen_instr(cfg);
+		
+	BasicBlock * elseBlock = new BasicBlock(cfg);
+	cfg->add_instr(IRInstr1op::jmp, BasicBlock::getNextLabel());
+	
+	cfg->add_bb(elseBlock);
+	for(Node * node : *else_sub_nodes)
+		node->gen_instr(cfg);
+
+	BasicBlock * nextBlock = new BasicBlock(cfg);
+	cfg->add_bb(nextBlock);
+}
 
 // ========================== Ast related stuff ================================
 

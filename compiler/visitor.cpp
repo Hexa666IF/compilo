@@ -87,7 +87,7 @@ antlrcpp::Any Visitor::visitLEpsilon(ifccParser::LEpsilonContext *ctx)
 	return blockNodes;
 }
 
-antlrcpp::Any Visitor::visitIfblock(ifccParser::IfblockContext * ctx)
+antlrcpp::Any Visitor::visitIfBlock(ifccParser::IfBlockContext * ctx)
 {
 	Condition * condition = visit(ctx->condition());
 	
@@ -96,6 +96,17 @@ antlrcpp::Any Visitor::visitIfblock(ifccParser::IfblockContext * ctx)
 	If * ifNode = new If(condition, ifBlock);
 
 	return ifNode;
+}
+
+antlrcpp::Any Visitor::visitIfElseBlock(ifccParser::IfElseBlockContext * ctx)
+{
+	Condition * condition = visit(ctx->condition());
+
+	deque<Node *> * ifBlock = visit(ctx->block(0));
+	deque<Node *> * elseBlock = visit(ctx->block(1));
+	If * ifElseNode = new IfElse(condition, ifBlock, elseBlock);
+
+	return ifElseNode;
 }
 
 antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)

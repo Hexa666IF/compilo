@@ -43,7 +43,9 @@ public:
   virtual antlrcpp::Any visitLEpsilon(ifccParser::LEpsilonContext *ctx) override;
 
 
-  virtual antlrcpp::Any visitIfblock(ifccParser::IfblockContext *context) override;
+  virtual antlrcpp::Any visitIfBlock(ifccParser::IfBlockContext * ctx) override;
+
+  virtual antlrcpp::Any visitIfElseBlock(ifccParser::IfElseBlockContext *context) override;
 
   virtual antlrcpp::Any visitCondition(ifccParser::ConditionContext *context) override;
 
