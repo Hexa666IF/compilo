@@ -218,6 +218,19 @@ class IfElse : public If
 		std::deque<Node *> * else_sub_nodes;
 };
 
+class While : public Node
+{
+	public:
+	// ---- Public methods -----
+		void gen_instr(CFG * cfg) const;
+	
+	// ---- Constructor ----
+		While(Condition * c, std::deque<Node *> * content);
+
+	protected:
+		Condition * condition;
+		std::deque<Node *> * sub_nodes;
+};
 
 // Abstract Syntax Tree for computation representation.
 // This class generate the instruction that will lead to
