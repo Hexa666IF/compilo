@@ -96,11 +96,14 @@ class FunctionCall : public RValue
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		FunctionCall(std::string functionName, std::vector<RValue *> args, Ast * ast);
+		FunctionCall(	std::string functionName, 
+						std::deque<RValue *> * args, 
+						Ast * ast
+					);
 
 	protected:
 		std::string name;
-		std::vector<RValue *> arguments;
+		std::deque<RValue *> * arguments;
 };
 
 class Operation : public RValue

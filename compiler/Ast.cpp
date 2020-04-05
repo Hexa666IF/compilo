@@ -101,7 +101,7 @@ void Variable::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-FunctionCall::FunctionCall(string functionName, vector<RValue *> args, Ast * ast)
+FunctionCall::FunctionCall(string functionName, deque<RValue *> * args, Ast * ast)
 : RValue(ast), arguments(args), name(functionName)
 {
 	
@@ -119,13 +119,11 @@ void FunctionCall::gen_instr(CFG * cfg) const
 	vector<string> args;
 	args.push_back(name);
 
-	//TODO : faire une enum des %
-	for(int i = 0; i < arguments.size() ; i++)
+	for(RValue * a : *arguments)
 	{
-		arguments[i]->gen_instr(cfg);
-		string value = arguments[i]->getValue();
-		args.push_back(value);
-	}
+		a->gen_instr(cfg);
+		args.push_back(a->getValue());
+	}	
 
 	cfg->add_instr(IRInstrSpecial::call, args);
 }

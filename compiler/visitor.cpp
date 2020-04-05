@@ -223,7 +223,7 @@ antlrcpp::Any Visitor::visitValCall(ifccParser::ValCallContext *ctx)
 antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
-	vector<RValue *> args = visit(ctx->param());
+	deque<RValue *> * args = visit(ctx->param());
 	RValue * function = new FunctionCall(name, args, ast);
 
 	return function;
@@ -232,7 +232,7 @@ antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
 antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
-	vector<RValue *> args;
+	deque<RValue *> * args = new deque<RValue *>();
 	RValue * function = new FunctionCall(name, args, ast);
 
 	return function;
@@ -240,16 +240,19 @@ antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
 
 antlrcpp::Any Visitor::visitParamSimple(ifccParser::ParamSimpleContext *ctx)
 {
-	vector<RValue *> args;
-	args.insert(args.begin(), 1, visit(ctx->expr()));
+	deque<RValue *> * args = new deque<RValue *>();
+	RValue * arg = visit(ctx->expr());
+	args->push_front(arg);
 
 	return args;
 }
 
 antlrcpp::Any Visitor::visitParamMultiple(ifccParser::ParamMultipleContext *ctx)
 {
-	vector<RValue *> args = visit(ctx->param());
-	args.insert(args.begin(), 1, visit(ctx->expr()));
+	deque<RValue *> * args = visit(ctx->param());
+	RValue * arg = visit(ctx->expr());
+	args->push_front(arg);
+
 	return args;
 }
 
