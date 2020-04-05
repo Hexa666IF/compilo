@@ -23,17 +23,17 @@ class Node
 		// Generate IRInstr and give them to the CFG.
 		virtual void gen_instr(CFG * cfg) const = 0;
 
-		void setParent(Ast * ast);
+		void setParent(Function * f);
 
 	// ----- Constructor - Destructor -----
-		Node(Ast * ast = nullptr);
+		Node(Function * f = nullptr);
 		// ~Node();
 
 	protected:
 	// ----- protected methods -----
 	
 	// ----- protected attributes -----
-		Ast * parentTree;
+		Function * parentTree;
 };
 
 class RValue : public Node
@@ -47,7 +47,7 @@ class RValue : public Node
 		virtual std::string getValue() const = 0;
 
 	// ----- Constructor - Destructor -----
-		RValue(Ast * ast = nullptr);
+		RValue(Function * f = nullptr);
 	
 };
 
@@ -60,8 +60,8 @@ class Constant : public RValue
 		void gen_instr(CFG * cfg) const;	
 	
 	// ----- Constructor -----
-		Constant(int val, Ast * ast);
-		Constant(std::string val, Ast * ast);
+		Constant(int val, Function * f);
+		Constant(std::string val, Function * f);
 	
 	protected:
 		int value;
@@ -81,7 +81,7 @@ class Variable : public RValue
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Variable(std::string variable, Ast * ast);
+		Variable(std::string variable, Function * f);
 
 	protected:
 		std::string name;
@@ -98,7 +98,7 @@ class FunctionCall : public RValue
 	// ----- Constructor -----
 		FunctionCall(	std::string functionName, 
 						std::deque<RValue *> * args, 
-						Ast * ast
+						Function * f
 					);
 
 	protected:
@@ -119,7 +119,7 @@ class Operation : public RValue
 					IRInstr3op::Operation3op op, 
 					RValue * l, 
 					RValue * r, 
-					Ast * ast
+					Function * f
 					);
 
 		~Operation();
@@ -149,7 +149,7 @@ class Return : public Node
 		void gen_instr(CFG * cfg) const;
 	
 	// ----- Constructor -----	
-		Return(RValue * rval, Ast * ast);
+		Return(RValue * rval, Function * f);
 
 	protected:
 		RValue * retvalue;
@@ -163,7 +163,7 @@ class Assign : public Node
 		void gen_instr(CFG * cfg) const;
 
 	// ----- Constructor -----
-		Assign(Variable * dest, RValue * rval, Ast * ast);
+		Assign(Variable * dest, RValue * rval, Function * f);
 	
 	protected:
 		Variable * lvalue;
@@ -235,15 +235,12 @@ class While : public Node
 		std::deque<Node *> * sub_nodes;
 };
 
-// Abstract Syntax Tree for computation representation.
-// This class generate the instruction that will lead to
-// the result to store somewhere in the memory.
-class Ast
+class Function 
 {
 	public:
 	//----- public methods -----
 				
-		// Add the node into the childs vector of the AST.
+		// Add the node into the childs vector of the Function.
 		void addNode(Node * node);
 		
 		void addSymbol(std::string symbol);
@@ -262,10 +259,8 @@ class Ast
 		// return false otherwise.
 		bool isDeclared(std::string variable) const;
 		
-		// Temporary function used to set the block of main function in the
-		// AST.
-		// In the future, we'll have a function vector, and functions will hold
-		// their own deque<Node *>.
+		void setParameters(std::deque<Variable *> * params);
+
 		void setChilds(std::deque<Node *> * block);
 
 		std::map<std::string, int> & getSymbolIndex();
@@ -273,18 +268,20 @@ class Ast
 
 		
 		const std::unordered_set<std::string> & getUnuseds() const;
+	
 	//--- Constructor - Destructor ---
-		Ast();	
-		~Ast();
+		Function(std::string name);	
+		~Function();
 
 	protected:
 	//----- protected methods -----
 	
 	//----- protected attributes -----
-		
+		std::string name;
+		std::deque<Variable *> * parameters;
 		std::deque<Node *> * childs;
 
-		// The symbol table held by the AST.
+		// The symbol table held by the Function.
 		// Variable will be inserted inside this map by the
 		// addSymbol method.
 		std::map<std::string, int> symbolIndex;

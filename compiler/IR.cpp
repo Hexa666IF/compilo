@@ -198,8 +198,8 @@ string BasicBlock::getLabel() const
 
 // === Constructor / Destructor ===
 
-CFG::CFG(Ast * tree, std::string asm_choice)
-: ast(tree), SymbolIndex(ast->getSymbolIndex()), nextFreeSymbolIndex(ast->getNextIndex())
+CFG::CFG(Function * tree, std::string asm_choice)
+: func(tree), SymbolIndex(tree->getSymbolIndex()), nextFreeSymbolIndex(tree->getNextIndex())
 {
 	if (asm_choice=="-arm") {
 		toasm = new AsmARM(this,cout);
@@ -214,7 +214,7 @@ CFG::CFG(Ast * tree, std::string asm_choice)
 	
 	//SymbolIndex = ast->getSymbolIndex();
 	//nextFreeSymbolIndex = ast->getNextIndex();
-	ast->gen_instr(this);
+	func->gen_instr(this);
 }
 
 // === public methods ===

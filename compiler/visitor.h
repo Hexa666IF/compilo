@@ -26,7 +26,8 @@ public:
 
   virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
-
+  virtual antlrcpp::Any visitFunction(ifccParser::FunctionContext * ctx) override;
+  
   virtual antlrcpp::Any visitBlock(ifccParser::BlockContext *context) override;
 
 
@@ -96,12 +97,11 @@ public:
   virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
 
-	Ast * getAst() const;
+	Function * getFunction() const;
 
 protected:
   
-	// Abstract Syntax Tree.
 	// This is the semantic representation of the program
 	// parsed by the visitor.
-	Ast * ast;
+	Function * func;
 };

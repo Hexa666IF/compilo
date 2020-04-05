@@ -12,13 +12,24 @@ using namespace std;
 
 Visitor::Visitor() : ifccVisitor()
 {
-	ast = new Ast();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
+	//ast = new Ast("main");
+	//deque<Node *> * block = visit(ctx->block());
+	//ast->setChilds(block);
+	visit(ctx->function());
+	//visit(ctx->prog());
+	return 0;
+}
+
+antlrcpp::Any Visitor::visitFunction(ifccParser::FunctionContext * ctx)
+{
+	string name = ctx->TEXT()->getText();
+	func = new Function(name);
 	deque<Node *> * block = visit(ctx->block());
-	ast->setChilds(block);
+	func->setChilds(block);
 	return 0;
 }
 
@@ -51,7 +62,7 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 {
 	RValue * call = visit(ctx->call());
-	ast->addNode(call);
+	// ast->addNode(call);
 
 	deque<Node *> * block = visit(ctx->l());
 	block->push_front(call);
@@ -61,7 +72,7 @@ antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
-	Return * ret = new Return(retval, ast);
+	Return * ret = new Return(retval, func);
 	// ast->addNode(ret);
 	
 	deque<Node *> * block = visit(ctx->l());
@@ -150,11 +161,11 @@ antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
+	func->addSymbol(symbol);
 
 	// Is the initialisation here a good idea ?
-	Variable * variable = new Variable(symbol, ast);
-	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
+	Variable * variable = new Variable(symbol, func);
+	Assign * assign = new Assign(variable, new Constant(0, func), func);
 	visit(ctx->decl());
 	
 	return assign;
@@ -163,9 +174,9 @@ antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol, ast);
-	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
+	func->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, func);
+	Assign * assign = new Assign(variable, new Constant(0, func), func);
 	// ast->addNode(assign);
 	
 	return assign;
@@ -174,7 +185,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	Variable * var = visit(ctx->var());	
-	Assign * assign = new Assign(var, visit(ctx->expr()), ast);
+	Assign * assign = new Assign(var, visit(ctx->expr()), func);
 	// ast->addNode(assign);
 
 	return assign;
@@ -183,8 +194,8 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol, ast);
+	func->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -192,7 +203,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	Variable * variable = new Variable(symbol, ast);
+	Variable * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -200,7 +211,7 @@ antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
 	string val = ctx->CONST()->getText();
-	RValue * constant = new Constant(val, ast);
+	RValue * constant = new Constant(val, func);
 	
 	return constant;
 }
@@ -208,7 +219,7 @@ antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	RValue * variable = new Variable(symbol, ast);
+	RValue * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -224,7 +235,7 @@ antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
 	deque<RValue *> * args = visit(ctx->param());
-	RValue * function = new FunctionCall(name, args, ast);
+	RValue * function = new FunctionCall(name, args, func);
 
 	return function;
 }
@@ -233,7 +244,7 @@ antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
 	deque<RValue *> * args = new deque<RValue *>();
-	RValue * function = new FunctionCall(name, args, ast);
+	RValue * function = new FunctionCall(name, args, func);
 
 	return function;
 }
@@ -262,7 +273,7 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * add = new Operation(IRInstr3op::add, left, right, ast);
+	RValue * add = new Operation(IRInstr3op::add, left, right, func);
 	
 	return add;
 }
@@ -271,7 +282,7 @@ antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * sub = new Operation(IRInstr3op::sub, left, right, ast);
+	RValue * sub = new Operation(IRInstr3op::sub, left, right, func);
 	
 	return sub;
 }
@@ -286,7 +297,7 @@ antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx)
 {
 	RValue * left = visit(ctx->f());
 	RValue * right = visit(ctx->term());
-	RValue * mul = new Operation(IRInstr3op::mul, left, right, ast); 
+	RValue * mul = new Operation(IRInstr3op::mul, left, right, func); 
 	
 	return mul;
 }
@@ -317,8 +328,8 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx)
 	return op;
 }
 
-Ast * Visitor::getAst() const
+Function * Visitor::getFunction() const
 {
-	return ast;
+	return func;
 }
 

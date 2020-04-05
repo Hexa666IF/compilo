@@ -2,7 +2,10 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' block ;
+prog : function
+	 ;
+
+function : 'int' TEXT '(' ')' block;
 
 block : '{' l '}' ;
 
