@@ -40,6 +40,13 @@ void AsmARM::label(string label)
 	
 }
 
+// =============== 1 operand  instructions =====================
+
+void AsmARM::jump(string label)
+{
+
+}
+
 // =============== 2 operands instructions =====================
 
 void AsmARM::ldconst(string arg1, string arg2)

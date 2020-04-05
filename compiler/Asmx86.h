@@ -27,6 +27,10 @@ class Asmx86 : public Asm
 		void globl(std::string name);
 		void label(std::string label);
 
+// =============== 1 operand  instructions =====================
+
+		void jump(std::string label);
+
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);

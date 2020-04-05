@@ -25,6 +25,10 @@ class Asm
 		virtual void globl(std::string name) = 0;
 		virtual void label(std::string label) = 0;
 
+// =============== 1 operands instructions =====================
+
+		virtual void jump(std::string label) = 0;
+
 // =============== 2 operands instructions =====================
 
 		virtual void ldconst(std::string arg1, std::string arg2) = 0;

@@ -45,6 +45,32 @@ class IRInstr {
 	// Type t ?
 };
 
+// === IRInstr1op ===
+
+class IRInstr1op : public IRInstr
+{
+	public:
+		typedef enum {
+			jmp
+		} Operation1op;
+
+	// === Constructors / Destructor ===
+	
+		IRInstr1op(	BasicBlock * bb,
+					Operation1op op,
+					std::string a1
+				  );
+	// === Overriden methods ===
+	
+		// code generation inherited from IRInstr.
+		void gen_asm(Asm &toasm) const;
+	
+	protected:
+		Operation1op operation;
+		std::string arg1;
+};
+
+
 // === IRInstr2op ===
 // 		2 operands instructions.
 // 		Used for copy, ldconst, rmem
@@ -178,6 +204,7 @@ class BasicBlock {
 		void gen_asm(Asm &toasm); /**< x86 assembly code generation for this basic block (very simple) */
 
 		// void add_instr(IRInstr * instr);
+		void add_instr(IRInstr1op::Operation1op op, std::string arg1);
 		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);
@@ -216,7 +243,7 @@ class CFG {
 	
 		// Add the IRInstr to the current BasicBlock.
 		// void add_instr(IRInstr * instr);
-		// void add_instr(IRInstr1op::Operation1op op, std::string arg);
+		void add_instr(IRInstr1op::Operation1op op, std::string arg);
 		void add_instr(IRInstr2op::Operation2op op, std::string arg1, std::string arg2);
 		void add_instr(IRInstr3op::Operation3op op, std::string arg1, std::string arg2, std::string arg3);
 		void add_instr(IRInstrSpecial::OperationSpe op, std::vector<std::string> args);

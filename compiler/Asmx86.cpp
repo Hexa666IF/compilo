@@ -44,6 +44,13 @@ void Asmx86::label(string label)
 	output << label << ":" << endl;
 }
 
+// =============== 1 operand instructions  =====================
+
+void Asmx86::jump(string label)
+{
+	output << "jmp " << label << endl;
+}
+
 // =============== 2 operands instructions =====================
 
 void Asmx86::ldconst(string arg1, string arg2)
