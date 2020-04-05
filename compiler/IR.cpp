@@ -211,10 +211,6 @@ CFG::CFG(Function * tree, std::string asm_choice)
 	
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
-	
-	//SymbolIndex = ast->getSymbolIndex();
-	//nextFreeSymbolIndex = ast->getNextIndex();
-	func->gen_instr(this);
 }
 
 // === public methods ===

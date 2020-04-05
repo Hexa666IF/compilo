@@ -96,12 +96,13 @@ public:
 
   virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
-
-	Function * getFunction() const;
+  Ast * getAst() const;
+  Function * getFunction() const;
 
 protected:
   
 	// This is the semantic representation of the program
 	// parsed by the visitor.
+	Ast * ast;
 	Function * func;
 };

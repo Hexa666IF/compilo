@@ -70,8 +70,10 @@ int main(int argn, const char **argv) {
 	//for(string var : unuseds)
 	//		cerr << "WARNING : " << var << " is declared but never used." << endl;
 
-	CFG * cfg = new CFG(visitor.getFunction(), asm_choice);
-	cfg->gen_asm();
+	Ast * ast = visitor.getAst();
+	vector<CFG *> * graphs = ast->gen_instr();
+	for(CFG * cfg : * graphs)
+		cfg->gen_asm();
 	
 	// errorFree <=> 0.
 	return errorFree;

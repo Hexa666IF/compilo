@@ -247,7 +247,7 @@ class Function
 
 		// Generate IRInstr and put them into the CFG by
 		// calling the cfg add_instr method.
-		void gen_instr(CFG * cfg) const;
+		CFG * gen_instr();
 		
 		// Remove a variable name from the unuseds unordered_set.
 		// This method should be called by the node that can perform
@@ -291,4 +291,18 @@ class Function
 
 };
 
+class Ast
+{
+	public:
+	// ----- public methods -----
+		std::vector<CFG *> * gen_instr();
+
+		void add_function(Function * f);
+	// ----- Constructor -----
+		Ast();
+	
+	protected:
+		std::vector<Function *> functions;
+
+};
 #endif // ! defined ( AST_H )

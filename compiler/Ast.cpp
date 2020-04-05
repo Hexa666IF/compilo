@@ -385,12 +385,14 @@ void Function::addSymbol(string symbol)
 	unuseds.insert(symbol);	
 }
 
-void Function::gen_instr(CFG * cfg) const
+CFG * Function::gen_instr()
 {
+	CFG * cfg = new CFG(this, "-x86"); 
 	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);
 	}
+	return cfg;
 }
 
 void Function::removeFromUnuseds(string variable)
@@ -453,4 +455,28 @@ Function::~Function()
 
 //------------- protected methods -----------------------------------------------
 
+// ===================== Ast related stuff ============================
 
+// ------ Constructor ------
+
+Ast::Ast()
+: functions()
+{
+
+}
+
+// ------ public methods ------
+
+vector<CFG *> * Ast::gen_instr()
+{
+	vector<CFG *> * graphs = new vector<CFG *>();
+	for(Function * f : functions)
+		graphs->push_back(f->gen_instr());
+
+	return graphs;
+}
+
+void Ast::add_function(Function * f)
+{
+	functions.push_back(f);
+}

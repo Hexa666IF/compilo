@@ -10,17 +10,16 @@
 
 using namespace std;
 
-Visitor::Visitor() : ifccVisitor()
+Visitor::Visitor() 
+: ifccVisitor(), ast(nullptr), func(nullptr)
 {
+	ast = new Ast();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
 {
-	//ast = new Ast("main");
-	//deque<Node *> * block = visit(ctx->block());
-	//ast->setChilds(block);
-	visit(ctx->function());
-	//visit(ctx->prog());
+	Function * f = visit(ctx->function());
+	ast->add_function(f);
 	return 0;
 }
 
@@ -30,7 +29,7 @@ antlrcpp::Any Visitor::visitFunction(ifccParser::FunctionContext * ctx)
 	func = new Function(name);
 	deque<Node *> * block = visit(ctx->block());
 	func->setChilds(block);
-	return 0;
+	return func;
 }
 
 antlrcpp::Any Visitor::visitBlock(ifccParser::BlockContext * ctx)
@@ -62,7 +61,6 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 {
 	RValue * call = visit(ctx->call());
-	// ast->addNode(call);
 
 	deque<Node *> * block = visit(ctx->l());
 	block->push_front(call);
@@ -73,7 +71,6 @@ antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
 	Return * ret = new Return(retval, func);
-	// ast->addNode(ret);
 	
 	deque<Node *> * block = visit(ctx->l());
 	block->push_front(ret);
@@ -177,7 +174,6 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 	func->addSymbol(symbol);
 	Variable * variable = new Variable(symbol, func);
 	Assign * assign = new Assign(variable, new Constant(0, func), func);
-	// ast->addNode(assign);
 	
 	return assign;
 }
@@ -186,7 +182,6 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	Variable * var = visit(ctx->var());	
 	Assign * assign = new Assign(var, visit(ctx->expr()), func);
-	// ast->addNode(assign);
 
 	return assign;
 }
@@ -326,6 +321,11 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx)
 	RValue * op = visit(ctx->expr());
 	
 	return op;
+}
+
+Ast * Visitor::getAst() const
+{
+	return ast;
 }
 
 Function * Visitor::getFunction() const
