@@ -16,9 +16,9 @@ Visitor::Visitor()
 	ast = new Ast();
 }
 
+
 antlrcpp::Any Visitor::visitProgFunction(ifccParser::ProgFunctionContext * ctx)
 {
-	//vector<Function *> * functions = visit(ctx->prog());
 	Function * f = visit(ctx->function());
 	ast->add_function(f);
 	visit(ctx->prog());
@@ -30,13 +30,51 @@ antlrcpp::Any Visitor::visitProgEpsilon(ifccParser::ProgEpsilonContext * ctx)
 	//vector<Function *> * functions = new vector<Function *>();
 	return nullptr;
 }
-antlrcpp::Any Visitor::visitFunction(ifccParser::FunctionContext * ctx)
+antlrcpp::Any Visitor::visitFunctionNoParam(ifccParser::FunctionNoParamContext * ctx)
+{
+		string name = ctx->TEXT()->getText();
+		func = new Function(name);
+		deque<Node *> * block = visit(ctx->block());
+		func->setChilds(block);
+
+		return func;
+}
+
+antlrcpp::Any Visitor::visitFunctionParam(ifccParser::FunctionParamContext * ctx)
 {
 	string name = ctx->TEXT()->getText();
 	func = new Function(name);
+	deque<string> * params = visit(ctx->paramDecl());
+	deque<Variable *> * variables = new deque<Variable *>();
+	
+	for(string param : *params)
+		variables->push_back(new Variable(param, func));
+
 	deque<Node *> * block = visit(ctx->block());
 	func->setChilds(block);
-	return func;
+	func->setParameters(variables);
+
+	return func;	
+}
+
+antlrcpp::Any Visitor::visitParamDeclNext(ifccParser::ParamDeclNextContext * ctx)
+{
+	string name = ctx->TEXT()->getText();
+	func->addSymbol(name);
+	deque<string> * params = visit(ctx->paramDecl());
+	params->push_front(name);
+
+	return params;
+}
+
+antlrcpp::Any Visitor::visitParamDeclSingle(ifccParser::ParamDeclSingleContext *ctx)
+{
+	deque<string> * params = new deque<string>();
+	string name = ctx->TEXT()->getText();
+	func->addSymbol(name);
+	params->push_front(name);
+
+	return params;
 }
 
 antlrcpp::Any Visitor::visitBlock(ifccParser::BlockContext * ctx)

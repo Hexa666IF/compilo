@@ -24,14 +24,19 @@ public:
     return visitChildren(ctx);
   }
 
-  //virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
-
   virtual antlrcpp::Any visitProgFunction(ifccParser::ProgFunctionContext * ctx) override;
 
   virtual antlrcpp::Any visitProgEpsilon(ifccParser::ProgEpsilonContext * ctx) override;
 
-  virtual antlrcpp::Any visitFunction(ifccParser::FunctionContext * ctx) override;
-  
+  virtual antlrcpp::Any visitFunctionNoParam(ifccParser::FunctionNoParamContext *context) override;
+
+  virtual antlrcpp::Any visitFunctionParam(ifccParser::FunctionParamContext *context) override;
+
+  virtual antlrcpp::Any visitParamDeclNext(ifccParser::ParamDeclNextContext *context) override;
+
+  virtual antlrcpp::Any visitParamDeclSingle(ifccParser::ParamDeclSingleContext *context) override;
+
+
   virtual antlrcpp::Any visitBlock(ifccParser::BlockContext *context) override;
 
 
