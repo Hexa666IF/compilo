@@ -40,9 +40,12 @@ public:
 
   virtual antlrcpp::Any visitLIf(ifccParser::LIfContext *context) override;
   
+  virtual antlrcpp::Any visitLWhile(ifccParser::LWhileContext * ctx) override;
+  
   virtual antlrcpp::Any visitLEpsilon(ifccParser::LEpsilonContext *ctx) override;
 
-
+  virtual antlrcpp::Any visitWhileblock(ifccParser::WhileblockContext * ctx) override;
+  
   virtual antlrcpp::Any visitIfBlock(ifccParser::IfBlockContext * ctx) override;
 
   virtual antlrcpp::Any visitIfElseBlock(ifccParser::IfElseBlockContext *context) override;
