@@ -224,6 +224,8 @@ Condition::Condition(RValue * l, Comparison comp, RValue * r)
 void Condition::gen_instr(CFG * cfg) const
 {
 	string jLabel = BasicBlock::getNextLabel();
+	left->gen_instr(cfg);
+	right->gen_instr(cfg);
 	switch(comparison)
 	// Because of Assembly code instructions, few instructions generated here can
 	// look like they're wrong. It is not the case.
