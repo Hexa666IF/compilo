@@ -1,11 +1,11 @@
 /******************************************************************
 Créé le : 18 mars 2020
 par : pierre
-e-mail :
+e-mail : Darkpierre@hotmail.fr
 ******************************************************************/
 
-#if ! defined ( ASMARM_H )
-#define ASMARM_H
+#if ! defined ( ASMMSP430_H )
+#define ASMMSP430_H
 
 #include <iostream>
 #include <string>
@@ -16,8 +16,8 @@ e-mail :
 class CFG;
 //-----------------------------------------------------------------
 
-// class used for converting IR instructions to x86 assembly
-class AsmARM : public Asm
+// class used for converting IR instructions to MSP430 assembly
+class AsmMSP430 : public Asm
 {
 	public:
 
@@ -59,10 +59,10 @@ class AsmARM : public Asm
 
 		// call the function wich is the first string of the vector with the rest of the arguments.
 		void call(std::vector<std::string> args);
-			
+
 	//---- overloaded operators ----
 	//--- Constructors / Destructor ---
-		AsmARM(CFG * graph, std::ostream &out);
+		AsmMSP430(CFG * graph, std::ostream &out);
 
 	protected:
 	//----- protected methods -----
@@ -72,9 +72,6 @@ class AsmARM : public Asm
 		// It returns the register in wich the variable has
 		// been put. (%eax, usually).
 		std::string loadVariable(std::string var, std::string dest = "default");
-
-		// Selects the correct 'load' operator to use betwenn ldr and mov
-		std::string getLoadOperator(std::string arg);	
 	//----- protected attributes -----
 		CFG * cfg;
 		std::ostream &output;
@@ -82,4 +79,4 @@ class AsmARM : public Asm
 
 };
 
-#endif // ! defined ( ASMARM_H )
+#endif // ! defined ( ASMMSP430_H )

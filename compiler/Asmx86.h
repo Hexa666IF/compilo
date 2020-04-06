@@ -23,7 +23,7 @@ class Asmx86 : public Asm
 
 	//----- public methods -----
 		void gen_prologue(int size);
-		void gen_epilogue();
+		void gen_epilogue(int size);
 		void globl(std::string name);
 		void label(std::string label);
 

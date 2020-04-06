@@ -26,7 +26,7 @@ void Asmx86::gen_prologue(int size)
 	output << "subq $" << decalage << ", %rsp" << endl;
 }
 
-void Asmx86::gen_epilogue()
+void Asmx86::gen_epilogue(int size)
 {
 	output << "movq %rbp, %rsp" << endl
 		   << "popq %rbp" << endl
@@ -36,7 +36,6 @@ void Asmx86::gen_epilogue()
 void Asmx86::globl(string name)
 {
 	output << ".globl " << name << endl;
-		 //  << name << ":" << endl;
 }
 
 void Asmx86::label(string label)
