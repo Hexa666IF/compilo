@@ -198,8 +198,8 @@ string BasicBlock::getLabel() const
 
 // === Constructor / Destructor ===
 
-CFG::CFG(Ast * tree, std::string asm_choice)
-: ast(tree), SymbolIndex(ast->getSymbolIndex()), nextFreeSymbolIndex(ast->getNextIndex())
+CFG::CFG(Function * tree, std::string asm_choice)
+: func(tree), SymbolIndex(tree->getSymbolIndex()), nextFreeSymbolIndex(tree->getNextIndex())
 {
 	if (asm_choice=="-arm") {
 		toasm = new AsmARM(this,cout);
@@ -211,10 +211,6 @@ CFG::CFG(Ast * tree, std::string asm_choice)
 	
 	current_bb = new BasicBlock(this, "main");
 	bbs.push_back(current_bb);
-	
-	//SymbolIndex = ast->getSymbolIndex();
-	//nextFreeSymbolIndex = ast->getNextIndex();
-	ast->gen_instr(this);
 }
 
 // === public methods ===
@@ -248,9 +244,12 @@ void CFG::add_instr(IRInstrSpecial::OperationSpe op, vector<string> args)
 
 void CFG::gen_asm()
 {
-	// TODO : do not use hardcoded string for globl() call.
-	toasm->globl("main");
-	toasm->label("main");
+	string name = func->getName();
+	if(name == "main")
+	{
+		toasm->globl("main");
+	}
+	toasm->label(name);
 	toasm->gen_prologue(SymbolIndex.size()*4);
 	bbs[0]->gen_asm(*toasm);
 	for(unsigned int i = 1; i < bbs.size(); ++i)
@@ -265,15 +264,15 @@ void CFG::gen_asm()
 
 string CFG::IR_reg_to_asm_x86(std::string reg)
 {
-	static const unsigned int n_reg = 10;
+	static const unsigned int n_reg = 11;
 	static const string abstract_reg [] = 
-		{ 	RETVAL, RETVALD, RBASEP, RSTACKP,
+		{ 	RETVAL, RETVALC, RETVALD, RBASEP, RSTACKP,
 			FARG1, FARG2, FARG3, FARG4,
 			FARG5, FARG6
 		};
 
 	static const string x86_reg [] =
-		{	"%eax", "%edx", "%rbp", "%rsp",
+		{	"%eax", "%ecx", "%edx", "%rbp", "%rsp",
 			"%rdi", "%rsi", "%rdx", "%rcx",
 			"%r8", "%r9"
 		};

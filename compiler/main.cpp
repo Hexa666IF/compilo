@@ -66,12 +66,14 @@ int main(int argn, const char **argv) {
 		return e; 
 	}
 
-	const unordered_set<string> & unuseds = visitor.getAst()->getUnuseds();
-	for(string var : unuseds)
-			cerr << "WARNING : " << var << " is declared but never used." << endl;
+	//const unordered_set<string> & unuseds = visitor.getAst()->getUnuseds();
+	//for(string var : unuseds)
+	//		cerr << "WARNING : " << var << " is declared but never used." << endl;
 
-	CFG * cfg = new CFG(visitor.getAst(), asm_choice);
-	cfg->gen_asm();
+	Ast * ast = visitor.getAst();
+	vector<CFG *> * graphs = ast->gen_instr();
+	for(CFG * cfg : * graphs)
+		cfg->gen_asm();
 	
 	// errorFree <=> 0.
 	return errorFree;

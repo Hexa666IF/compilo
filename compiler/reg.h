@@ -8,6 +8,7 @@
 
 const std::string RETVAL = "%retval";
 const std::string RETVALD = "%retvald";
+const std::string RETVALC = "%retvalc";
 const std::string RBASEP = "%rbasep";
 const std::string RSTACKP = "%rstackp";
 const std::string FARG1 = "%farg1";

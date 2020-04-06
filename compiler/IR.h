@@ -16,7 +16,7 @@
 
 class BasicBlock;
 class CFG;
-class Ast;
+class Function;
 
 /*
  * IRInstr classes :
@@ -237,7 +237,7 @@ class BasicBlock {
  */
 class CFG {
  	public:
-		CFG(Ast * ast, std::string asm_choice);
+		CFG(Function * f, std::string asm_choice);
 	
 		void add_bb(BasicBlock* bb);
 	
@@ -275,7 +275,7 @@ class CFG {
 
 	protected:
 	
-		Ast* ast; /**< The AST this CFG comes from */
+		Function * func; /**< The Function this CFG comes from */
 		BasicBlock* current_bb;
 	
 		//std::map <std::string, Type> SymbolType; /**< part of the symbol table  */

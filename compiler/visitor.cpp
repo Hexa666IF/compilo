@@ -10,16 +10,71 @@
 
 using namespace std;
 
-Visitor::Visitor() : ifccVisitor()
+Visitor::Visitor() 
+: ifccVisitor(), ast(nullptr), func(nullptr)
 {
 	ast = new Ast();
 }
 
-antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)
+
+antlrcpp::Any Visitor::visitProgFunction(ifccParser::ProgFunctionContext * ctx)
 {
-	deque<Node *> * block = visit(ctx->block());
-	ast->setChilds(block);
+	Function * f = visit(ctx->function());
+	ast->add_function(f);
+	visit(ctx->prog());
 	return 0;
+}
+
+antlrcpp::Any Visitor::visitProgEpsilon(ifccParser::ProgEpsilonContext * ctx)
+{
+	//vector<Function *> * functions = new vector<Function *>();
+	return nullptr;
+}
+antlrcpp::Any Visitor::visitFunctionNoParam(ifccParser::FunctionNoParamContext * ctx)
+{
+		string name = ctx->TEXT()->getText();
+		func = new Function(name);
+		deque<Node *> * block = visit(ctx->block());
+		func->setChilds(block);
+
+		return func;
+}
+
+antlrcpp::Any Visitor::visitFunctionParam(ifccParser::FunctionParamContext * ctx)
+{
+	string name = ctx->TEXT()->getText();
+	func = new Function(name);
+	deque<string> * params = visit(ctx->paramDecl());
+	deque<Variable *> * variables = new deque<Variable *>();
+	
+	for(string param : *params)
+		variables->push_back(new Variable(param, func));
+
+	deque<Node *> * block = visit(ctx->block());
+	func->setChilds(block);
+	func->setParameters(variables);
+
+	return func;	
+}
+
+antlrcpp::Any Visitor::visitParamDeclNext(ifccParser::ParamDeclNextContext * ctx)
+{
+	string name = ctx->TEXT()->getText();
+	func->addSymbol(name);
+	deque<string> * params = visit(ctx->paramDecl());
+	params->push_front(name);
+
+	return params;
+}
+
+antlrcpp::Any Visitor::visitParamDeclSingle(ifccParser::ParamDeclSingleContext *ctx)
+{
+	deque<string> * params = new deque<string>();
+	string name = ctx->TEXT()->getText();
+	func->addSymbol(name);
+	params->push_front(name);
+
+	return params;
 }
 
 antlrcpp::Any Visitor::visitBlock(ifccParser::BlockContext * ctx)
@@ -51,7 +106,6 @@ antlrcpp::Any Visitor::visitLAffect(ifccParser::LAffectContext *ctx)
 antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 {
 	RValue * call = visit(ctx->call());
-	ast->addNode(call);
 
 	deque<Node *> * block = visit(ctx->l());
 	block->push_front(call);
@@ -61,8 +115,7 @@ antlrcpp::Any Visitor::visitLCall(ifccParser::LCallContext *ctx)
 antlrcpp::Any Visitor::visitReturn(ifccParser::ReturnContext *ctx)
 {
 	RValue * retval = visit(ctx->expr());
-	Return * ret = new Return(retval, ast);
-	// ast->addNode(ret);
+	Return * ret = new Return(retval, func);
 	
 	deque<Node *> * block = visit(ctx->l());
 	block->push_front(ret);
@@ -150,11 +203,11 @@ antlrcpp::Any Visitor::visitCondition(ifccParser::ConditionContext * ctx)
 antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
+	func->addSymbol(symbol);
 
 	// Is the initialisation here a good idea ?
-	Variable * variable = new Variable(symbol, ast);
-	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
+	Variable * variable = new Variable(symbol, func);
+	Assign * assign = new Assign(variable, new Constant(0, func), func);
 	visit(ctx->decl());
 	
 	return assign;
@@ -163,10 +216,9 @@ antlrcpp::Any Visitor::visitDeclMultiple(ifccParser::DeclMultipleContext *ctx)
 antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol, ast);
-	Assign * assign = new Assign(variable, new Constant(0, ast), ast);
-	// ast->addNode(assign);
+	func->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, func);
+	Assign * assign = new Assign(variable, new Constant(0, func), func);
 	
 	return assign;
 }
@@ -174,8 +226,7 @@ antlrcpp::Any Visitor::visitDeclSimple(ifccParser::DeclSimpleContext *ctx)
 antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 {
 	Variable * var = visit(ctx->var());	
-	Assign * assign = new Assign(var, visit(ctx->expr()), ast);
-	// ast->addNode(assign);
+	Assign * assign = new Assign(var, visit(ctx->expr()), func);
 
 	return assign;
 }
@@ -183,8 +234,8 @@ antlrcpp::Any Visitor::visitAffect(ifccParser::AffectContext *ctx)
 antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	ast->addSymbol(symbol);
-	Variable * variable = new Variable(symbol, ast);
+	func->addSymbol(symbol);
+	Variable * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -192,7 +243,7 @@ antlrcpp::Any Visitor::visitVarDecl(ifccParser::VarDeclContext *ctx)
 antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	Variable * variable = new Variable(symbol, ast);
+	Variable * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -200,7 +251,7 @@ antlrcpp::Any Visitor::visitVarText(ifccParser::VarTextContext *ctx)
 antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 {
 	string val = ctx->CONST()->getText();
-	RValue * constant = new Constant(val, ast);
+	RValue * constant = new Constant(val, func);
 	
 	return constant;
 }
@@ -208,7 +259,7 @@ antlrcpp::Any Visitor::visitValConst(ifccParser::ValConstContext *ctx)
 antlrcpp::Any Visitor::visitValText(ifccParser::ValTextContext *ctx)
 {
 	string symbol = ctx->TEXT()->getText();
-	RValue * variable = new Variable(symbol, ast);
+	RValue * variable = new Variable(symbol, func);
 	
 	return variable;
 }
@@ -223,8 +274,8 @@ antlrcpp::Any Visitor::visitValCall(ifccParser::ValCallContext *ctx)
 antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
-	vector<RValue *> args = visit(ctx->param());
-	RValue * function = new FunctionCall(name, args, ast);
+	deque<RValue *> * args = visit(ctx->param());
+	RValue * function = new FunctionCall(name, args, func);
 
 	return function;
 }
@@ -232,24 +283,27 @@ antlrcpp::Any Visitor::visitCallParam(ifccParser::CallParamContext *ctx)
 antlrcpp::Any Visitor::visitCallNoParam(ifccParser::CallNoParamContext *ctx)
 {
 	string name = ctx->TEXT()->getText();
-	vector<RValue *> args;
-	RValue * function = new FunctionCall(name, args, ast);
+	deque<RValue *> * args = new deque<RValue *>();
+	RValue * function = new FunctionCall(name, args, func);
 
 	return function;
 }
 
 antlrcpp::Any Visitor::visitParamSimple(ifccParser::ParamSimpleContext *ctx)
 {
-	vector<RValue *> args;
-	args.insert(args.begin(), 1, visit(ctx->expr()));
+	deque<RValue *> * args = new deque<RValue *>();
+	RValue * arg = visit(ctx->expr());
+	args->push_front(arg);
 
 	return args;
 }
 
 antlrcpp::Any Visitor::visitParamMultiple(ifccParser::ParamMultipleContext *ctx)
 {
-	vector<RValue *> args = visit(ctx->param());
-	args.insert(args.begin(), 1, visit(ctx->expr()));
+	deque<RValue *> * args = visit(ctx->param());
+	RValue * arg = visit(ctx->expr());
+	args->push_front(arg);
+
 	return args;
 }
 
@@ -259,7 +313,7 @@ antlrcpp::Any Visitor::visitAdd(ifccParser::AddContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * add = new Operation(IRInstr3op::add, left, right, ast);
+	RValue * add = new Operation(IRInstr3op::add, left, right, func);
 	
 	return add;
 }
@@ -268,7 +322,7 @@ antlrcpp::Any Visitor::visitSub(ifccParser::SubContext *ctx)
 {
 	RValue * left = visit(ctx->term());
 	RValue * right = visit(ctx->expr());
-	RValue * sub = new Operation(IRInstr3op::sub, left, right, ast);
+	RValue * sub = new Operation(IRInstr3op::sub, left, right, func);
 	
 	return sub;
 }
@@ -283,7 +337,7 @@ antlrcpp::Any Visitor::visitMult(ifccParser::MultContext *ctx)
 {
 	RValue * left = visit(ctx->f());
 	RValue * right = visit(ctx->term());
-	RValue * mul = new Operation(IRInstr3op::mul, left, right, ast); 
+	RValue * mul = new Operation(IRInstr3op::mul, left, right, func); 
 	
 	return mul;
 }
@@ -317,5 +371,10 @@ antlrcpp::Any Visitor::visitPar(ifccParser::ParContext *ctx)
 Ast * Visitor::getAst() const
 {
 	return ast;
+}
+
+Function * Visitor::getFunction() const
+{
+	return func;
 }
 

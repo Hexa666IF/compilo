@@ -2,7 +2,17 @@ grammar ifcc;
 
 axiom : prog;
 
-prog : 'int' 'main' '(' ')' block ;
+prog : function prog #progFunction
+	 | /*epsilon*/ #progEpsilon
+	 ;
+
+function : 'int' TEXT '(' ')' block # functionNoParam
+		 | 'int' TEXT '(' paramDecl ')' block # functionParam
+		 ;
+
+paramDecl : 'int' TEXT ',' paramDecl # paramDeclNext
+		  | 'int' TEXT # paramDeclSingle
+		  ;
 
 block : '{' l '}' ;
 
