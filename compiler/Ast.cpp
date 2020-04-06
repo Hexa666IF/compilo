@@ -13,25 +13,25 @@ using namespace std;
 
 // ----- Constructors - Destructor ------
 
-Node::Node(Ast * ast)
-: parentTree(ast)
+Node::Node(Function * f)
+: parentTree(f)
 {
 
 }
 
 // ----- Public methods ------
 
-void Node::setParent(Ast * ast)
+void Node::setParent(Function * f)
 {
-	parentTree = ast;
+	parentTree = f;
 }
 
 // ================== RValue related stuff ========================
 
 // Constructor
 
-RValue::RValue(Ast * ast)
-: Node(ast)
+RValue::RValue(Function * f)
+: Node(f)
 {
 
 }
@@ -42,14 +42,14 @@ RValue::RValue(Ast * ast)
 
 // ----- Constructor -----
 
-Constant::Constant(int val, Ast * ast)
-: RValue(ast), value(val)
+Constant::Constant(int val, Function * f)
+: RValue(f), value(val)
 {
 
 }
 
-Constant::Constant(string val, Ast * ast)
-: RValue(ast), value(atoi(val.c_str()))
+Constant::Constant(string val, Function * f)
+: RValue(f), value(atoi(val.c_str()))
 {
 
 }
@@ -70,8 +70,8 @@ void Constant::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Variable::Variable(string variable, Ast * ast)
-: RValue(ast), name(variable)
+Variable::Variable(string variable, Function * f)
+: RValue(f), name(variable)
 {
 	if(parentTree->isDeclared(name) == false)
 	{
@@ -101,8 +101,8 @@ void Variable::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-FunctionCall::FunctionCall(string functionName, vector<RValue *> args, Ast * ast)
-: RValue(ast), arguments(args), name(functionName)
+FunctionCall::FunctionCall(string functionName, deque<RValue *> * args, Function *f)
+: RValue(f), arguments(args), name(functionName)
 {
 	
 }
@@ -111,7 +111,7 @@ FunctionCall::FunctionCall(string functionName, vector<RValue *> args, Ast * ast
 
 string FunctionCall::getValue() const
 {
-	return RETVALD;
+	return RETVALC;
 }
 
 void FunctionCall::gen_instr(CFG * cfg) const
@@ -119,13 +119,11 @@ void FunctionCall::gen_instr(CFG * cfg) const
 	vector<string> args;
 	args.push_back(name);
 
-	//TODO : faire une enum des %
-	for(int i = 0; i < arguments.size() ; i++)
+	for(RValue * a : *arguments)
 	{
-		arguments[i]->gen_instr(cfg);
-		string value = arguments[i]->getValue();
-		args.push_back(value);
-	}
+		a->gen_instr(cfg);
+		args.push_back(a->getValue());
+	}	
 
 	cfg->add_instr(IRInstrSpecial::call, args);
 }
@@ -137,9 +135,9 @@ void FunctionCall::gen_instr(CFG * cfg) const
 Operation::Operation(	IRInstr3op::Operation3op op, 
 						RValue * l, 
 						RValue * r,
-						Ast * ast
+						Function * f
 					)
-: RValue(ast), left(l), right(r), operation(op), tmp_var(get_tmp_var())
+: RValue(f), left(l), right(r), operation(op), tmp_var(get_tmp_var())
 {
 
 }
@@ -177,8 +175,8 @@ void Operation::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Return::Return(RValue * retval, Ast * ast)
-: Node(ast), retvalue(retval)
+Return::Return(RValue * retval, Function * f)
+: Node(f), retvalue(retval)
 {
 	// TODO : perform checks.
 }
@@ -197,8 +195,8 @@ void Return::gen_instr(CFG * cfg) const
 
 // ----- Constructor -----
 
-Assign::Assign(Variable * dest, RValue * rval, Ast * ast)
-: Node(ast), lvalue(dest), rvalue(rval)
+Assign::Assign(Variable * dest, RValue * rval, Function * f)
+: Node(f), lvalue(dest), rvalue(rval)
 {
 
 }
@@ -363,16 +361,16 @@ void While::gen_instr(CFG * cfg) const
 	cfg->add_bb(next);
 }
 
-// ========================== Ast related stuff ================================
+// ========================== Function related stuff ================================
 
 //------------- public methods -------------------------------------------------
 
-void Ast::addNode(Node * node)
+void Function::addNode(Node * node)
 {
 	childs->push_back(node);	
 }
 
-void Ast::addSymbol(string symbol)
+void Function::addSymbol(string symbol)
 {
 	if(symbolIndex.find(symbol) != symbolIndex.end())
 	{
@@ -387,22 +385,24 @@ void Ast::addSymbol(string symbol)
 	unuseds.insert(symbol);	
 }
 
-void Ast::gen_instr(CFG * cfg) const
+CFG * Function::gen_instr()
 {
+	CFG * cfg = new CFG(this, "-x86"); 
 	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);
 	}
+	return cfg;
 }
 
-void Ast::removeFromUnuseds(string variable)
+void Function::removeFromUnuseds(string variable)
 {
 	unordered_set<string>::iterator it = unuseds.find(variable);
 	if(it != unuseds.end())
 			unuseds.erase(it);
 }
 
-bool Ast::isDeclared(string variable) const
+bool Function::isDeclared(string variable) const
 {
 	bool declared = false;
 	map<string, int>::const_iterator cit = symbolIndex.find(variable);
@@ -412,39 +412,76 @@ bool Ast::isDeclared(string variable) const
 	return declared;
 }
 
-void Ast::setChilds(deque<Node *> * block)
+void Function::setParameters(deque<Variable *> * params)
+{
+	parameters = params;
+}
+void Function::setChilds(deque<Node *> * block)
 {
 	childs = block;
 }
 
-map<string, int> & Ast::getSymbolIndex()
+string Function::getName() const
+{
+	return name;
+}
+
+map<string, int> & Function::getSymbolIndex()
 {
 	return symbolIndex;
 }
 
-int & Ast::getNextIndex()
+int & Function::getNextIndex()
 {
 	return next_index;
 }
 
-const unordered_set<string> & Ast::getUnuseds() const
+const unordered_set<string> & Function::getUnuseds() const
 {
 	return unuseds;
 }
 
 //------------- Constructor - Destructor ------------------------------------
 
-Ast::Ast()
-: childs(nullptr), symbolIndex(), next_index(4)
+Function::Function(string name)
+: 	name(name),
+	parameters(nullptr),
+	childs(nullptr), 
+	symbolIndex(), 
+	next_index(4)
 {
 
 }
 
-Ast::~Ast()
+Function::~Function()
 {
 	
 }
 
 //------------- protected methods -----------------------------------------------
 
+// ===================== Ast related stuff ============================
 
+// ------ Constructor ------
+
+Ast::Ast()
+: functions()
+{
+
+}
+
+// ------ public methods ------
+
+vector<CFG *> * Ast::gen_instr()
+{
+	vector<CFG *> * graphs = new vector<CFG *>();
+	for(Function * f : functions)
+		graphs->push_back(f->gen_instr());
+
+	return graphs;
+}
+
+void Ast::add_function(Function * f)
+{
+	functions.push_back(f);
+}
