@@ -126,7 +126,7 @@ void Asmx86::call(vector<string> args)
 	}
 	
 	output << "call " << args[0] << endl;
-	output << "movl %eax, %edx" << endl;
+	output << "movl %eax, %ecx" << endl;
 }
 
 //------------- Constructor / Destructors ------------------------------------------------

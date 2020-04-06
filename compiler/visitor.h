@@ -24,7 +24,17 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
+  virtual antlrcpp::Any visitProgFunction(ifccParser::ProgFunctionContext * ctx) override;
+
+  virtual antlrcpp::Any visitProgEpsilon(ifccParser::ProgEpsilonContext * ctx) override;
+
+  virtual antlrcpp::Any visitFunctionNoParam(ifccParser::FunctionNoParamContext *context) override;
+
+  virtual antlrcpp::Any visitFunctionParam(ifccParser::FunctionParamContext *context) override;
+
+  virtual antlrcpp::Any visitParamDeclNext(ifccParser::ParamDeclNextContext *context) override;
+
+  virtual antlrcpp::Any visitParamDeclSingle(ifccParser::ParamDeclSingleContext *context) override;
 
 
   virtual antlrcpp::Any visitBlock(ifccParser::BlockContext *context) override;
@@ -95,13 +105,13 @@ public:
 
   virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
-
-	Ast * getAst() const;
+  Ast * getAst() const;
+  Function * getFunction() const;
 
 protected:
   
-	// Abstract Syntax Tree.
 	// This is the semantic representation of the program
 	// parsed by the visitor.
 	Ast * ast;
+	Function * func;
 };
