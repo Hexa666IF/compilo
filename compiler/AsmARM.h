@@ -71,7 +71,10 @@ class AsmARM : public Asm
 		// it can be used for calculation.
 		// It returns the register in wich the variable has
 		// been put. (%eax, usually).
-		std::string loadVariable(std::string var, std::string dest = "default");	
+		std::string loadVariable(std::string var, std::string dest = "default");
+
+		// Selects the correct 'load' operator to use betwenn ldr and mov
+		std::string getLoadOperator(std::string arg);	
 	//----- protected attributes -----
 		CFG * cfg;
 		std::ostream &output;

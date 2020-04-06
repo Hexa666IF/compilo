@@ -28,20 +28,19 @@ void AsmMSP430::gen_epilogue(int size)
 void AsmMSP430::globl(string name)
 {
 	output << ".global	" << name << endl
-		<< "type " << name << " @function" << endl
-		<< name << ":" << endl;
+		<< "type " << name << " @function" << endl;
 }
 
 void AsmMSP430::label(string label)
 {
-	
 }
 
 // =============== 1 operand  instructions =====================
 
 void AsmMSP430::jump(string label)
 {
-
+	output << "; jump" << endl;
+	output << "; not implemented" << endl;
 }
 
 // =============== 2 operands instructions =====================
@@ -88,39 +87,38 @@ void AsmMSP430::sub(string arg1, string arg2, string arg3)
 }
 
 void AsmMSP430::mul(string arg1, string arg2, string arg3)
-// to-do : find the MSP430 equivalent, also kill myself
 {
+	output << "; " << arg3 << "=" << arg1 << "*" << arg2 << endl;
+
 	arg1 = cfg->IR_reg_to_asm_msp430(arg1);	
 	arg2 = cfg->IR_reg_to_asm_msp430(arg2);
 	arg3 = cfg->IR_reg_to_asm_msp430(arg3);
-	
-	output << "movl " << arg1 << ", " << "%eax" << endl;
-	output << "movl " << arg2 << ", " << "%ebx" << endl;
-	output << "mul %ebx" << endl;
-	output << "movl %eax, " << arg3 << endl;
 }
 
 void AsmMSP430::cmp_le(string arg1, string arg2, string label)
 {
-
+	output << "; " << arg1 << "<=" << arg2 << endl;
+	output << "; not implemented" << endl;
 }	
 
 void AsmMSP430::cmp_lt(string arg1, string arg2, string label)
 {
-
+	output << "; " << arg1 << "<" << arg2 << endl;
+	output << "; not implemented" << endl;
 }	
 
 void AsmMSP430::cmp_eq(string arg1, string arg2, string label)
 {
-
+	output << "; " << arg1 << "==" << arg2 << endl;
+	output << "; not implemented" << endl;
 }
 
 // =============== special instructions ========================
 
 void AsmMSP430::call(vector<string> args)
 {
-
-	
+	output << "; call" << endl;
+	output << "; not implemented" << endl;	
 }
 
 //------------- Constructor / Destructors ------------------------------------------------
