@@ -111,7 +111,7 @@ FunctionCall::FunctionCall(string functionName, deque<RValue *> * args, Function
 
 string FunctionCall::getValue() const
 {
-	return RETVALD;
+	return RETVALC;
 }
 
 void FunctionCall::gen_instr(CFG * cfg) const

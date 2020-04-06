@@ -264,15 +264,15 @@ void CFG::gen_asm()
 
 string CFG::IR_reg_to_asm_x86(std::string reg)
 {
-	static const unsigned int n_reg = 10;
+	static const unsigned int n_reg = 11;
 	static const string abstract_reg [] = 
-		{ 	RETVAL, RETVALD, RBASEP, RSTACKP,
+		{ 	RETVAL, RETVALC, RETVALD, RBASEP, RSTACKP,
 			FARG1, FARG2, FARG3, FARG4,
 			FARG5, FARG6
 		};
 
 	static const string x86_reg [] =
-		{	"%eax", "%edx", "%rbp", "%rsp",
+		{	"%eax", "%ecx", "%edx", "%rbp", "%rsp",
 			"%rdi", "%rsi", "%rdx", "%rcx",
 			"%r8", "%r9"
 		};
