@@ -163,11 +163,15 @@ if args.debug:
 
 ######################################################################################
 ## TEST step: actually compile all test-cases with both compilers
+ok_tests = 0
+failed_tests = 0
+failure_messages = []
+nb_tests = len(jobs)
 
 for jobname in jobs:
     os.chdir(orig_cwd)
 
-    print('TEST-CASE: '+jobname)
+    os.system('echo "===TEST-CASE:"'+jobname+"===")
     os.chdir(jobname)
     
     ## JEDI compiler, aka GCC
@@ -187,15 +191,20 @@ for jobname in jobs:
     
     if gccstatus != 0 and pldstatus != 0:
         ## padawan correctly rejects invalid program -> test-case ok
-        print("TEST OK (both compilers fail to compile the program)")
+        ok_tests = ok_tests + 1
+        os.system('echo "\e[32mTEST OK (both compilers fail to compile the program)\e[39m"')
         continue
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
-        print("TEST FAIL (your compiler accepts an invalid program)")
+        failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : compiler accepts an invalid program")
+        os.system('echo "\e[31mTEST FAIL (your compiler accepts an invalid program)\e[39m"')
         continue
     elif gccstatus == 0 and pldstatus != 0:
         ## padawan wrongly rejects valid program -> error
-        print("TEST FAIL (your compiler rejects a valid program)")
+        failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : compiler rejects a valid program")
+        os.system('echo "\e[31mTEST FAIL (your compiler rejects a valid program)\e[39m"')
         if args.verbose:
             dumpfile("pld-compile.txt")
         continue
@@ -203,7 +212,9 @@ for jobname in jobs:
         ## padawan accepts to compile valid program -> let's link it
         ldstatus=command("gcc -o exe-pld asm-pld.s", "pld-link.txt")
         if ldstatus:
-            print("TEST FAIL (your compiler produces incorrect assembly)")
+            failed_tests = failed_tests + 1
+            failure_messages.append(jobname + " : compiler produces incorrect assembly")
+            os.system('echo "\e[31mTEST FAIL (your compiler produces incorrect assembly)\e[39m"')
             if args.verbose:
                 dumpfile("pld-link.txt")
             continue
@@ -213,7 +224,9 @@ for jobname in jobs:
         
     exepldstatus=command("./exe-pld","pld-execute.txt")
     if open("gcc-execute.txt").read() != open("pld-execute.txt").read() :
-        print("TEST FAIL (different results at execution)")
+        failed_tests = failed_tests + 1
+        failure_messages.append(jobname + " : different results at execution")
+        os.system('echo "\e[31mTEST FAIL (different results at execution)\e[39m"')
         if args.verbose:
             print("GCC:")
             dumpfile("gcc-execute.txt")
@@ -222,4 +235,27 @@ for jobname in jobs:
         continue
 
     ## last but not least
-    print("TEST OK (its a all good man)")
+    ok_tests = ok_tests + 1
+    os.system('echo "\e[32mTEST OK (its a all good man)\e[39m"')
+
+if failed_tests != 0 :
+    print("success : ", ok_tests, "/", nb_tests, "     failures : ", failed_tests, "/", nb_tests)
+    print("\nFAILURES :")
+    for m in failure_messages:
+        print(m)
+    print("              ░▄▀▄▀▀▀▀▄▀▄░░░░░░░░░")
+    print("              ░█░░░░░░░░▀▄░░░░░░▄░")
+    print(" much failure █░░▀░░▀░░░░░▀▄▄░░█░█")
+    print("              █░▄░█▀░▄░░░░░░░▀▀░░█  such disappointment")
+    print("              █░░▀▀▀▀░░░░░░░░░░░░█")
+    print("              █░░░░░░░░░░░░░░░░░░█")
+    print("              █░░░░░░░░░░░░░░░░░░█")
+    print("        wow   ░█░░▄▄░░▄▄▄▄░░▄▄░░█░")
+    print("              ░█░▄▀█░▄▀░░█░▄▀█░▄▀░")
+    print("              ░░▀░░░▀░░░░░▀░░░▀░░░")
+else:
+    print("success : ", ok_tests, "/", nb_tests, "     failure : Marie")
+    print("\n          (\__/)    All tests ok :3")
+    print("good boi (  •ω• )-__/)")
+    print("         (      (o•ω•o)    *pat pat*")
+    print("          V----V( n n/)")

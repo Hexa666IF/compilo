@@ -25,6 +25,26 @@ void AsmMSP430::gen_epilogue(int size)
 		<< "; end of epilogue" << endl;
 }
 
+void AsmMSP430::globl(string name)
+{
+	output << ".global	" << name << endl
+		<< "type " << name << " @function" << endl
+		<< name << ":" << endl;
+}
+
+void AsmMSP430::label(string label)
+{
+	
+}
+
+// =============== 1 operand  instructions =====================
+
+void AsmMSP430::jump(string label)
+{
+
+}
+
+// =============== 2 operands instructions =====================
 
 void AsmMSP430::ldconst(string arg1, string arg2)
 {
@@ -80,11 +100,27 @@ void AsmMSP430::mul(string arg1, string arg2, string arg3)
 	output << "movl %eax, " << arg3 << endl;
 }
 
-void AsmMSP430::globl(string name)
+void AsmMSP430::cmp_le(string arg1, string arg2, string label)
 {
-	output << ".global	" << name << endl
-		<< "type " << name << " @function" << endl
-		<< name << ":" << endl;
+
+}	
+
+void AsmMSP430::cmp_lt(string arg1, string arg2, string label)
+{
+
+}	
+
+void AsmMSP430::cmp_eq(string arg1, string arg2, string label)
+{
+
+}
+
+// =============== special instructions ========================
+
+void AsmMSP430::call(vector<string> args)
+{
+
+	
 }
 
 //------------- Constructor / Destructors ------------------------------------------------
@@ -96,7 +132,7 @@ AsmMSP430::AsmMSP430(CFG * graph, ostream &out) : cfg(graph), output(out)
 
 //------------- Protected methods ----------------------------------------------
 
-string AsmMSP430::loadVariable(string var)
+string AsmMSP430::loadVariable(string var, string dest)
 {
 	return var;
 }
