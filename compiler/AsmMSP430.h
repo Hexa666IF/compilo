@@ -34,7 +34,8 @@ class AsmMSP430 : public Asm
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);
-		
+		void ldparam(std::string arg1, std::string arg2);
+
 // =============== 3 operands instructions =====================
 
 		// add arg1 and arg2, and store the result into arg3.

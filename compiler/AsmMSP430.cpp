@@ -56,6 +56,11 @@ void AsmMSP430::ldconst(string arg1, string arg2)
 	output << "MOV.W	" << arg1 << ", " << arg2 << endl;	
 }
 
+void AsmMSP430::ldparam(string arg1, string arg2)
+{
+
+}
+
 void AsmMSP430::add(string arg1, string arg2, string arg3)
 {
 	output << "; " << arg3 << "=" << arg1 << "+" << arg2 << endl;
