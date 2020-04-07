@@ -7,41 +7,62 @@ e-mail : sadsitha.lokuge@insa-lyon.fr
 #include <algorithm>
 #include <sstream>
 #include <iterator>
+#include <string>
 
 #include "ArgProcessor.h"
 
+//------------- static initialisation --------------------------------------------------
+
+std::map<std::string, std::string> ArgProcessor::argMap;
+
 //------------- public methods ---------------------------------------------------------
 
-static std::string ArgProcessor::getAsmChoice()
-{
-	return asm_choice;
-}
 
-static std::string ArgProcessor::getFilePath()
+std::string ArgProcessor::getArg(std::string key)
 {
-	return file_path;
+	std::string value = "";
+	try 
+	{ 
+		value = argMap.at(key);
+	} catch (const std::out_of_range& e) 
+	{ 
+		value="";
+	}
+	
+	return value;
 }
 //------------- Constructor / Destructors ------------------------------------------------
 
 ArgProcessor::ArgProcessor(int argn, const char **argv)
 {
-	//defaults
-	file_path = "";
-	asm_choice = "x86";
+	// Insert default args here
+	argMap.insert(std::pair<std::string, std::string>("target", "x86"));
+	argMap.insert(std::pair<std::string, std::string>("file_path", ""));  
 
-	for (int i=argn-1; i>=0; --i) 
+	for (int i=argn-1; i>0; --i) 
 	{
+		std::string key = argv[i];
 		std::string value = argv[i];
-		if (i==argn-1) {
-			file_path = value;
-		} else if (i==argn-2) {
+
+		if (i==argn-1) { // map target file_path
+			argMap.at("file_path") = value;
+		} else { // map other options
 			std::stringstream ss(value);
 			std::string token;
-			std::string option;
-			while (std::getline(ss, token, '=')) {
-				option=token;
+			for (int j=0; std::getline(ss, token, '='); ++j) {
+				switch (j)
+				{
+					case 0:
+						key = token.erase(0,2);
+						break;
+					case 1:
+						value = token;
+						break;
+					default:
+						break;
+				}
 			}
-			asm_choice=option;
+			setMapValue(key,value);
 		};
    
 	}
@@ -50,3 +71,13 @@ ArgProcessor::ArgProcessor(int argn, const char **argv)
 
 
 //------------- Protected methods ---------------------------------------------------------
+
+void ArgProcessor::setMapValue(std::string key, std::string value)
+{
+	std::map<std::string, std::string>::iterator it = argMap.find(key); 
+	if (it != argMap.end()){
+		(*it).second = value; 
+	}else{
+		argMap.insert(std::pair<std::string, std::string>(key, value));
+	}
+}

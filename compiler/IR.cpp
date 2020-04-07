@@ -198,12 +198,13 @@ string BasicBlock::getLabel() const
 
 // === Constructor / Destructor ===
 
-CFG::CFG(Function * tree, std::string asm_choice)
+CFG::CFG(Function * tree, std::string redundant)
 : func(tree), SymbolIndex(tree->getSymbolIndex()), nextFreeSymbolIndex(tree->getNextIndex())
 {
-	if (asm_choice=="arm") {
+	std::string target = ArgProcessor::getArg("target");
+	if (target=="arm") {
 		toasm = new AsmARM(this,cout);
-	} else if (asm_choice=="msp430") {
+	} else if (target=="msp430") {
 		toasm = new Asmx86(this,cout);
 	} else {
 		toasm = new Asmx86(this,cout);

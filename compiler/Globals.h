@@ -1,1 +1,0 @@
-extern std::string asm_choice;

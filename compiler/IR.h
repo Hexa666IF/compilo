@@ -12,6 +12,7 @@
 #include "Asmx86.h"
 #include "AsmARM.h"
 #include "Errors.h"
+#include "ArgProcessor.h"
 // Declarations from the parser -- replace with your own
 
 class BasicBlock;
