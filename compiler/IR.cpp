@@ -201,9 +201,9 @@ string BasicBlock::getLabel() const
 CFG::CFG(Function * tree, std::string asm_choice)
 : func(tree), SymbolIndex(tree->getSymbolIndex()), nextFreeSymbolIndex(tree->getNextIndex())
 {
-	if (asm_choice=="-arm") {
+	if (asm_choice=="arm") {
 		toasm = new AsmARM(this,cout);
-	} else if (asm_choice=="-msp430") {
+	} else if (asm_choice=="msp430") {
 		toasm = new Asmx86(this,cout);
 	} else {
 		toasm = new Asmx86(this,cout);

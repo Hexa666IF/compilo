@@ -9,6 +9,7 @@
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
 #include "Errors.h"
+#include "Globals.h"
 
 #include "IR.h"
 
@@ -18,7 +19,7 @@ using namespace std;
 
 int main(int argn, const char **argv) {
 	int ret = 0;
-	std::string asm_choice = "-x86";
+	std::string asm_choice = "x86";
 	stringstream in;
 	if (argn>=2) {
 		int pathIndex = 1;
