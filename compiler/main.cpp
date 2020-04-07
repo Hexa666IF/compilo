@@ -9,8 +9,7 @@
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
 #include "Errors.h"
-#include "Globals.h"
-
+#include "ArgProcessor.h"
 #include "IR.h"
 
 using namespace antlr4;
@@ -31,6 +30,9 @@ int main(int argn, const char **argv) {
 		in << lecture.rdbuf();
 
 	}
+	ArgProcessor argProc(argn, argv);
+	cout << ArgProcessor::getFilePath() << " : " << ArgProcessor::getAsmChoice() << endl;
+
 	ANTLRInputStream input(in.str());
 	ifccLexer lexer(&input);
 	CommonTokenStream tokens(&lexer);

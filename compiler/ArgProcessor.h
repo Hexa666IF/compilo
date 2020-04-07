@@ -7,10 +7,6 @@ e-mail : sadsitha.lokuge@insa-lyon.fr
 #if ! defined ( ARGPROC_H )
 #define ARGPROC_H
 
-#include <string>
-#include <algorithm>
-#include <iterator>
-
 // class used for processing commandline parameters
 class ArgProcessor
 {
@@ -21,8 +17,8 @@ class ArgProcessor
 		static std::string file_path;
 
 	//----- public methods -----
-		std::string getAsmChoice();
-		std::string getFilePath();
+		static std::string getAsmChoice();
+		static std::string getFilePath();
 
 	//--- Constructors / Destructor ---
 		ArgProcessor(int argn, const char **argv);
@@ -31,7 +27,6 @@ class ArgProcessor
 	//----- protected methods -----
 
 	//----- protected attributes -----
-
 
 
 };

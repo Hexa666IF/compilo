@@ -4,17 +4,20 @@ par : sadsitha
 e-mail : sadsitha.lokuge@insa-lyon.fr
 *******************************************************************************************/
 
+#include <algorithm>
+#include <sstream>
+#include <iterator>
 
 #include "ArgProcessor.h"
 
 //------------- public methods ---------------------------------------------------------
 
-std::string ArgProcessor::getAsmChoice()
+static std::string ArgProcessor::getAsmChoice()
 {
 	return asm_choice;
 }
 
-std::string ArgProcessor::getFilePath()
+static std::string ArgProcessor::getFilePath()
 {
 	return file_path;
 }
@@ -22,16 +25,28 @@ std::string ArgProcessor::getFilePath()
 
 ArgProcessor::ArgProcessor(int argn, const char **argv)
 {
-	if (argn>=2) {
-		int pathIndex = 1;
-		if (argn==3) {
-			pathIndex = 2;
-			asm_choice = argv[1];
-		}
-		ifstream lecture(argv[pathIndex]);
-		in << lecture.rdbuf();
+	//defaults
+	file_path = "";
+	asm_choice = "x86";
 
+	for (int i=argn-1; i>=0; --i) 
+	{
+		std::string value = argv[i];
+		if (i==argn-1) {
+			file_path = value;
+		} else if (i==argn-2) {
+			std::stringstream ss(value);
+			std::string token;
+			std::string option;
+			while (std::getline(ss, token, '=')) {
+				option=token;
+			}
+			asm_choice=option;
+		};
+   
 	}
-}	
+}
+
+
 
 //------------- Protected methods ---------------------------------------------------------
