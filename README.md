@@ -69,6 +69,8 @@ With options - Compiles to ARM and outputs to file
 ```bash
 ifcc --target=arm my_program.c > my_assembly.s
 ```
+## 4. Authors
+JACQUOT Pierre, THONIEL Solal, VILLENAVE Sophie, GRENIER Marie, ABOUHSSOUS Hakima, LONGEPEE-DUPAS Baptiste, LOKUGE Sadsitha
 
-## 4. License
+## 5. License
 [MIT](https://choosealicense.com/licenses/mit/)
