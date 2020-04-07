@@ -236,10 +236,10 @@ for jobname in jobs:
 
     ## last but not least
     ok_tests = ok_tests + 1
-    os.system('echo "\e[32mTEST OK (its a all good man)\e[39m"')
+    os.system('echo "\e[32mTEST OK (normal execution)\e[39m"')
 
+print("success : ", ok_tests, "/", nb_tests, "     failures : ", failed_tests, "/", nb_tests)
 if failed_tests != 0 :
-    print("success : ", ok_tests, "/", nb_tests, "     failures : ", failed_tests, "/", nb_tests)
     print("\nFAILURES :")
     for m in failure_messages:
         print(m)
@@ -254,7 +254,6 @@ if failed_tests != 0 :
     print("              ░█░▄▀█░▄▀░░█░▄▀█░▄▀░")
     print("              ░░▀░░░▀░░░░░▀░░░▀░░░")
 else:
-    print("success : ", ok_tests, "/", nb_tests, "     failure : Marie")
     print("\n          (\__/)    All tests ok :3")
     print("good boi (  •ω• )-__/)")
     print("         (      (o•ω•o)    *pat pat*")
