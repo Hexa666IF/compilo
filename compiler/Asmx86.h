@@ -34,6 +34,7 @@ class Asmx86 : public Asm
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);
+		void ldparam(std::string arg1, std::string arg2);
 		
 // =============== 3 operands instructions =====================
 
@@ -71,7 +72,7 @@ class Asmx86 : public Asm
 	
 		// Loads the variable into a register so that
 		// it can be used for calculation.
-		// It returns the register in wich the variable has
+		// It returns the register in which the variable has
 		// been put. (%eax, usually).
 		std::string loadVariable(std::string var, std::string dest = "%eax");
 
