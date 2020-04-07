@@ -21,7 +21,7 @@ class Asm
 
 	//----- public methods -----
 		virtual void gen_prologue(int size) = 0;
-		virtual void gen_epilogue() = 0;
+		virtual void gen_epilogue(int size) = 0;
 		virtual void globl(std::string name) = 0;
 		virtual void label(std::string label) = 0;
 
@@ -32,6 +32,7 @@ class Asm
 // =============== 2 operands instructions =====================
 
 		virtual void ldconst(std::string arg1, std::string arg2) = 0;
+		virtual void ldparam(std::string arg1, std::string arg2) = 0;
 	
 // =============== 3 operands instructions =====================
 

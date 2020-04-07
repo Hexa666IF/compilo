@@ -23,7 +23,7 @@ class AsmARM : public Asm
 
 	//----- public methods -----
 		void gen_prologue(int size);
-		void gen_epilogue();
+		void gen_epilogue(int size);
 		void globl(std::string name);
 		void label(std::string label);
 
@@ -34,6 +34,7 @@ class AsmARM : public Asm
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);
+		void ldparam(std::string arg1, std::string arg2);
 		
 // =============== 3 operands instructions =====================
 
@@ -71,7 +72,10 @@ class AsmARM : public Asm
 		// it can be used for calculation.
 		// It returns the register in wich the variable has
 		// been put. (%eax, usually).
-		std::string loadVariable(std::string var, std::string dest = "default");	
+		std::string loadVariable(std::string var, std::string dest = "default");
+
+		// Selects the correct 'load' operator to use betwenn ldr and mov
+		std::string getLoadOperator(std::string arg);	
 	//----- protected attributes -----
 		CFG * cfg;
 		std::ostream &output;

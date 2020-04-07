@@ -11,7 +11,9 @@
 #include "Asm.h"
 #include "Asmx86.h"
 #include "AsmARM.h"
+#include "AsmMSP430.h"
 #include "Errors.h"
+#include "ArgProcessor.h"
 // Declarations from the parser -- replace with your own
 
 class BasicBlock;
@@ -73,7 +75,7 @@ class IRInstr1op : public IRInstr
 
 // === IRInstr2op ===
 // 		2 operands instructions.
-// 		Used for copy, ldconst, rmem
+// 		Used for , ldconst, ldparam rmem
 // 		and wmem.
 
 class IRInstr2op : public IRInstr
@@ -82,6 +84,7 @@ class IRInstr2op : public IRInstr
 		typedef enum {
 			copy,
 			ldconst,
+			ldparam,
 			rmem,
 			wmem,
 		} Operation2op;
