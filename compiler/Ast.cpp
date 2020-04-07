@@ -387,7 +387,16 @@ void Function::addSymbol(string symbol)
 
 CFG * Function::gen_instr()
 {
-	CFG * cfg = new CFG(this, "-x86"); 
+	CFG * cfg = new CFG(this, "-x86");
+	int i = 1;
+	if(parameters != nullptr)
+	{
+		for (auto it = parameters->cbegin(); it != parameters->cend(); ++it){
+			cfg->add_instr(IRInstr2op::ldparam, "%farg"+to_string(i), (*it)->getValue());
+			++i;
+		}
+	}
+
 	for(Node * node : *childs)
 	{
 		node->gen_instr(cfg);

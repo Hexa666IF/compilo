@@ -21,6 +21,7 @@ int main(int argn, const char **argv) {
 	stringstream in;
 	// process arguments
 	ArgProcessor argProc(argn, argv);
+	// read file
 	ifstream lecture(ArgProcessor::getArg("file_path"));
 	in << lecture.rdbuf();
 

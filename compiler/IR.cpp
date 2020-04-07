@@ -52,8 +52,15 @@ IRInstr2op::IRInstr2op(	BasicBlock * bb,
 
 void IRInstr2op::gen_asm(Asm &toasm) const
 {
-	// for now, only ldconst is implemented.
-	toasm.ldconst(arg1, arg2);	
+	switch(operation)
+	{
+		case ldconst:
+			toasm.ldconst(arg1, arg2);
+			break;
+		case ldparam:
+			toasm.ldparam(arg1, arg2);
+			break;
+	}
 }
 
 // ====== IRInstr3op class related stuff ======
@@ -205,7 +212,7 @@ CFG::CFG(Function * tree, std::string redundant)
 	if (target=="arm") {
 		toasm = new AsmARM(this,cout);
 	} else if (target=="msp430") {
-		toasm = new Asmx86(this,cout);
+		toasm = new AsmMSP430(this,cout);
 	} else {
 		toasm = new Asmx86(this,cout);
 	}
@@ -258,7 +265,7 @@ void CFG::gen_asm()
 		toasm->label(bbs[i]->getLabel());
 		bbs[i]->gen_asm(*toasm);
 	}
-	toasm->gen_epilogue();
+	toasm->gen_epilogue(SymbolIndex.size()*4);
 }
 
 // = symbol table methods =
@@ -274,7 +281,7 @@ string CFG::IR_reg_to_asm_x86(std::string reg)
 
 	static const string x86_reg [] =
 		{	"%eax", "%ecx", "%edx", "%rbp", "%rsp",
-			"%rdi", "%rsi", "%rdx", "%rcx",
+			"%edi", "%rsi", "%rdx", "%rcx",
 			"%r8", "%r9"
 		};
 
@@ -318,6 +325,38 @@ string CFG::IR_reg_to_asm_arm(std::string reg)
 	{
 		asm_reg = reg;
 	}
+	else 
+	{
+		asm_reg = '#' + reg;
+	}
+
+	return asm_reg;
+}
+
+string CFG::IR_reg_to_asm_msp430(std::string reg)
+{
+	string asm_reg;
+	int index = get_var_index(reg);
+
+	// Variable stored in memory
+	if(index != 0)
+	{
+		int address = (SymbolIndex.size()*4) - index;
+		// Last block
+		if (address==0) {
+			asm_reg = "@R1";
+		// Other blocks
+		} else {
+			asm_reg = to_string(address) + "(R1)";
+		}
+		
+	}
+	// Return
+	else if (reg[0] == '%')
+	{
+		if(reg == "%retval") asm_reg = "R12";
+	}
+	// Constant
 	else 
 	{
 		asm_reg = '#' + reg;

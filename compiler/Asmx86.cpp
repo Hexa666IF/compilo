@@ -26,7 +26,7 @@ void Asmx86::gen_prologue(int size)
 	output << "subq $" << decalage << ", %rsp" << endl;
 }
 
-void Asmx86::gen_epilogue()
+void Asmx86::gen_epilogue(int size)
 {
 	output << "movq %rbp, %rsp" << endl
 		   << "popq %rbp" << endl
@@ -36,7 +36,6 @@ void Asmx86::gen_epilogue()
 void Asmx86::globl(string name)
 {
 	output << ".globl " << name << endl;
-		 //  << name << ":" << endl;
 }
 
 void Asmx86::label(string label)
@@ -57,6 +56,15 @@ void Asmx86::ldconst(string arg1, string arg2)
 {
 	// Getting x86 assembly code to access variables.
 	arg1 = loadVariable(arg1);
+	arg2 = cfg->IR_reg_to_asm_x86(arg2);
+
+	output << "movl " << arg1 << ", " << arg2 << endl;	
+}
+
+void Asmx86::ldparam(string arg1, string arg2)
+{
+	// Getting x86 assembly code to access variables.
+	arg1 = cfg->IR_reg_to_asm_x86(arg1);
 	arg2 = cfg->IR_reg_to_asm_x86(arg2);
 
 	output << "movl " << arg1 << ", " << arg2 << endl;	
@@ -123,7 +131,7 @@ void Asmx86::call(vector<string> args)
 		string arg = cfg->IR_reg_to_asm_x86(args[i]);
 		string dest = cfg->IR_reg_to_asm_x86("%farg"+to_string(i));
 
-		output << "movq " << arg << ", " << dest << endl;
+		output << "movl " << arg << ", " << dest << endl;
 	}
 	
 	output << "call " << args[0] << endl;
