@@ -34,6 +34,7 @@ class AsmARM : public Asm
 // =============== 2 operands instructions =====================
 
 		void ldconst(std::string arg1, std::string arg2);
+		void ldparam(std::string arg1, std::string arg2);
 		
 // =============== 3 operands instructions =====================
 

@@ -32,6 +32,7 @@ class Asm
 // =============== 2 operands instructions =====================
 
 		virtual void ldconst(std::string arg1, std::string arg2) = 0;
+		virtual void ldparam(std::string arg1, std::string arg2) = 0;
 	
 // =============== 3 operands instructions =====================
 

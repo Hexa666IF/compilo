@@ -52,8 +52,15 @@ IRInstr2op::IRInstr2op(	BasicBlock * bb,
 
 void IRInstr2op::gen_asm(Asm &toasm) const
 {
-	// for now, only ldconst is implemented.
-	toasm.ldconst(arg1, arg2);	
+	switch(operation)
+	{
+		case ldconst:
+			toasm.ldconst(arg1, arg2);
+			break;
+		case ldparam:
+			toasm.ldparam(arg1, arg2);
+			break;
+	}
 }
 
 // ====== IRInstr3op class related stuff ======
@@ -273,7 +280,7 @@ string CFG::IR_reg_to_asm_x86(std::string reg)
 
 	static const string x86_reg [] =
 		{	"%eax", "%ecx", "%edx", "%rbp", "%rsp",
-			"%rdi", "%rsi", "%rdx", "%rcx",
+			"%edi", "%rsi", "%rdx", "%rcx",
 			"%r8", "%r9"
 		};
 

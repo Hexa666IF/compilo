@@ -68,6 +68,8 @@ void AsmARM::ldconst(string arg1, string arg2)
 	}
 }
 
+void AsmARM::ldparam(string arg1, string arg2){}
+
 // =============== 3 operands instructions =====================
 
 void AsmARM::add(string arg1, string arg2, string arg3)
