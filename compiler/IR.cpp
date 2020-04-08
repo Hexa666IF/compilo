@@ -281,7 +281,7 @@ string CFG::IR_reg_to_asm_x86(std::string reg)
 
 	static const string x86_reg [] =
 		{	"%eax", "%ecx", "%edx", "%rbp", "%rsp",
-			"%edi", "%rsi", "%rdx", "%rcx",
+			"%edi", "%esi", "%edx", "%ecx",
 			"%r8", "%r9"
 		};
 
